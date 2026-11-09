@@ -72,7 +72,8 @@ if __name__ == "__main__":
 
     # Roda o servidor FastAPI em 0.0.0.0 (acessível no PC e na rede Wi-Fi local)
     try:
-        uvicorn.run("app:app", host="0.0.0.0", port=8000, reload=False, log_level="info")
+        porta = int(os.environ.get("PORT", 8080))
+        uvicorn.run("app:app", host="0.0.0.0", port=porta, reload=False, log_level="info")
     finally:
         print("\n" + "=" * 65)
         print("💾 [Encerramento] Gravando backup de segurança dos seus dados...")
