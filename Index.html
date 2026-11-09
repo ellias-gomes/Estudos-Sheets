@@ -1,0 +1,1806 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+  <meta charset="UTF-8">
+  <title>Study Hub & Life OS</title>
+  
+  <!-- 1. Tailwind CSS Estático (Mais rápido e nunca é bloqueado pelo iframe do Google) -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+  <!-- 2. Tailwind CDN complementar -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Bibliotecas Externas -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+  <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
+
+  <style>
+    /* ================= FALLBACK CSS BLINDADO (Garante o layout mesmo se o CDN falhar) ================= */
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: #f8fafc;
+      color: #1e293b;
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+    .hidden, .view-hidden { display: none !important; }
+    
+    /* Cores e Utilitários Modernos (Compatibilidade Tailwind v2/v3) */
+    .bg-slate-950 { background-color: #020617; }
+    .bg-slate-900 { background-color: #0f172a; }
+    .bg-slate-800 { background-color: #1e293b; }
+    .bg-slate-700 { background-color: #334155; }
+    .bg-slate-100 { background-color: #f1f5f9; }
+    .bg-slate-50  { background-color: #f8fafc; }
+    .text-slate-800 { color: #1e293b; }
+    .text-slate-700 { color: #334155; }
+    .text-slate-600 { color: #475569; }
+    .text-slate-400 { color: #94a3b8; }
+    .text-slate-300 { color: #cbd5e1; }
+    .border-slate-800 { border-color: #1e293b; }
+    .border-slate-700 { border-color: #334155; }
+    .bg-emerald-600 { background-color: #059669; }
+    .bg-emerald-600:hover { background-color: #047857; }
+    .bg-emerald-50 { background-color: #ecfdf5; }
+    .text-emerald-800 { color: #065f46; }
+    .text-emerald-700 { color: #047857; }
+    .text-emerald-600 { color: #059669; }
+    .text-emerald-500 { color: #10b981; }
+    .bg-amber-500 { background-color: #f59e0b; }
+    .bg-amber-500:hover { background-color: #d97706; }
+
+    /* Menu Lateral */
+    .nav-item-active { background-color: #4f46e5 !important; color: #ffffff !important; box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3); }
+    .nav-item-inactive { color: #94a3b8; }
+    .nav-item-inactive:hover { background-color: #1e293b; color: #ffffff; }
+
+    /* Fundo Escurecido dos Modais */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: rgba(15, 23, 42, 0.7);
+      backdrop-filter: blur(4px);
+      z-index: 50;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    /* Estilos customizados para o Editor tipo Word (Quill) */
+    .ql-toolbar.ql-snow {
+      border: none !important;
+      border-bottom: 1px solid #e2e8f0 !important;
+      background-color: #f8fafc;
+      padding: 10px 16px !important;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .ql-container.ql-snow {
+      border: none !important;
+      font-family: inherit;
+      font-size: 1rem;
+    }
+    .ql-editor {
+      min-height: 380px;
+      padding: 24px 32px !important;
+      line-height: 1.75;
+      color: #1e293b;
+    }
+    .ql-editor img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 0.5rem;
+      margin: 1rem 0;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Formatação de exibição de conteúdo rico */
+    .rich-content h1 { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.75rem; color: #0f172a; }
+    .rich-content h2 { font-size: 1.4rem; font-weight: 600; margin-top: 1.25rem; margin-bottom: 0.5rem; color: #1e293b; }
+    .rich-content h3 { font-size: 1.15rem; font-weight: 600; margin-top: 1rem; margin-bottom: 0.5rem; color: #334155; }
+    .rich-content p { margin-bottom: 0.75rem; line-height: 1.7; }
+    .rich-content ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 0.75rem; }
+    .rich-content ol { list-style-type: decimal; padding-left: 1.5rem; margin-bottom: 0.75rem; }
+    .rich-content blockquote { border-left: 4px solid #6366f1; color: #475569; font-style: italic; margin: 1rem 0; background: #f8fafc; padding: 0.75rem 1rem; border-radius: 0 0.5rem 0.5rem 0; }
+    .rich-content pre { background: #0f172a; color: #f8fafc; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; font-family: monospace; margin-bottom: 0.75rem; }
+    .rich-content a { color: #4f46e5; text-decoration: underline; }
+    .rich-content img { max-width: 100%; border-radius: 0.5rem; margin: 0.75rem 0; }
+
+    /* Limite de altura para os cards minimizados */
+    .card-preview-box {
+      max-height: 130px;
+      overflow: hidden;
+      position: relative;
+    }
+    .card-preview-fade {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 48px;
+      background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,1));
+      pointer-events: none;
+    }
+
+    /* Kanban Ghost Card */
+    .sortable-ghost {
+      opacity: 0.4;
+      background-color: #e0e7ff !important;
+      border: 2px dashed #6366f1 !important;
+    }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans flex h-screen overflow-hidden">
+
+  <!-- ================= MENU LATERAL + POMODORO ================= -->
+  <aside class="w-64 bg-slate-900 text-white flex flex-col transition-all duration-300 flex-shrink-0">
+    <div class="p-5 text-2xl font-bold bg-slate-950 flex items-center space-x-3">
+      <i class="fa-solid fa-brain text-indigo-500"></i>
+      <span>Life OS</span>
+    </div>
+
+    <nav class="flex-1 px-4 py-3 space-y-1.5 overflow-y-auto">
+      <a href="javascript:void(0)" id="menu-dashboard" onclick="mudarAba('dashboard')" class="flex items-center space-x-3 p-2.5 rounded-lg font-medium text-sm transition-colors nav-item-active"><i class="fa-solid fa-chart-pie w-5 text-center"></i> <span>Visão Geral</span></a>
+      <a href="javascript:void(0)" id="menu-anotacoes" onclick="mudarAba('anotacoes')" class="flex items-center space-x-3 p-2.5 rounded-lg font-medium text-sm transition-colors nav-item-inactive"><i class="fa-solid fa-book-open w-5 text-center"></i> <span>Base de Conhecimento</span></a>
+      <a href="javascript:void(0)" id="menu-tarefas" onclick="mudarAba('tarefas')" class="flex items-center space-x-3 p-2.5 rounded-lg font-medium text-sm transition-colors nav-item-inactive"><i class="fa-solid fa-list-check w-5 text-center"></i> <span>Tarefas & Kanban</span></a>
+      <a href="javascript:void(0)" id="menu-calendario" onclick="mudarAba('calendario')" class="flex items-center space-x-3 p-2.5 rounded-lg font-medium text-sm transition-colors nav-item-inactive"><i class="fa-regular fa-calendar-days w-5 text-center"></i> <span>Calendário</span></a>
+      <a href="javascript:void(0)" id="menu-flashcards" onclick="mudarAba('flashcards')" class="flex items-center space-x-3 p-2.5 rounded-lg font-medium text-sm transition-colors nav-item-inactive"><i class="fa-solid fa-layer-group w-5 text-center"></i> <span>Flashcards</span></a>
+      <a href="javascript:void(0)" id="menu-cursos" onclick="mudarAba('cursos')" class="flex items-center space-x-3 p-2.5 rounded-lg font-medium text-sm transition-colors nav-item-inactive"><i class="fa-solid fa-graduation-cap w-5 text-center"></i> <span>Cursos & Treinos</span></a>
+    </nav>
+
+    <!-- WIDGET POMODORO INTEGRADO -->
+    <div class="mx-3 mb-3 p-3.5 bg-slate-800 rounded-xl border border-slate-700 space-y-2.5">
+      <div class="flex justify-between items-center">
+        <span class="text-xs font-bold uppercase tracking-wider text-indigo-400 flex items-center space-x-1">
+          <i class="fa-solid fa-stopwatch"></i> <span>Pomodoro</span>
+        </span>
+        <div class="flex space-x-1">
+          <button type="button" onclick="configurarModoPomodoro(25, 'Foco')" id="btnPomoFoco" class="text-xs bg-indigo-600 text-white px-2 py-0.5 rounded font-semibold">25m</button>
+          <button type="button" onclick="configurarModoPomodoro(5, 'Pausa')" id="btnPomoPausa" class="text-xs bg-slate-700 text-slate-300 px-2 py-0.5 rounded hover:bg-gray-600">5m</button>
+        </div>
+      </div>
+
+      <div class="text-center py-1">
+        <div id="visorPomodoro" class="text-3xl font-mono font-bold text-white tracking-wider">25:00</div>
+        <div id="statusPomodoro" class="text-xs text-slate-400">Pronto para focar</div>
+      </div>
+
+      <select id="categoriaPomodoro" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-1.5 text-xs text-slate-300 focus:outline-none select-categorias"></select>
+
+      <div class="flex space-x-1.5">
+        <button type="button" onclick="alternarPomodoro()" id="btnIniciarPomodoro" class="flex-1 bg-emerald-600 text-white text-xs py-1.5 rounded-lg font-semibold transition-colors">
+          <i class="fa-solid fa-play mr-1"></i> Iniciar
+        </button>
+        <button type="button" onclick="resetarPomodoro()" class="bg-slate-700 text-slate-300 text-xs px-2.5 py-1.5 rounded-lg" title="Reiniciar">
+          <i class="fa-solid fa-rotate-right"></i>
+        </button>
+        <button type="button" onclick="salvarPomodoroManual()" class="bg-indigo-600 text-white text-xs px-2.5 py-1.5 rounded-lg" title="Registar sessão concluída">
+          <i class="fa-solid fa-check"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="p-3 border-t border-slate-800">
+      <button type="button" onclick="abrirModal('modalCategoria')" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs py-2 px-3 rounded-lg flex items-center justify-center space-x-2 transition-colors">
+        <i class="fa-solid fa-folder-plus text-indigo-400"></i> <span>+ Nova Categoria</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- ================= CONTEÚDO PRINCIPAL ================= -->
+  <main class="flex-1 flex flex-col h-screen overflow-y-auto">
+    <header class="bg-white p-4 shadow-sm flex flex-wrap justify-between items-center gap-3 border-b border-gray-200 sticky top-0 z-20">
+      <h1 class="text-2xl font-semibold text-slate-800" id="titulo-pagina">Visão Geral dos Estudos</h1>
+      <div class="flex items-center space-x-2">
+        <button type="button" onclick="abrirModalAnotacao()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3.5 py-2 rounded-lg font-medium shadow-sm transition-all flex items-center space-x-1.5 text-xs sm:text-sm">
+          <i class="fa-solid fa-pen-to-square"></i> <span>+ Anotação</span>
+        </button>
+        <button type="button" onclick="abrirModalTarefa()" class="bg-emerald-600 text-white px-3.5 py-2 rounded-lg font-medium shadow-sm transition-all flex items-center space-x-1.5 text-xs sm:text-sm">
+          <i class="fa-solid fa-square-check"></i> <span>+ Tarefa</span>
+        </button>
+        <button type="button" onclick="abrirModal('modalFlashcard')" class="bg-amber-500 text-white px-3.5 py-2 rounded-lg font-medium shadow-sm transition-all flex items-center space-x-1.5 text-xs sm:text-sm">
+          <i class="fa-solid fa-layer-group"></i> <span>+ Flashcard</span>
+        </button>
+        <button type="button" onclick="abrirModal('modalCurso')" class="bg-purple-600 hover:bg-purple-700 text-white px-3.5 py-2 rounded-lg font-medium shadow-sm transition-all flex items-center space-x-1.5 text-xs sm:text-sm">
+          <i class="fa-solid fa-graduation-cap"></i> <span>+ Curso</span>
+        </button>
+      </div>
+    </header>
+
+    <div class="p-6">
+      <!-- ================= 1. DASHBOARD ================= -->
+      <div id="view-dashboard" class="space-y-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+          <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200" style="border-left: 4px solid #6366f1;">
+            <p class="text-xs text-gray-500 font-medium">Anotações</p>
+            <h3 class="text-2xl font-bold text-slate-800 mt-1" id="card-anotacoes">0</h3>
+          </div>
+          <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200" style="border-left: 4px solid #f97316;">
+            <p class="text-xs text-gray-500 font-medium">Tarefas Pendentes</p>
+            <h3 class="text-2xl font-bold text-slate-800 mt-1" id="card-pendentes">0</h3>
+          </div>
+          <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200" style="border-left: 4px solid #10b981;">
+            <p class="text-xs text-gray-500 font-medium">Tarefas Concluídas</p>
+            <h3 class="text-2xl font-bold text-slate-800 mt-1" id="card-concluidas">0</h3>
+          </div>
+          <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200" style="border-left: 4px solid #8b5cf6;">
+            <p class="text-xs text-gray-500 font-medium">Cursos Ativos</p>
+            <h3 class="text-2xl font-bold text-slate-800 mt-1" id="card-cursos">0</h3>
+          </div>
+          <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200" style="border-left: 4px solid #ec4899;">
+            <p class="text-xs text-gray-500 font-medium">Tempo Focado (Pomodoro)</p>
+            <h3 class="text-2xl font-bold text-slate-800 mt-1" id="card-pomodoro">0h</h3>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 space-y-3">
+            <h2 class="text-lg font-semibold text-slate-800">Ecossistema Completo Ativo</h2>
+            <div class="p-3.5 bg-indigo-50 rounded-lg text-indigo-800 border border-indigo-100 text-sm">
+              <i class="fa-solid fa-wand-magic-sparkles mr-2"></i><strong>Assistente IA Gemini:</strong> Dentro do editor de anotações, gere resumos, extraia conceitos-chave ou crie flashcards automaticamente com 1 clique.
+            </div>
+            <div class="p-3.5 bg-green-50 rounded-lg text-green-800 border border-green-100 text-sm">
+              <i class="fa-solid fa-table-columns mr-2"></i><strong>Quadro Kanban & Calendário:</strong> Arraste tarefas entre colunas no modo Kanban ou acompanhe os prazos no Calendário mensal.
+            </div>
+            <div class="p-3.5 bg-yellow-50 rounded-lg text-yellow-800 border border-yellow-100 text-sm">
+              <i class="fa-solid fa-layer-group mr-2"></i><strong>Repetição Espaçada (Flashcards):</strong> Pratique memorização ativa virando cartões de perguntas e respostas.
+            </div>
+          </div>
+          
+          <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+            <h2 class="text-lg font-semibold text-slate-800 mb-4">Distribuição de Atividades por Categoria</h2>
+            <div class="h-64 relative">
+              <canvas id="graficoCategorias"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================= 2. ANOTAÇÕES ================= -->
+      <div id="view-anotacoes" class="view-hidden space-y-4">
+        <div class="flex flex-wrap gap-3 justify-between items-center bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+          <div class="flex gap-3 flex-1" style="min-width: 280px;">
+            <input type="text" id="buscaAnotacao" oninput="filtrarAnotacoes()" placeholder="Pesquisar por título, conteúdo ou tag..." class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none">
+            <select id="filtroCategoriaAnotacao" onchange="filtrarAnotacoes()" class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none">
+              <option value="">Todas as Categorias</option>
+            </select>
+          </div>
+          <button type="button" onclick="abrirModalAnotacao()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+            + Nova Anotação
+          </button>
+        </div>
+
+        <div id="listaAnotacoes" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div class="col-span-full text-center py-12 text-gray-400">A carregar anotações...</div>
+        </div>
+      </div>
+
+      <!-- ================= 3. TAREFAS (LISTA + KANBAN) ================= -->
+      <div id="view-tarefas" class="view-hidden space-y-4">
+        <div class="flex flex-wrap justify-between items-center gap-3 bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+          <div class="flex items-center gap-2">
+            <!-- Alternador Lista / Kanban -->
+            <div class="bg-slate-100 p-1 rounded-lg flex items-center mr-2">
+              <button type="button" id="btnModoLista" onclick="alternarModoVisualizacaoTarefas('lista')" class="px-3 py-1.5 rounded-md text-xs font-semibold bg-white text-slate-800 shadow-sm flex items-center space-x-1.5">
+                <i class="fa-solid fa-list"></i> <span>Lista</span>
+              </button>
+              <button type="button" id="btnModoKanban" onclick="alternarModoVisualizacaoTarefas('kanban')" class="px-3 py-1.5 rounded-md text-xs font-semibold text-slate-600 hover:text-slate-800 flex items-center space-x-1.5">
+                <i class="fa-solid fa-table-columns"></i> <span>Quadro Kanban</span>
+              </button>
+            </div>
+
+            <div id="filtrosListaTarefas" class="flex space-x-1.5">
+              <button type="button" onclick="filtrarStatusTarefa('')" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-indigo-50 text-indigo-700">Todas</button>
+              <button type="button" onclick="filtrarStatusTarefa('Pendente')" class="px-3 py-1.5 rounded-lg text-xs font-medium text-gray-600 hover:bg-gray-100">Pendentes</button>
+              <button type="button" onclick="filtrarStatusTarefa('Em Andamento')" class="px-3 py-1.5 rounded-lg text-xs font-medium text-gray-600 hover:bg-gray-100">Em Andamento</button>
+              <button type="button" onclick="filtrarStatusTarefa('Concluído')" class="px-3 py-1.5 rounded-lg text-xs font-medium text-gray-600 hover:bg-gray-100">Concluídas</button>
+            </div>
+          </div>
+
+          <button type="button" onclick="abrirModalTarefa()" class="bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+            + Nova Tarefa
+          </button>
+        </div>
+
+        <!-- MODO TABELA -->
+        <div id="containerTabelaTarefas" class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+          <table class="w-full text-left text-sm text-gray-600">
+            <thead class="bg-slate-50 text-slate-700 font-semibold border-b border-gray-200">
+              <tr>
+                <th class="p-4 w-10">Status</th>
+                <th class="p-4">Tarefa & Descrição</th>
+                <th class="p-4">Categoria</th>
+                <th class="p-4">Prazo</th>
+                <th class="p-4">Prioridade</th>
+                <th class="p-4">Anexo</th>
+                <th class="p-4 text-right">Ações</th>
+              </tr>
+            </thead>
+            <tbody id="tabelaTarefas">
+              <tr><td colspan="7" class="text-center py-8 text-gray-400">A carregar tarefas...</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- MODO QUADRO KANBAN (DRAG AND DROP) -->
+        <div id="containerKanbanTarefas" class="view-hidden grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div class="bg-slate-100 p-4 rounded-xl border border-gray-200 flex flex-col" style="height: 70vh;">
+            <div class="flex justify-between items-center mb-3 px-1">
+              <span class="font-bold text-slate-700 text-sm flex items-center space-x-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-yellow-500"></span> <span>Pendente</span>
+              </span>
+              <span id="count-kanban-pendente" class="text-xs bg-gray-200 text-slate-700 px-2 py-0.5 rounded-full font-semibold">0</span>
+            </div>
+            <div id="kanban-Pendente" data-status="Pendente" class="kanban-col flex-1 space-y-3 overflow-y-auto pr-1"></div>
+          </div>
+
+          <div class="bg-indigo-50 p-4 rounded-xl border border-indigo-100 flex flex-col" style="height: 70vh;">
+            <div class="flex justify-between items-center mb-3 px-1">
+              <span class="font-bold text-indigo-900 text-sm flex items-center space-x-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span> <span>Em Andamento</span>
+              </span>
+              <span id="count-kanban-andamento" class="text-xs bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded-full font-semibold">0</span>
+            </div>
+            <div id="kanban-Em Andamento" data-status="Em Andamento" class="kanban-col flex-1 space-y-3 overflow-y-auto pr-1"></div>
+          </div>
+
+          <div class="bg-emerald-50 p-4 rounded-xl border border-green-100 flex flex-col" style="height: 70vh;">
+            <div class="flex justify-between items-center mb-3 px-1">
+              <span class="font-bold text-emerald-800 text-sm flex items-center space-x-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-green-500"></span> <span>Concluído</span>
+              </span>
+              <span id="count-kanban-concluido" class="text-xs bg-green-100 text-emerald-800 px-2 py-0.5 rounded-full font-semibold">0</span>
+            </div>
+            <div id="kanban-Concluído" data-status="Concluído" class="kanban-col flex-1 space-y-3 overflow-y-auto pr-1"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================= 4. CALENDÁRIO DE PRAZOS ================= -->
+      <div id="view-calendario" class="view-hidden space-y-4">
+        <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+          <div id="calendarioContainer"></div>
+        </div>
+      </div>
+
+      <!-- ================= 5. FLASHCARDS (REPETIÇÃO ESPAÇADA) ================= -->
+      <div id="view-flashcards" class="view-hidden space-y-6">
+        <div class="flex flex-wrap justify-between items-center gap-3 bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+          <div class="flex items-center space-x-3">
+            <select id="filtroCategoriaFlashcard" onchange="filtrarFlashcards()" class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none">
+              <option value="">Todas as Matérias</option>
+            </select>
+            <button type="button" onclick="iniciarModoEstudoFlashcards()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-sm flex items-center space-x-2">
+              <i class="fa-solid fa-play"></i> <span>Praticar Agora (Modo Estudo)</span>
+            </button>
+          </div>
+          <button type="button" onclick="abrirModal('modalFlashcard')" class="bg-amber-500 text-white px-4 py-2 rounded-lg text-sm font-medium">
+            + Criar Flashcard
+          </button>
+        </div>
+
+        <!-- Arena de Estudo Ativo -->
+        <div id="arenaEstudoFlashcard" class="hidden bg-slate-900 text-white p-8 rounded-2xl shadow-xl max-w-2xl mx-auto text-center space-y-6">
+          <div class="flex justify-between items-center text-xs text-slate-400">
+            <span id="estudoFlashcardCategoria" class="bg-indigo-900 text-indigo-300 px-3 py-1 rounded-full"></span>
+            <span id="estudoFlashcardProgresso">Cartão 1 de X</span>
+            <button type="button" onclick="fecharArenaFlashcards()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+          </div>
+
+          <div onclick="virarCartaoEstudo()" class="bg-slate-800 border border-slate-700 rounded-xl p-8 flex flex-col items-center justify-center cursor-pointer hover:border-indigo-500 transition-all select-none" style="min-height: 220px;">
+            <span id="labelLadoCartao" class="text-xs uppercase tracking-widest text-indigo-400 mb-3 font-bold">PERGUNTA (Clique para virar)</span>
+            <div id="textoCartaoEstudo" class="text-xl font-semibold leading-relaxed"></div>
+          </div>
+
+          <div id="botoesAvaliacaoFlashcard" class="hidden flex justify-center space-x-4 pt-2">
+            <button type="button" onclick="avaliarFlashcardAtual('Difícil')" class="bg-red-600 hover:bg-red-500 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all">
+              <i class="fa-solid fa-rotate-left mr-1"></i> Errei / Rever Breve
+            </button>
+            <button type="button" onclick="avaliarFlashcardAtual('Bom')" class="bg-amber-500 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all">
+              <i class="fa-regular fa-thumbs-up mr-1"></i> Bom
+            </button>
+            <button type="button" onclick="avaliarFlashcardAtual('Dominado')" class="bg-emerald-600 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all">
+              <i class="fa-solid fa-check-double mr-1"></i> Fácil / Dominado
+            </button>
+          </div>
+        </div>
+
+        <div id="listaFlashcards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div class="col-span-full text-center py-12 text-gray-400">A carregar flashcards...</div>
+        </div>
+      </div>
+
+      <!-- ================= 6. CURSOS ================= -->
+      <div id="view-cursos" class="view-hidden space-y-4">
+        <div class="flex justify-between items-center bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+          <h2 class="font-semibold text-slate-700">Os Seus Cursos & Certificações</h2>
+          <button type="button" onclick="abrirModal('modalCurso')" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+            + Novo Curso
+          </button>
+        </div>
+
+        <div id="listaCursos" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div class="col-span-full text-center py-12 text-gray-400">A carregar cursos...</div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ================= MODAL DE LEITURA (VISUALIZAÇÃO EXPANDIDA) ================= -->
+  <div id="modalLeituraAnotacao" class="modal-backdrop hidden">
+    <div class="bg-white w-full max-w-4xl rounded-2xl shadow-2xl flex flex-col overflow-hidden" style="max-height: 90vh;">
+      <div class="bg-slate-900 px-6 py-4 flex justify-between items-center text-white flex-shrink-0">
+        <div class="flex items-center space-x-3">
+          <span id="leituraMateria" class="text-xs font-semibold bg-indigo-900 text-indigo-200 px-3 py-1 rounded-full"></span>
+          <span id="leituraData" class="text-xs text-slate-400"></span>
+        </div>
+        <div class="flex items-center space-x-3">
+          <button type="button" id="btnEditarDaLeitura" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3 py-1.5 rounded-lg font-medium flex items-center space-x-1.5 transition-colors">
+            <i class="fa-solid fa-pen"></i> <span>Editar Documento</span>
+          </button>
+          <button type="button" onclick="fecharModal('modalLeituraAnotacao')" class="text-slate-400 hover:text-white p-1">
+            <i class="fa-solid fa-xmark text-xl"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="p-8 overflow-y-auto flex-1 space-y-6">
+        <h1 id="leituraTopico" class="text-3xl font-bold text-slate-800 border-b border-gray-100 pb-4"></h1>
+        <div id="leituraConteudo" class="rich-content text-slate-700"></div>
+      </div>
+
+      <div class="bg-slate-50 px-8 py-4 border-t border-gray-200 flex flex-wrap justify-between items-center gap-4 flex-shrink-0">
+        <div id="leituraTags" class="flex flex-wrap gap-1.5"></div>
+        <div class="flex items-center space-x-4" id="leituraLinks"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: ANOTAÇÃO (ESTÚDIO + ASSISTENTE IA) ================= -->
+  <div id="modalAnotacao" class="modal-backdrop hidden">
+    <div class="bg-white w-full max-w-6xl rounded-2xl shadow-2xl flex flex-col overflow-hidden" style="height: 92vh;">
+      <!-- Topbar do Editor -->
+      <div class="bg-slate-900 px-6 py-3.5 flex justify-between items-center text-white flex-shrink-0">
+        <div class="flex items-center space-x-3">
+          <i class="fa-solid fa-file-word text-indigo-400 text-xl"></i>
+          <h2 class="text-lg font-bold" id="tituloModalAnotacao">Estúdio de Anotação</h2>
+          <span id="badgeUploadImagem" class="hidden text-xs bg-amber-500 text-white px-2.5 py-0.5 rounded-full">
+            <i class="fa-solid fa-cloud-arrow-up mr-1"></i> A processar...
+          </span>
+        </div>
+        <div class="flex items-center space-x-3">
+          <button type="button" onclick="fecharModal('modalAnotacao')" class="px-4 py-2 text-sm text-slate-300 hover:text-white rounded-lg transition-colors">Cancelar</button>
+          <button type="button" onclick="dispararSubmitAnotacao()" id="btnSalvarAnotacao" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm rounded-lg font-medium shadow-md flex items-center space-x-2 transition-all">
+            <i class="fa-solid fa-floppy-disk"></i> <span>Guardar Documento</span>
+          </button>
+        </div>
+      </div>
+
+      <form id="formAnotacao" class="flex-1 flex flex-col lg:flex-row overflow-hidden" onsubmit="processarAnotacao(event)">
+        <input type="hidden" id="anotacaoId">
+        <input type="hidden" id="anotacaoAnexoUrl">
+        <input type="hidden" id="anotacaoAnexoNome">
+
+        <!-- Coluna Principal: Título + Barra IA + Editor -->
+        <div class="flex-1 flex flex-col h-full overflow-hidden border-r border-gray-200 bg-white">
+          <div class="px-8 pt-5 pb-3 border-b border-gray-100 flex flex-wrap justify-between items-center gap-3">
+            <input type="text" id="topico" placeholder="Título do Documento..." required class="flex-1 text-2xl font-bold text-slate-800 placeholder-gray-400 focus:outline-none" style="min-width: 240px;">
+
+            <!-- BARRA DO ASSISTENTE IA GEMINI -->
+            <div class="flex items-center space-x-1.5 bg-indigo-50 border border-indigo-100 px-2.5 py-1.5 rounded-xl">
+              <span class="text-xs font-bold text-indigo-700 mr-1 flex items-center space-x-1">
+                <i class="fa-solid fa-wand-magic-sparkles"></i> <span>IA:</span>
+              </span>
+              <button type="button" onclick="executarAcaoIA('resumir')" class="text-xs bg-white hover:bg-indigo-600 text-indigo-700 hover:text-white border border-indigo-200 px-2.5 py-1 rounded-lg font-medium transition-colors">
+                Resumir
+              </button>
+              <button type="button" onclick="executarAcaoIA('topicos')" class="text-xs bg-white hover:bg-indigo-600 text-indigo-700 hover:text-white border border-indigo-200 px-2.5 py-1 rounded-lg font-medium transition-colors">
+                Extrair Conceitos
+              </button>
+              <button type="button" onclick="executarAcaoIA('flashcards')" class="text-xs bg-white hover:bg-amber-500 text-yellow-700 hover:text-white border border-yellow-300 px-2.5 py-1 rounded-lg font-medium transition-colors" title="Gera 4 flashcards automaticamente a partir deste texto">
+                + Gerar Flashcards
+              </button>
+              <button type="button" onclick="configurarChaveAPI()" class="text-xs text-indigo-500 hover:text-indigo-800 px-1.5 py-1" title="Configurar Chave da API Gemini">
+                <i class="fa-solid fa-gear"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="flex-1 flex flex-col overflow-y-auto">
+            <div id="editor-container" class="flex-1"></div>
+          </div>
+        </div>
+
+        <!-- Barra Lateral Direita -->
+        <div class="w-full lg:w-80 bg-slate-50 p-6 overflow-y-auto space-y-5 flex-shrink-0">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">Propriedades do Documento</h3>
+
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1.5">Categoria / Matéria</label>
+            <select id="materia" required class="w-full bg-white border border-gray-300 rounded-lg p-2.5 text-sm focus:outline-none select-categorias"></select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1.5">Tags (separadas por vírgula)</label>
+            <input type="text" id="tags" placeholder="ex: resumo, artigo, cloud" class="w-full bg-white border border-gray-300 rounded-lg p-2.5 text-sm focus:outline-none">
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1.5">Link de Referência (Opcional)</label>
+            <input type="url" id="link" placeholder="https://..." class="w-full bg-white border border-gray-300 rounded-lg p-2.5 text-sm focus:outline-none">
+          </div>
+
+          <div class="pt-4 border-t border-gray-200">
+            <label class="block text-xs font-semibold text-gray-600 mb-1.5">
+              <i class="fa-solid fa-paperclip mr-1 text-indigo-600"></i> Ficheiro Anexo (PDF, ZIP, Doc)
+            </label>
+            <input type="file" id="arquivoAnotacao" class="w-full bg-white border border-gray-300 rounded-lg p-2 text-xs text-gray-500">
+            <div id="statusAnexoAnotacao" class="text-xs text-indigo-600 mt-2 font-medium break-all"></div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: FLASHCARD ================= -->
+  <div id="modalFlashcard" class="modal-backdrop hidden">
+    <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden">
+      <div class="bg-slate-900 p-5 flex justify-between items-center text-white">
+        <h2 class="text-xl font-bold"><i class="fa-solid fa-layer-group text-yellow-400 mr-2"></i>Novo Flashcard</h2>
+        <button type="button" onclick="fecharModal('modalFlashcard')" class="text-gray-300 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
+      </div>
+      <form id="formFlashcard" class="p-6 space-y-4" onsubmit="processarFlashcard(event)">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Categoria / Matéria</label>
+          <select id="categoriaFlashcard" required class="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none select-categorias"></select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Frente (Pergunta ou Conceito)</label>
+          <textarea id="frenteFlashcard" rows="3" placeholder="Ex: O que é um Deadlock em Sistemas Operativos?" required class="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none"></textarea>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Verso (Resposta Explicativa)</label>
+          <textarea id="versoFlashcard" rows="3" placeholder="Ex: Impasse onde dois ou mais processos ficam bloqueados a aguardar recursos..." required class="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none"></textarea>
+        </div>
+        <div class="flex justify-end space-x-3 mt-6 pt-4 border-t border-gray-200">
+          <button type="button" onclick="fecharModal('modalFlashcard')" class="px-5 py-2.5 text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium">Cancelar</button>
+          <button type="submit" id="btnSalvarFlashcard" class="px-5 py-2.5 bg-amber-500 text-white rounded-lg font-medium shadow-md">Guardar Cartão</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: TAREFA ================= -->
+  <div id="modalTarefa" class="modal-backdrop hidden">
+    <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden">
+      <div class="bg-slate-900 p-5 flex justify-between items-center text-white">
+        <h2 class="text-xl font-bold" id="tituloModalTarefa">Nova Tarefa</h2>
+        <button type="button" onclick="fecharModal('modalTarefa')" class="text-gray-300 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
+      </div>
+      <form id="formTarefa" class="p-6 space-y-4" onsubmit="processarTarefa(event)">
+        <input type="hidden" id="tarefaId">
+        <input type="hidden" id="tarefaAnexoUrl">
+        <input type="hidden" id="tarefaAnexoNome">
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Título da Tarefa</label>
+          <input type="text" id="tituloTarefa" placeholder="Ex: Entregar trabalho de Base de Dados" required class="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Descrição Detalhada / Instruções</label>
+          <textarea id="descricaoTarefa" rows="3" placeholder="Detalhes adicionais da tarefa..." class="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none"></textarea>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Categoria</label>
+            <select id="categoriaTarefa" required class="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none select-categorias"></select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Prazo / Data Limite</label>
+            <input type="date" id="prazoTarefa" required class="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Prioridade</label>
+            <select id="prioridadeTarefa" class="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none">
+              <option value="Baixa">Baixa</option>
+              <option value="Média" selected>Média</option>
+              <option value="Alta">Alta</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Status Inicial</label>
+            <select id="statusTarefa" class="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none">
+              <option value="Pendente" selected>Pendente</option>
+              <option value="Em Andamento">Em Andamento</option>
+              <option value="Concluído">Concluído</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Anexar Ficheiro (Google Drive)</label>
+          <input type="file" id="arquivoTarefa" class="w-full border border-gray-300 rounded-lg p-2 text-sm text-gray-500">
+          <div id="statusAnexoTarefa" class="text-xs text-emerald-600 mt-1"></div>
+        </div>
+
+        <div class="flex justify-end space-x-3 mt-6 pt-4 border-t border-gray-200">
+          <button type="button" onclick="fecharModal('modalTarefa')" class="px-5 py-2.5 text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium">Cancelar</button>
+          <button type="submit" id="btnSalvarTarefa" class="px-5 py-2.5 bg-emerald-600 text-white rounded-lg font-medium shadow-md">Guardar Tarefa</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: CURSO -->
+  <div id="modalCurso" class="modal-backdrop hidden">
+    <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden">
+      <div class="bg-slate-900 p-5 flex justify-between items-center text-white">
+        <h2 class="text-xl font-bold">Registar Curso / Certificação</h2>
+        <button type="button" onclick="fecharModal('modalCurso')" class="text-gray-300 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
+      </div>
+      <form id="formCurso" class="p-6 space-y-4" onsubmit="processarCurso(event)">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Nome do Curso / Certificação</label>
+          <input type="text" id="nomeCurso" placeholder="Ex: Formação Cloud DevOps" required class="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none">
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Instituição / Plataforma</label>
+            <input type="text" id="instituicaoCurso" placeholder="Ex: Alura, AWS" required class="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Categoria</label>
+            <select id="categoriaCurso" required class="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none select-categorias"></select>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Carga Horária (Horas)</label>
+            <input type="number" id="cargaHorariaCurso" placeholder="Ex: 40" required class="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+            <select id="statusCurso" class="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none">
+              <option value="Em Andamento" selected>Em Andamento</option>
+              <option value="Concluído">Concluído</option>
+              <option value="Planejado">Planeado</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Link do Curso / Certificado (Opcional)</label>
+          <input type="url" id="linkCurso" placeholder="https://..." class="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none">
+        </div>
+        <div class="flex justify-end space-x-3 mt-6 pt-4 border-t border-gray-200">
+          <button type="button" onclick="fecharModal('modalCurso')" class="px-5 py-2.5 text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium">Cancelar</button>
+          <button type="submit" id="btnSalvarCurso" class="px-5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium shadow-md">Guardar Curso</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: NOVA CATEGORIA -->
+  <div id="modalCategoria" class="modal-backdrop hidden">
+    <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden">
+      <div class="bg-slate-900 p-5 flex justify-between items-center text-white">
+        <h2 class="text-xl font-bold">Adicionar Categoria Personalizada</h2>
+        <button type="button" onclick="fecharModal('modalCategoria')" class="text-gray-300 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
+      </div>
+      <form id="formCategoria" class="p-6 space-y-4" onsubmit="processarCategoria(event)">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Nome da Categoria</label>
+          <input type="text" id="nomeCategoria" placeholder="Ex: Inteligência Artificial, Finanças..." required class="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none">
+        </div>
+        <div class="flex justify-end space-x-3 mt-6 pt-4 border-t border-gray-200">
+          <button type="button" onclick="fecharModal('modalCategoria')" class="px-5 py-2.5 text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium">Cancelar</button>
+          <button type="submit" id="btnSalvarCategoria" class="px-5 py-2.5 bg-slate-800 hover:bg-slate-900 text-white rounded-lg font-medium shadow-md">Adicionar Categoria</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const abas = ['dashboard', 'anotacoes', 'tarefas', 'calendario', 'flashcards', 'cursos'];
+    const titulos = {
+      'dashboard': 'Visão Geral dos Estudos',
+      'anotacoes': 'Base de Conhecimento Central',
+      'tarefas': 'Gestão de Tarefas & Quadro Kanban',
+      'calendario': 'Calendário de Prazos & Entregas',
+      'flashcards': 'Flashcards & Repetição Espaçada',
+      'cursos': 'Cursos & Treinos'
+    };
+
+    let listaAnotacoesGlobal = [];
+    let listaTarefasGlobal = [];
+    let listaCursosGlobal = [];
+    let listaFlashcardsGlobal = [];
+    let categoriasGlobal = [];
+    let chartInstancia = null;
+    let statusFiltroTarefa = '';
+    let modoVisualizacaoTarefa = 'lista';
+    let quill = null;
+    let calendarInstancia = null;
+
+    // Variáveis Pomodoro
+    let pomoSegundosRestantes = 25 * 60;
+    let pomoDuracaoMinutos = 25;
+    let pomoIntervalo = null;
+    let pomoRodando = false;
+
+    // Variáveis Estudo Flashcards
+    let filaEstudoFlashcards = [];
+    let indiceFlashcardAtual = 0;
+    let mostrandoVersoFlashcard = false;
+
+    window.onload = function() {
+      try { inicializarQuill(); } catch(e) { console.error(e); }
+      try { inicializarKanbanSortable(); } catch(e) { console.error(e); }
+      carregarCategorias();
+      carregarDashboard();
+      mudarAba('dashboard');
+    };
+
+    // ================= PROCESSAMENTO E COMPRESSÃO DE IMAGENS =================
+    function comprimirImagemBase64(base64Str, maxDim = 1200, qualidade = 0.8) {
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.src = base64Str;
+        img.onload = () => {
+          let width = img.width;
+          let height = img.height;
+
+          if (width > height) {
+            if (width > maxDim) {
+              height = Math.round((height * maxDim) / width);
+              width = maxDim;
+            }
+          } else {
+            if (height > maxDim) {
+              width = Math.round((width * maxDim) / height);
+              height = maxDim;
+            }
+          }
+
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+          resolve(canvas.toDataURL('image/jpeg', qualidade));
+        };
+        img.onerror = () => resolve(base64Str);
+      });
+    }
+
+    function inicializarQuill() {
+      quill = new Quill('#editor-container', {
+        theme: 'snow',
+        placeholder: 'Comece a escrever seu documento...',
+        modules: {
+          toolbar: {
+            container: [
+              [{ 'header': [1, 2, 3, false] }],
+              [{ 'font': [] }],
+              ['bold', 'italic', 'underline', 'strike'],
+              [{ 'color': [] }, { 'background': [] }],
+              [{ 'align': [] }],
+              [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+              ['blockquote', 'code-block'],
+              ['link', 'image'],
+              ['clean']
+            ],
+            handlers: { image: imageHandlerDrive }
+          }
+        }
+      });
+
+      // Intercepta imagens coladas via Ctrl+V para upload imediato
+      quill.root.addEventListener('paste', function(e) {
+        const clipboardData = e.clipboardData || window.clipboardData;
+        if (clipboardData && clipboardData.items) {
+          for (let i = 0; i < clipboardData.items.length; i++) {
+            const item = clipboardData.items[i];
+            if (item.type.indexOf('image') !== -1) {
+              e.preventDefault();
+              const file = item.getAsFile();
+              enviarArquivoImagemAoDrive(file);
+            }
+          }
+        }
+      });
+    }
+
+    function enviarArquivoImagemAoDrive(file) {
+      if (!file) return;
+      const badge = document.getElementById('badgeUploadImagem');
+      badge.innerHTML = '<i class="fa-solid fa-cloud-arrow-up mr-1"></i> Otimizando e enviando imagem...';
+      badge.classList.remove('hidden');
+
+      const reader = new FileReader();
+      reader.onload = async () => {
+        const base64Comprimido = await comprimirImagemBase64(reader.result);
+        const fileObj = {
+          fileName: "IMG_" + Date.now() + ".jpg",
+          mimeType: "image/jpeg",
+          data: base64Comprimido
+        };
+
+        google.script.run
+          .withSuccessHandler(function(res) {
+            badge.classList.add('hidden');
+            const range = quill.getSelection(true) || { index: quill.getLength() };
+            quill.insertEmbed(range.index, 'image', res.directUrl);
+            quill.setSelection(range.index + 1);
+          })
+          .withFailureHandler(function(err) {
+            badge.classList.add('hidden');
+            alert("Erro ao enviar imagem ao Drive: " + err);
+          })
+          .uploadImagemEditor(fileObj);
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function imageHandlerDrive() {
+      const input = document.createElement('input');
+      input.setAttribute('type', 'file');
+      input.setAttribute('accept', 'image/*');
+      input.click();
+      input.onchange = () => {
+        if (input.files && input.files[0]) {
+          enviarArquivoImagemAoDrive(input.files[0]);
+        }
+      };
+    }
+
+    // ================= ASSISTENTE IA (GEMINI) =================
+    function configurarChaveAPI() {
+      const chave = prompt("Insira a sua API Key gratuita do Google AI Studio (Gemini):");
+      if (chave && chave.trim()) {
+        google.script.run.withSuccessHandler(res => alert(res.message)).salvarChaveGemini(chave);
+      }
+    }
+
+    function executarAcaoIA(acao) {
+      const textoPuro = quill ? quill.getText().trim() : '';
+      if (textoPuro.length < 30) {
+        alert("Escreva pelo menos um parágrafo no editor para que a IA possa analisar o conteúdo.");
+        return;
+      }
+
+      const badge = document.getElementById('badgeUploadImagem');
+      badge.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles mr-1"></i> A IA está a processar...';
+      badge.classList.remove('hidden');
+
+      const categoria = document.getElementById('materia').value;
+
+      google.script.run
+        .withSuccessHandler(function(res) {
+          badge.classList.add('hidden');
+          if (!res.success) {
+            alert(res.message);
+            if (res.needKey) configurarChaveAPI();
+            return;
+          }
+          if (res.isFlashcards) {
+            alert(res.message);
+          } else if (res.html) {
+            const conteudoAtual = quill.root.innerHTML;
+            const blocoIA = `<hr><p><strong>✨ Gerado pelo Assistente IA:</strong></p>${res.html}<hr>`;
+            quill.root.innerHTML = conteudoAtual + blocoIA;
+          }
+        })
+        .withFailureHandler(function(err) {
+          badge.classList.add('hidden');
+          alert("Erro na chamada da IA: " + err);
+        })
+        .chamarAssistenteIA(acao, textoPuro, categoria);
+    }
+
+    // ================= NAVEGAÇÃO ENTRE ABAS =================
+    function mudarAba(abaSelecionada) {
+      abas.forEach(aba => {
+        const viewEl = document.getElementById(`view-${aba}`);
+        if (viewEl) viewEl.classList.add('view-hidden');
+        const menuBtn = document.getElementById(`menu-${aba}`);
+        if (menuBtn) {
+          menuBtn.classList.remove('nav-item-active');
+          menuBtn.classList.add('nav-item-inactive');
+        }
+      });
+      const viewAtiva = document.getElementById(`view-${abaSelecionada}`);
+      if (viewAtiva) viewAtiva.classList.remove('view-hidden');
+      const menuBtnAtivo = document.getElementById(`menu-${abaSelecionada}`);
+      if (menuBtnAtivo) {
+        menuBtnAtivo.classList.remove('nav-item-inactive');
+        menuBtnAtivo.classList.add('nav-item-active');
+      }
+      document.getElementById('titulo-pagina').innerText = titulos[abaSelecionada];
+
+      if (abaSelecionada === 'anotacoes') carregarAnotacoes();
+      if (abaSelecionada === 'tarefas') carregarTarefas();
+      if (abaSelecionada === 'calendario') carregarCalendario();
+      if (abaSelecionada === 'flashcards') carregarFlashcards();
+      if (abaSelecionada === 'cursos') carregarCursos();
+      if (abaSelecionada === 'dashboard') carregarDashboard();
+    }
+
+    function formatarConteudoParaExibicao(conteudo) {
+      if (!conteudo) return '';
+      const pareceHtml = /<[a-z][\s\S]*>/i.test(conteudo);
+      if (pareceHtml) return conteudo;
+      return conteudo.split('\n').map(linha => `<p>${linha || '<br>'}</p>`).join('');
+    }
+
+    function extrairTextoPuro(html) {
+      const temp = document.createElement('div');
+      temp.innerHTML = html || '';
+      return temp.textContent || temp.innerText || '';
+    }
+
+    function lerArquivoParaBase64(inputElement) {
+      return new Promise((resolve, reject) => {
+        const file = inputElement.files[0];
+        if (!file) { resolve(null); return; }
+        const reader = new FileReader();
+        reader.onload = () => resolve({ fileName: file.name, mimeType: file.type, data: reader.result });
+        reader.onerror = error => reject(error);
+        reader.readAsDataURL(file);
+      });
+    }
+
+    // ================= TEMPORIZADOR POMODORO =================
+    function configurarModoPomodoro(minutos, rotulo) {
+      pararPomodoro();
+      pomoDuracaoMinutos = minutos;
+      pomoSegundosRestantes = minutos * 60;
+      atualizarVisorPomodoro();
+      document.getElementById('statusPomodoro').innerText = `Modo ${rotulo} (${minutos}m)`;
+    }
+
+    function atualizarVisorPomodoro() {
+      const m = Math.floor(pomoSegundosRestantes / 60).toString().padStart(2, '0');
+      const s = (pomoSegundosRestantes % 60).toString().padStart(2, '0');
+      document.getElementById('visorPomodoro').innerText = `${m}:${s}`;
+    }
+
+    function alternarPomodoro() {
+      const btn = document.getElementById('btnIniciarPomodoro');
+      if (pomoRodando) {
+        pararPomodoro();
+        btn.innerHTML = '<i class="fa-solid fa-play mr-1"></i> Retomar';
+        document.getElementById('statusPomodoro').innerText = 'Em pausa';
+      } else {
+        pomoRodando = true;
+        btn.innerHTML = '<i class="fa-solid fa-pause mr-1"></i> Pausar';
+        document.getElementById('statusPomodoro').innerText = 'A focar...';
+        pomoIntervalo = setInterval(() => {
+          if (pomoSegundosRestantes > 0) {
+            pomoSegundosRestantes--;
+            atualizarVisorPomodoro();
+          } else {
+            pararPomodoro();
+            salvarPomodoroManual();
+          }
+        }, 1000);
+      }
+    }
+
+    function pararPomodoro() {
+      pomoRodando = false;
+      if (pomoIntervalo) clearInterval(pomoIntervalo);
+    }
+
+    function resetarPomodoro() {
+      pararPomodoro();
+      pomoSegundosRestantes = pomoDuracaoMinutos * 60;
+      atualizarVisorPomodoro();
+      document.getElementById('btnIniciarPomodoro').innerHTML = '<i class="fa-solid fa-play mr-1"></i> Iniciar';
+      document.getElementById('statusPomodoro').innerText = 'Pronto para focar';
+    }
+
+    function salvarPomodoroManual() {
+      const cat = document.getElementById('categoriaPomodoro').value;
+      google.script.run.withSuccessHandler(res => {
+        alert(res.message);
+        resetarPomodoro();
+        carregarDashboard();
+      }).registrarSessaoPomodoro(cat, pomoDuracaoMinutos);
+    }
+
+    // ================= CATEGORIAS =================
+    function carregarCategorias() {
+      google.script.run.withSuccessHandler(function(cats) {
+        categoriasGlobal = cats || [];
+        const selects = document.querySelectorAll('.select-categorias');
+        selects.forEach(select => {
+          const valAntigo = select.value;
+          select.innerHTML = '';
+          categoriasGlobal.forEach(c => {
+            select.innerHTML += `<option value="${c}">${c}</option>`;
+          });
+          if (valAntigo) select.value = valAntigo;
+        });
+
+        ['filtroCategoriaAnotacao', 'filtroCategoriaFlashcard'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) {
+            el.innerHTML = '<option value="">Todas as Categorias</option>';
+            categoriasGlobal.forEach(c => el.innerHTML += `<option value="${c}">${c}</option>`);
+          }
+        });
+      }).getCategorias();
+    }
+
+    function processarCategoria(e) {
+      e.preventDefault();
+      const nome = document.getElementById('nomeCategoria').value;
+      const btn = document.getElementById('btnSalvarCategoria');
+      btn.innerText = 'A guardar...'; btn.disabled = true;
+
+      google.script.run.withSuccessHandler(function(resp) {
+        alert(resp.message);
+        fecharModal('modalCategoria');
+        btn.innerText = 'Adicionar Categoria'; btn.disabled = false;
+        carregarCategorias();
+      }).salvarCategoria(nome);
+    }
+
+    // ================= DASHBOARD =================
+    function carregarDashboard() {
+      google.script.run.withSuccessHandler(atualizarInterfaceDashboard).getDashboardData();
+    }
+
+    function atualizarInterfaceDashboard(dados) {
+      if (!dados) return;
+      document.getElementById('card-anotacoes').innerText = dados.anotacoes || 0;
+      document.getElementById('card-pendentes').innerText = dados.pendentes || 0;
+      document.getElementById('card-concluidas').innerText = dados.concluidas || 0;
+      document.getElementById('card-cursos').innerText = dados.cursosAndamento || 0;
+      
+      const mins = dados.minutosEstudo || 0;
+      const horasFmt = mins >= 60 ? `${(mins / 60).toFixed(1)}h (${mins}m)` : `${mins} min`;
+      document.getElementById('card-pomodoro').innerText = horasFmt;
+      
+      const ctx = document.getElementById('graficoCategorias').getContext('2d');
+      const labels = dados.graficoCategorias.map(d => d.nome);
+      const values = dados.graficoCategorias.map(d => d.valor);
+
+      if (chartInstancia) chartInstancia.destroy();
+
+      chartInstancia = new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels: labels.length ? labels : ['Sem dados'],
+          datasets: [{ 
+            data: values.length ? values : [1], 
+            backgroundColor: values.length ? ['#4f46e5', '#f97316', '#10b981', '#8b5cf6', '#64748b', '#ec4899'] : ['#e2e8f0'],
+            borderWidth: 0 
+          }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+      });
+    }
+
+    // ================= ANOTAÇÕES (SALVAMENTO OTIMIZADO) =================
+    function carregarAnotacoes() {
+      google.script.run.withSuccessHandler(function(data) {
+        listaAnotacoesGlobal = data || [];
+        renderizarAnotacoes(listaAnotacoesGlobal);
+      }).getAnotacoes();
+    }
+
+    function renderizarAnotacoes(lista) {
+      const el = document.getElementById('listaAnotacoes');
+      if (!lista || lista.length === 0) {
+        el.innerHTML = `<div class="col-span-full text-center py-12 bg-white rounded-xl border border-gray-200"><i class="fa-solid fa-book-open text-4xl text-gray-300 mb-3"></i><p class="text-gray-500 font-medium">Nenhuma anotação registada.</p></div>`;
+        return;
+      }
+
+      el.innerHTML = lista.map(item => {
+        const htmlFormatado = formatarConteudoParaExibicao(item.conteudo);
+        const temImagem = /<img/i.test(htmlFormatado);
+
+        return `
+        <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all flex flex-col justify-between" style="height: 320px;">
+          <div class="overflow-hidden flex flex-col flex-1 cursor-pointer" onclick="abrirLeituraAnotacao('${item.id}')">
+            <div class="flex justify-between items-start gap-2 mb-2 flex-shrink-0">
+              <span class="text-xs font-semibold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-full truncate" style="max-width: 65%;">${item.materia}</span>
+              <span class="text-xs text-gray-400 flex-shrink-0"><i class="fa-regular fa-clock mr-1"></i>${item.data}</span>
+            </div>
+
+            <h3 class="font-bold text-slate-800 text-lg mb-2 truncate hover:text-indigo-600 transition-colors">${item.topico}</h3>
+
+            <div class="card-preview-box text-sm text-gray-600 rich-content flex-1">
+              ${htmlFormatado}
+              <div class="card-preview-fade"></div>
+            </div>
+          </div>
+
+          <div class="pt-3 border-t border-gray-100 flex-shrink-0 mt-2">
+            <div class="flex items-center justify-between mb-2">
+              <div class="flex flex-wrap gap-1 overflow-hidden h-5" style="max-width: 70%;">
+                ${item.tags ? item.tags.split(',').slice(0, 3).map(t => `<span class="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded">#${t.trim()}</span>`).join('') : ''}
+              </div>
+              <div class="flex items-center space-x-2 text-xs text-slate-400">
+                ${temImagem ? `<i class="fa-regular fa-image text-indigo-500" title="Contém imagens"></i>` : ''}
+                ${item.anexoUrl ? `<i class="fa-solid fa-paperclip text-purple-600" title="Anexo: ${item.anexoNome}"></i>` : ''}
+                ${item.link ? `<i class="fa-solid fa-link text-indigo-600" title="Link externo"></i>` : ''}
+              </div>
+            </div>
+
+            <div class="flex justify-between items-center">
+              <button type="button" onclick="abrirLeituraAnotacao('${item.id}')" class="text-xs text-slate-600 hover:text-indigo-600 font-semibold flex items-center space-x-1">
+                <i class="fa-solid fa-expand text-indigo-500"></i> <span>Ler completo</span>
+              </button>
+              <div class="flex items-center space-x-3">
+                <button type="button" onclick="abrirModalAnotacao('${item.id}')" class="text-xs text-indigo-600 hover:text-indigo-800 font-medium flex items-center space-x-1"><i class="fa-solid fa-pen"></i> <span>Editar</span></button>
+                <button type="button" onclick="deletarAnotacao('${item.id}')" class="text-xs text-red-500 hover:text-red-700 p-1"><i class="fa-solid fa-trash"></i></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `}).join('');
+    }
+
+    function abrirLeituraAnotacao(id) {
+      const item = listaAnotacoesGlobal.find(a => a.id === id);
+      if (!item) return;
+
+      document.getElementById('leituraMateria').innerText = item.materia;
+      document.getElementById('leituraData').innerHTML = `<i class="fa-regular fa-clock mr-1"></i>${item.data}`;
+      document.getElementById('leituraTopico').innerText = item.topico;
+      document.getElementById('leituraConteudo').innerHTML = formatarConteudoParaExibicao(item.conteudo);
+
+      const tagsEl = document.getElementById('leituraTags');
+      tagsEl.innerHTML = item.tags 
+        ? item.tags.split(',').map(t => `<span class="text-xs bg-gray-200 text-slate-700 px-2.5 py-1 rounded-md font-medium">#${t.trim()}</span>`).join('')
+        : '<span class="text-xs text-gray-400">Sem tags</span>';
+
+      const linksEl = document.getElementById('leituraLinks');
+      let linksHtml = '';
+      if (item.link) linksHtml += `<a href="${item.link}" target="_blank" class="text-xs bg-indigo-50 text-indigo-700 border border-indigo-200 px-3 py-1.5 rounded-lg hover:bg-indigo-100 font-medium flex items-center space-x-1.5"><i class="fa-solid fa-up-right-from-square"></i> <span>Link Externo</span></a>`;
+      if (item.anexoUrl) linksHtml += `<a href="${item.anexoUrl}" target="_blank" class="text-xs bg-purple-50 text-purple-700 border border-purple-200 px-3 py-1.5 rounded-lg hover:bg-purple-100 font-medium flex items-center space-x-1.5"><i class="fa-solid fa-paperclip"></i> <span>Anexo: ${item.anexoNome}</span></a>`;
+      linksEl.innerHTML = linksHtml;
+
+      document.getElementById('btnEditarDaLeitura').onclick = function() {
+        fecharModal('modalLeituraAnotacao');
+        abrirModalAnotacao(item.id);
+      };
+
+      abrirModal('modalLeituraAnotacao');
+    }
+
+    function filtrarAnotacoes() {
+      const busca = document.getElementById('buscaAnotacao').value.toLowerCase();
+      const cat = document.getElementById('filtroCategoriaAnotacao').value;
+
+      const filtrado = listaAnotacoesGlobal.filter(item => {
+        const textoLimpo = extrairTextoPuro(item.conteudo).toLowerCase();
+        const bateBusca = item.topico.toLowerCase().includes(busca) || 
+                           textoLimpo.includes(busca) || 
+                           (item.tags && item.tags.toLowerCase().includes(busca));
+        const bateCat = cat === '' || item.materia === cat;
+        return bateBusca && bateCat;
+      });
+
+      renderizarAnotacoes(filtrado);
+    }
+
+    function abrirModalAnotacao(id = null) {
+      document.getElementById('formAnotacao').reset();
+      document.getElementById('anotacaoId').value = '';
+      document.getElementById('anotacaoAnexoUrl').value = '';
+      document.getElementById('anotacaoAnexoNome').value = '';
+      document.getElementById('statusAnexoAnotacao').innerText = '';
+      if (quill) quill.setContents([]);
+
+      if (id) {
+        const item = listaAnotacoesGlobal.find(a => a.id === id);
+        if (item) {
+          document.getElementById('tituloModalAnotacao').innerText = 'Editar Documento';
+          document.getElementById('anotacaoId').value = item.id;
+          document.getElementById('materia').value = item.materia;
+          document.getElementById('topico').value = item.topico;
+          if (quill) quill.root.innerHTML = formatarConteudoParaExibicao(item.conteudo);
+          document.getElementById('tags').value = item.tags || '';
+          document.getElementById('link').value = item.link || '';
+          document.getElementById('anotacaoAnexoUrl').value = item.anexoUrl || '';
+          document.getElementById('anotacaoAnexoNome').value = item.anexoNome || '';
+          if (item.anexoNome) {
+            document.getElementById('statusAnexoAnotacao').innerText = 'Anexo Atual: ' + item.anexoNome;
+          }
+        }
+      } else {
+        document.getElementById('tituloModalAnotacao').innerText = 'Novo Documento de Estudo';
+      }
+      abrirModal('modalAnotacao');
+    }
+
+    function dispararSubmitAnotacao() {
+      document.getElementById('formAnotacao').requestSubmit();
+    }
+
+    async function processarAnotacao(e) {
+      e.preventDefault();
+
+      const btn = document.getElementById('btnSalvarAnotacao');
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processando...';
+      btn.disabled = true;
+
+      try {
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = quill.root.innerHTML;
+        const base64Imgs = Array.from(tempDiv.querySelectorAll('img[src^="data:image"]'));
+
+        // Upload paralelo e conversão de Base64 para URLs do Google Drive
+        if (base64Imgs.length > 0) {
+          btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Otimizando ${base64Imgs.length} imagem(ns)...`;
+
+          const uploadPromises = base64Imgs.map(async (img) => {
+            const rawSrc = img.getAttribute('src');
+            const base64Otimizado = await comprimirImagemBase64(rawSrc);
+
+            return new Promise((resolve, reject) => {
+              google.script.run
+                .withSuccessHandler((res) => {
+                  if (res && res.directUrl) {
+                    img.setAttribute('src', res.directUrl);
+                  }
+                  resolve();
+                })
+                .withFailureHandler(reject)
+                .uploadImagemEditor({
+                  fileName: "IMG_BODY_" + Date.now() + "_" + Math.floor(Math.random() * 1000) + ".jpg",
+                  mimeType: "image/jpeg",
+                  data: base64Otimizado
+                });
+            });
+          });
+
+          await Promise.all(uploadPromises);
+          quill.root.innerHTML = tempDiv.innerHTML;
+        }
+
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Gravando na planilha...';
+
+        const arqData = await lerArquivoParaBase64(document.getElementById('arquivoAnotacao'));
+
+        const dados = {
+          id: document.getElementById('anotacaoId').value,
+          materia: document.getElementById('materia').value,
+          topico: document.getElementById('topico').value,
+          conteudo: tempDiv.innerHTML,
+          tags: document.getElementById('tags').value,
+          link: document.getElementById('link').value,
+          anexoUrl: document.getElementById('anotacaoAnexoUrl').value,
+          anexoNome: document.getElementById('anotacaoAnexoNome').value,
+          arquivoData: arqData
+        };
+
+        google.script.run
+          .withSuccessHandler(function(resp) {
+            btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Guardar Documento';
+            btn.disabled = false;
+            alert(resp.message);
+            fecharModal('modalAnotacao');
+            carregarAnotacoes();
+          })
+          .withFailureHandler(function(err) {
+            btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Guardar Documento';
+            btn.disabled = false;
+            alert("Erro ao salvar: " + err);
+          })
+          .salvarAnotacao(dados);
+
+      } catch (err) {
+        btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Guardar Documento';
+        btn.disabled = false;
+        alert("Falha no processamento: " + err);
+      }
+    }
+
+    function deletarAnotacao(id) {
+      if (confirm('Excluir esta anotação permanentemente?')) {
+        google.script.run.withSuccessHandler(function(resp) {
+          alert(resp.message);
+          carregarAnotacoes();
+        }).excluirAnotacao(id);
+      }
+    }
+
+    // ================= TAREFAS & QUADRO KANBAN =================
+    function inicializarKanbanSortable() {
+      const colunas = document.querySelectorAll('.kanban-col');
+      colunas.forEach(col => {
+        new Sortable(col, {
+          group: 'kanban-tarefas',
+          animation: 150,
+          ghostClass: 'sortable-ghost',
+          onEnd: function(evt) {
+            const tarefaId = evt.item.getAttribute('data-id');
+            const novoStatus = evt.to.getAttribute('data-status');
+            if (tarefaId && novoStatus) {
+              const t = listaTarefasGlobal.find(x => x.id === tarefaId);
+              if (t && t.status !== novoStatus) {
+                t.status = novoStatus;
+                atualizarContadoresKanban();
+                google.script.run.atualizarStatusTarefa(tarefaId, novoStatus);
+              }
+            }
+          }
+        });
+      });
+    }
+
+    function alternarModoVisualizacaoTarefas(modo) {
+      modoVisualizacaoTarefa = modo;
+      const btnLista = document.getElementById('btnModoLista');
+      const btnKanban = document.getElementById('btnModoKanban');
+      const containerTabela = document.getElementById('containerTabelaTarefas');
+      const containerKanban = document.getElementById('containerKanbanTarefas');
+      const filtrosLista = document.getElementById('filtrosListaTarefas');
+
+      if (modo === 'kanban') {
+        btnKanban.className = "px-3 py-1.5 rounded-md text-xs font-semibold bg-white text-slate-800 shadow-sm flex items-center space-x-1.5";
+        btnLista.className = "px-3 py-1.5 rounded-md text-xs font-semibold text-slate-600 hover:text-slate-800 flex items-center space-x-1.5";
+        containerTabela.classList.add('view-hidden');
+        filtrosLista.classList.add('view-hidden');
+        containerKanban.classList.remove('view-hidden');
+      } else {
+        btnLista.className = "px-3 py-1.5 rounded-md text-xs font-semibold bg-white text-slate-800 shadow-sm flex items-center space-x-1.5";
+        btnKanban.className = "px-3 py-1.5 rounded-md text-xs font-semibold text-slate-600 hover:text-slate-800 flex items-center space-x-1.5";
+        containerKanban.classList.add('view-hidden');
+        containerTabela.classList.remove('view-hidden');
+        filtrosLista.classList.remove('view-hidden');
+      }
+      renderizarTarefas();
+    }
+
+    function carregarTarefas() {
+      google.script.run.withSuccessHandler(function(data) {
+        listaTarefasGlobal = data || [];
+        renderizarTarefas();
+      }).getTarefas();
+    }
+
+    function renderizarTarefas() {
+      renderizarTabelaTarefas();
+      renderizarKanbanTarefas();
+    }
+
+    function renderizarTabelaTarefas() {
+      const el = document.getElementById('tabelaTarefas');
+      let lista = statusFiltroTarefa ? listaTarefasGlobal.filter(t => t.status === statusFiltroTarefa) : listaTarefasGlobal;
+
+      if (!lista || lista.length === 0) {
+        el.innerHTML = `<tr><td colspan="7" class="text-center py-8 text-gray-400">Nenhuma tarefa encontrada.</td></tr>`;
+        return;
+      }
+
+      const prioridadeCores = {
+        'Alta': 'bg-red-100 text-red-700 border-red-200',
+        'Média': 'bg-yellow-100 text-yellow-800 border-yellow-200',
+        'Baixa': 'bg-gray-100 text-gray-600 border-gray-200'
+      };
+
+      el.innerHTML = lista.map(t => `
+        <tr class="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+          <td class="p-4">
+            <button type="button" onclick="alternarStatusTarefa('${t.id}', '${t.status}')" class="text-lg">
+              ${t.status === 'Concluído' ? '<i class="fa-solid fa-circle-check text-emerald-500"></i>' : '<i class="fa-regular fa-circle text-gray-300 hover:text-emerald-500"></i>'}
+            </button>
+          </td>
+          <td class="p-4">
+            <div class="font-medium ${t.status === 'Concluído' ? 'line-through text-gray-400' : 'text-slate-800'}">${t.titulo}</div>
+            ${t.descricao ? `<div class="text-xs text-gray-500 mt-1 whitespace-pre-line">${t.descricao}</div>` : ''}
+          </td>
+          <td class="p-4"><span class="text-xs bg-slate-100 text-slate-700 px-2.5 py-1 rounded-md font-medium">${t.categoria}</span></td>
+          <td class="p-4 text-xs text-gray-500"><i class="fa-regular fa-calendar mr-1"></i>${t.prazo || 'Sem prazo'}</td>
+          <td class="p-4"><span class="text-xs px-2.5 py-1 rounded-full border font-semibold ${prioridadeCores[t.prioridade] || prioridadeCores['Média']}">${t.prioridade}</span></td>
+          <td class="p-4 text-xs">
+            ${t.anexoUrl ? `<a href="${t.anexoUrl}" target="_blank" class="text-emerald-600 hover:underline flex items-center space-x-1"><i class="fa-solid fa-paperclip"></i> <span>${t.anexoNome}</span></a>` : '<span class="text-gray-300">-</span>'}
+          </td>
+          <td class="p-4 text-right space-x-2">
+            <button type="button" onclick="abrirModalTarefa('${t.id}')" class="text-indigo-600 hover:text-indigo-800 p-1 text-xs font-medium"><i class="fa-solid fa-pen"></i></button>
+            <button type="button" onclick="deletarTarefa('${t.id}')" class="text-red-500 hover:text-red-700 p-1 text-xs"><i class="fa-solid fa-trash"></i></button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function renderizarKanbanTarefas() {
+      const statusList = ['Pendente', 'Em Andamento', 'Concluído'];
+      const prioridadeBadge = {
+        'Alta': 'bg-red-100 text-red-700',
+        'Média': 'bg-yellow-100 text-yellow-800',
+        'Baixa': 'bg-gray-100 text-gray-600'
+      };
+
+      statusList.forEach(status => {
+        const colEl = document.getElementById(`kanban-${status}`);
+        if (!colEl) return;
+        const tarefasCol = listaTarefasGlobal.filter(t => (t.status || 'Pendente') === status);
+
+        colEl.innerHTML = tarefasCol.map(t => `
+          <div data-id="${t.id}" class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 cursor-move hover:shadow-md transition-all space-y-2">
+            <div class="flex justify-between items-start gap-2">
+              <span class="text-xs font-semibold bg-slate-100 text-slate-600 px-2 py-0.5 rounded truncate" style="max-width: 70%;">${t.categoria}</span>
+              <span class="text-xs font-bold px-2 py-0.5 rounded-full ${prioridadeBadge[t.prioridade] || prioridadeBadge['Média']}">${t.prioridade}</span>
+            </div>
+            <h4 class="font-bold text-slate-800 text-sm">${t.titulo}</h4>
+            ${t.descricao ? `<p class="text-xs text-gray-500 truncate">${t.descricao}</p>` : ''}
+            <div class="flex justify-between items-center pt-2 border-t border-gray-100 text-xs text-gray-400">
+              <span><i class="fa-regular fa-calendar mr-1"></i>${t.prazo || 'S/ prazo'}</span>
+              <div class="flex space-x-2">
+                <button type="button" onclick="abrirModalTarefa('${t.id}')" class="text-indigo-600 hover:text-indigo-800"><i class="fa-solid fa-pen"></i></button>
+                <button type="button" onclick="deletarTarefa('${t.id}')" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button>
+              </div>
+            </div>
+          </div>
+        `).join('');
+      });
+
+      atualizarContadoresKanban();
+    }
+
+    function atualizarContadoresKanban() {
+      document.getElementById('count-kanban-pendente').innerText = listaTarefasGlobal.filter(t => (t.status || 'Pendente') === 'Pendente').length;
+      document.getElementById('count-kanban-andamento').innerText = listaTarefasGlobal.filter(t => t.status === 'Em Andamento').length;
+      document.getElementById('count-kanban-concluido').innerText = listaTarefasGlobal.filter(t => t.status === 'Concluído').length;
+    }
+
+    function abrirModalTarefa(id = null) {
+      document.getElementById('formTarefa').reset();
+      document.getElementById('tarefaId').value = '';
+      document.getElementById('tarefaAnexoUrl').value = '';
+      document.getElementById('tarefaAnexoNome').value = '';
+      document.getElementById('statusAnexoTarefa').innerText = '';
+
+      if (id) {
+        const t = listaTarefasGlobal.find(item => item.id === id);
+        if (t) {
+          document.getElementById('tituloModalTarefa').innerText = 'Editar Tarefa';
+          document.getElementById('tarefaId').value = t.id;
+          document.getElementById('tituloTarefa').value = t.titulo;
+          document.getElementById('descricaoTarefa').value = t.descricao || '';
+          document.getElementById('categoriaTarefa').value = t.categoria;
+          document.getElementById('prazoTarefa').value = t.prazo;
+          document.getElementById('prioridadeTarefa').value = t.prioridade;
+          document.getElementById('statusTarefa').value = t.status;
+          document.getElementById('tarefaAnexoUrl').value = t.anexoUrl || '';
+          document.getElementById('tarefaAnexoNome').value = t.anexoNome || '';
+          if (t.anexoNome) {
+            document.getElementById('statusAnexoTarefa').innerText = 'Anexo Atual: ' + t.anexoNome;
+          }
+        }
+      } else {
+        document.getElementById('tituloModalTarefa').innerText = 'Nova Tarefa';
+      }
+      abrirModal('modalTarefa');
+    }
+
+    function filtrarStatusTarefa(st) {
+      statusFiltroTarefa = st;
+      renderizarTabelaTarefas();
+    }
+
+    function alternarStatusTarefa(id, statusAtual) {
+      const novoStatus = statusAtual === 'Concluído' ? 'Pendente' : 'Concluído';
+      google.script.run.withSuccessHandler(function() { carregarTarefas(); }).atualizarStatusTarefa(id, novoStatus);
+    }
+
+    async function processarTarefa(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btnSalvarTarefa');
+      btn.innerText = 'A guardar...'; btn.disabled = true;
+
+      const arqData = await lerArquivoParaBase64(document.getElementById('arquivoTarefa'));
+
+      const dados = {
+        id: document.getElementById('tarefaId').value,
+        titulo: document.getElementById('tituloTarefa').value,
+        descricao: document.getElementById('descricaoTarefa').value,
+        categoria: document.getElementById('categoriaTarefa').value,
+        prazo: document.getElementById('prazoTarefa').value,
+        prioridade: document.getElementById('prioridadeTarefa').value,
+        status: document.getElementById('statusTarefa').value,
+        anexoUrl: document.getElementById('tarefaAnexoUrl').value,
+        anexoNome: document.getElementById('tarefaAnexoNome').value,
+        arquivoData: arqData
+      };
+
+      google.script.run.withSuccessHandler(function(resp) {
+        alert(resp.message);
+        fecharModal('modalTarefa');
+        btn.innerText = 'Guardar Tarefa'; btn.disabled = false;
+        carregarTarefas();
+      }).salvarTarefa(dados);
+    }
+
+    function deletarTarefa(id) {
+      if (confirm('Excluir esta tarefa?')) {
+        google.script.run.withSuccessHandler(function(resp) {
+          alert(resp.message);
+          carregarTarefas();
+        }).excluirTarefa(id);
+      }
+    }
+
+    // ================= CALENDÁRIO DE PRAZOS =================
+    function carregarCalendario() {
+      google.script.run.withSuccessHandler(function(tarefas) {
+        listaTarefasGlobal = tarefas || [];
+        renderizarCalendario();
+      }).getTarefas();
+    }
+
+    function renderizarCalendario() {
+      const calendarEl = document.getElementById('calendarioContainer');
+      const eventos = listaTarefasGlobal
+        .filter(t => t.prazo)
+        .map(t => ({
+          id: t.id,
+          title: `[${t.status}] ${t.titulo}`,
+          start: t.prazo,
+          backgroundColor: t.status === 'Concluído' ? '#10b981' : (t.prioridade === 'Alta' ? '#ef4444' : '#4f46e5'),
+          borderColor: 'transparent'
+        }));
+
+      if (calendarInstancia) calendarInstancia.destroy();
+
+      calendarInstancia = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        locale: 'pt-br',
+        height: 620,
+        headerToolbar: {
+          left: 'prev,next today',
+          center: 'title',
+          right: 'dayGridMonth,listMonth'
+        },
+        buttonText: { today: 'Hoje', month: 'Mês', list: 'Lista' },
+        events: eventos,
+        eventClick: function(info) {
+          abrirModalTarefa(info.event.id);
+        }
+      });
+
+      calendarInstancia.render();
+    }
+
+    // ================= FLASHCARDS =================
+    function carregarFlashcards() {
+      google.script.run.withSuccessHandler(function(data) {
+        listaFlashcardsGlobal = data || [];
+        filtrarFlashcards();
+      }).getFlashcards();
+    }
+
+    function filtrarFlashcards() {
+      const cat = document.getElementById('filtroCategoriaFlashcard').value;
+      const filtrados = cat ? listaFlashcardsGlobal.filter(f => f.categoria === cat) : listaFlashcardsGlobal;
+      renderizarFlashcards(filtrados);
+    }
+
+    function renderizarFlashcards(lista) {
+      const el = document.getElementById('listaFlashcards');
+      if (!lista || lista.length === 0) {
+        el.innerHTML = `<div class="col-span-full text-center py-12 bg-white rounded-xl border border-gray-200"><i class="fa-solid fa-layer-group text-4xl text-gray-300 mb-3"></i><p class="text-gray-500 font-medium">Nenhum flashcard encontrado. Crie manualmente ou gere via IA nas suas anotações!</p></div>`;
+        return;
+      }
+
+      const coresNivel = {
+        'Novo': 'bg-blue-100 text-blue-700 border-blue-200',
+        'Difícil': 'bg-red-100 text-red-700 border-red-200',
+        'Bom': 'bg-yellow-100 text-yellow-800 border-yellow-200',
+        'Dominado': 'bg-green-100 text-emerald-700 border-green-200'
+      };
+
+      el.innerHTML = lista.map(f => `
+        <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
+          <div>
+            <div class="flex justify-between items-center gap-2 mb-3">
+              <span class="text-xs font-semibold bg-slate-100 text-slate-700 px-2.5 py-1 rounded-md truncate" style="max-width: 65%;">${f.categoria}</span>
+              <span class="text-xs font-bold px-2.5 py-0.5 rounded-full border ${coresNivel[f.nivel] || coresNivel['Novo']}">${f.nivel}</span>
+            </div>
+            <p class="text-xs uppercase font-bold text-indigo-500 mb-1">Pergunta:</p>
+            <h4 class="font-bold text-slate-800 text-sm mb-3">${f.frente}</h4>
+            <div class="p-3 bg-slate-50 rounded-lg border border-gray-100">
+              <p class="text-xs uppercase font-bold text-slate-400 mb-1">Resposta:</p>
+              <p class="text-xs text-slate-600">${f.verso}</p>
+            </div>
+          </div>
+          <div class="flex justify-between items-center pt-3 mt-3 border-t border-gray-100 text-xs text-gray-400">
+            <span>Última revisão: ${f.ultimaRevisao}</span>
+            <button type="button" onclick="deletarFlashcard('${f.id}')" class="text-red-500 hover:text-red-700 p-1"><i class="fa-solid fa-trash"></i></button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function processarFlashcard(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btnSalvarFlashcard');
+      btn.innerText = 'A guardar...'; btn.disabled = true;
+
+      const dados = {
+        categoria: document.getElementById('categoriaFlashcard').value,
+        frente: document.getElementById('frenteFlashcard').value,
+        verso: document.getElementById('versoFlashcard').value
+      };
+
+      google.script.run.withSuccessHandler(function(resp) {
+        alert(resp.message);
+        fecharModal('modalFlashcard');
+        btn.innerText = 'Guardar Cartão'; btn.disabled = false;
+        carregarFlashcards();
+      }).salvarFlashcard(dados);
+    }
+
+    function deletarFlashcard(id) {
+      if (confirm('Excluir este flashcard?')) {
+        google.script.run.withSuccessHandler(() => carregarFlashcards()).excluirFlashcard(id);
+      }
+    }
+
+    function iniciarModoEstudoFlashcards() {
+      const cat = document.getElementById('filtroCategoriaFlashcard').value;
+      filaEstudoFlashcards = cat ? listaFlashcardsGlobal.filter(f => f.categoria === cat) : [...listaFlashcardsGlobal];
+
+      if (filaEstudoFlashcards.length === 0) {
+        alert("Não há flashcards disponíveis para praticar.");
+        return;
+      }
+
+      indiceFlashcardAtual = 0;
+      document.getElementById('arenaEstudoFlashcard').classList.remove('hidden');
+      mostrarCartaoEstudoAtual();
+    }
+
+    function mostrarCartaoEstudoAtual() {
+      const card = filaEstudoFlashcards[indiceFlashcardAtual];
+      mostrandoVersoFlashcard = false;
+      document.getElementById('estudoFlashcardCategoria').innerText = card.categoria;
+      document.getElementById('estudoFlashcardProgresso').innerText = `Cartão ${indiceFlashcardAtual + 1} de ${filaEstudoFlashcards.length}`;
+      document.getElementById('labelLadoCartao').innerText = 'PERGUNTA (Clique no cartão para revelar a resposta)';
+      document.getElementById('textoCartaoEstudo').innerText = card.frente;
+      document.getElementById('botoesAvaliacaoFlashcard').classList.add('hidden');
+    }
+
+    function virarCartaoEstudo() {
+      const card = filaEstudoFlashcards[indiceFlashcardAtual];
+      mostrandoVersoFlashcard = !mostrandoVersoFlashcard;
+      if (mostrandoVersoFlashcard) {
+        document.getElementById('labelLadoCartao').innerText = 'RESPOSTA';
+        document.getElementById('textoCartaoEstudo').innerText = card.verso;
+        document.getElementById('botoesAvaliacaoFlashcard').classList.remove('hidden');
+      } else {
+        document.getElementById('labelLadoCartao').innerText = 'PERGUNTA (Clique para virar)';
+        document.getElementById('textoCartaoEstudo').innerText = card.frente;
+      }
+    }
+
+    function avaliarFlashcardAtual(nivel) {
+      const card = filaEstudoFlashcards[indiceFlashcardAtual];
+      google.script.run.atualizarNivelFlashcard(card.id, nivel);
+
+      if (indiceFlashcardAtual + 1 < filaEstudoFlashcards.length) {
+        indiceFlashcardAtual++;
+        mostrarCartaoEstudoAtual();
+      } else {
+        alert("Parabéns! Concluiu a revisão de todos os cartões desta sessão.");
+        fecharArenaFlashcards();
+        carregarFlashcards();
+      }
+    }
+
+    function fecharArenaFlashcards() {
+      document.getElementById('arenaEstudoFlashcard').classList.add('hidden');
+    }
+
+    // ================= CURSOS =================
+    function carregarCursos() {
+      google.script.run.withSuccessHandler(function(data) {
+        listaCursosGlobal = data || [];
+        renderizarCursos();
+      }).getCursos();
+    }
+
+    function renderizarCursos() {
+      const el = document.getElementById('listaCursos');
+      if (!listaCursosGlobal || listaCursosGlobal.length === 0) {
+        el.innerHTML = `<div class="col-span-full text-center py-12 bg-white rounded-xl border border-gray-200"><i class="fa-solid fa-graduation-cap text-4xl text-gray-300 mb-3"></i><p class="text-gray-500 font-medium">Nenhum curso registado.</p></div>`;
+        return;
+      }
+
+      const statusBadges = {
+        'Em Andamento': 'bg-purple-100 text-purple-700 border-purple-200',
+        'Concluído': 'bg-green-100 text-emerald-700 border-green-200',
+        'Planejado': 'bg-gray-100 text-gray-600 border-gray-200'
+      };
+
+      el.innerHTML = listaCursosGlobal.map(c => `
+        <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
+          <div>
+            <div class="flex justify-between items-start gap-2 mb-2">
+              <span class="text-xs font-semibold px-2.5 py-1 rounded-full border ${statusBadges[c.status] || statusBadges['Em Andamento']}">${c.status}</span>
+              <span class="text-xs text-gray-400"><i class="fa-solid fa-clock mr-1"></i>${c.cargaHoraria}h</span>
+            </div>
+            <h3 class="font-bold text-slate-800 text-lg mb-1">${c.nome}</h3>
+            <p class="text-xs text-gray-500 mb-2"><i class="fa-solid fa-building mr-1"></i>${c.instituicao}</p>
+            <span class="text-xs bg-slate-100 text-slate-600 px-2.5 py-1 rounded-md font-medium">${c.categoria}</span>
+          </div>
+          <div class="flex justify-between items-center pt-4 mt-4 border-t border-gray-100">
+            ${c.link ? `<a href="${c.link}" target="_blank" class="text-xs text-purple-600 hover:underline flex items-center space-x-1"><i class="fa-solid fa-up-right-from-square"></i> <span>Aceder ao Link</span></a>` : '<span></span>'}
+            <button type="button" onclick="deletarCurso('${c.id}')" class="text-xs text-red-500 hover:text-red-700 p-1"><i class="fa-solid fa-trash"></i> Excluir</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function processarCurso(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btnSalvarCurso');
+      btn.innerText = 'A guardar...'; btn.disabled = true;
+
+      const dados = {
+        nome: document.getElementById('nomeCurso').value,
+        instituicao: document.getElementById('instituicaoCurso').value,
+        categoria: document.getElementById('categoriaCurso').value,
+        cargaHoraria: document.getElementById('cargaHorariaCurso').value,
+        status: document.getElementById('statusCurso').value,
+        link: document.getElementById('linkCurso').value
+      };
+
+      google.script.run.withSuccessHandler(function(resp) {
+        alert(resp.message);
+        fecharModal('modalCurso');
+        btn.innerText = 'Guardar Curso'; btn.disabled = false;
+        carregarCursos();
+      }).salvarCurso(dados);
+    }
+
+    function deletarCurso(id) {
+      if (confirm('Excluir este curso?')) {
+        google.script.run.withSuccessHandler(function(resp) {
+          alert(resp.message);
+          carregarCursos();
+        }).excluirCurso(id);
+      }
+    }
+
+    // ================= MODAIS =================
+    function abrirModal(id) {
+      const el = document.getElementById(id);
+      if (el) {
+        el.classList.remove('hidden');
+        el.style.display = 'flex';
+      }
+    }
+
+    function fecharModal(id) {
+      const el = document.getElementById(id);
+      if (el) {
+        el.classList.add('hidden');
+        el.style.display = 'none';
+        const form = el.querySelector('form');
+        if (form) form.reset();
+      }
+    }
+  </script>
+</body>
+</html>

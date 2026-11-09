@@ -1,0 +1,66 @@
+# ========================================================
+# DADOS SENSÍVEIS, CHAVES DE API E CREDENCIAIS
+# ========================================================
+# Variáveis de ambiente (chaves de API como Gemini)
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# Credenciais e tokens do Google Drive / OAuth
+credentials.json
+token.json
+client_secret*.json
+service_account*.json
+
+# ========================================================
+# BANCO DE DADOS LOCAL E ARQUIVOS PESSOAIS
+# ========================================================
+# Banco SQLite e journals
+*.db
+*.sqlite
+*.sqlite3
+study_hub.db*
+*.db-journal
+*.db-wal
+*.db-shm
+
+# Anexos e imagens pessoais de anotações/tarefas (mantém a pasta via .gitkeep)
+uploads/*
+!uploads/.gitkeep
+
+# Arquivos de backup ZIP gerados localmente
+backups/*
+!backups/.gitkeep
+*.zip
+*.tar.gz
+
+# Arquivos temporários de importação de planilhas
+temp_upload_*
+*.xlsx
+*.csv
+
+# ========================================================
+# AMBIENTE VIRTUAL PYTHON E CACHES
+# ========================================================
+.venv/
+venv/
+env/
+ENV/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.coverage
+htmlcov/
+
+# ========================================================
+# ARQUIVOS DO SISTEMA OPERACIONAL E EDITORES
+# ========================================================
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
