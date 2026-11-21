@@ -4,6 +4,8 @@ import unicodedata
 from datetime import datetime, date
 from db import get_connection
 
+QUADRANTES_EISENHOWER = {"", "fazer", "agendar", "delegar", "eliminar"}
+
 def normalizar_nome(texto: str) -> str:
     if not texto:
         return ""
@@ -54,11 +56,18 @@ def importar_arquivo_xlsx(caminho_arquivo: str):
                 link = str(r[6]).strip() if len(r) > 6 and r[6] is not None else ""
                 anexo_nome = str(r[7]).strip() if len(r) > 7 and r[7] is not None else ""
                 anexo_url = str(r[8]).strip() if len(r) > 8 and r[8] is not None else ""
+                subcategoria = str(r[9]).strip() if len(r) > 9 and r[9] is not None else ""
+
+                if materia and subcategoria:
+                    cursor.execute(
+                        "INSERT OR IGNORE INTO subcategorias (categoria, nome) VALUES (?, ?)",
+                        (materia, subcategoria)
+                    )
 
                 cursor.execute("""
-                INSERT OR REPLACE INTO anotacoes (id, data, materia, topico, conteudo, tags, link, anexo_nome, anexo_url)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """, (aid, adata, materia, topico, conteudo, tags, link, anexo_nome, anexo_url))
+                INSERT OR REPLACE INTO anotacoes (id, data, materia, subcategoria, topico, conteudo, tags, link, anexo_nome, anexo_url)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """, (aid, adata, materia, subcategoria, topico, conteudo, tags, link, anexo_nome, anexo_url))
                 resumo["anotacoes"] += 1
 
         elif "tarefa" in norm:  # Tarefas
@@ -75,11 +84,14 @@ def importar_arquivo_xlsx(caminho_arquivo: str):
                 descricao = str(r[7]) if len(r) > 7 and r[7] is not None else ""
                 anexo_nome = str(r[8]).strip() if len(r) > 8 and r[8] is not None else ""
                 anexo_url = str(r[9]).strip() if len(r) > 9 and r[9] is not None else ""
+                eisenhower = str(r[10]).strip().lower() if len(r) > 10 and r[10] is not None else ""
+                if eisenhower not in QUADRANTES_EISENHOWER:
+                    eisenhower = ""
 
                 cursor.execute("""
-                INSERT OR REPLACE INTO tarefas (id, data_criacao, titulo, categoria, status, prazo, prioridade, descricao, anexo_nome, anexo_url)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """, (tid, data_criacao, titulo, categoria, status, prazo, prioridade, descricao, anexo_nome, anexo_url))
+                INSERT OR REPLACE INTO tarefas (id, data_criacao, titulo, categoria, status, prazo, prioridade, descricao, anexo_nome, anexo_url, eisenhower)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """, (tid, data_criacao, titulo, categoria, status, prazo, prioridade, descricao, anexo_nome, anexo_url, eisenhower))
                 resumo["tarefas"] += 1
 
         elif "curso" in norm:  # Cursos
@@ -99,6 +111,18 @@ def importar_arquivo_xlsx(caminho_arquivo: str):
                 VALUES (?, ?, ?, ?, ?, ?, ?)
                 """, (cid, nome, instituicao, categoria, carga_horaria, status, link))
                 resumo["cursos"] += 1
+
+        elif "subcategoria" in norm:  # Subcategorias (verificar antes de "categoria")
+            for r in dados_linhas:
+                if not r or r[0] is None:
+                    continue
+                cat = str(r[0]).strip()
+                sub = str(r[1]).strip() if len(r) > 1 and r[1] is not None else ""
+                if cat and sub:
+                    cursor.execute(
+                        "INSERT OR IGNORE INTO subcategorias (categoria, nome) VALUES (?, ?)",
+                        (cat, sub)
+                    )
 
         elif "categoria" in norm:  # Categorias
             for r in dados_linhas:
@@ -173,15 +197,34 @@ def importar_arquivo_json(caminho_arquivo: str):
                 cursor.execute("INSERT OR IGNORE INTO categorias (nome) VALUES (?)", (nome.strip(),))
                 resumo["categorias"] += 1
 
+    if "subcategorias" in dados:
+        for s in dados["subcategorias"]:
+            if isinstance(s, dict):
+                cat = (s.get("categoria") or "").strip()
+                nome = (s.get("nome") or "").strip()
+                if cat and nome:
+                    cursor.execute(
+                        "INSERT OR IGNORE INTO subcategorias (categoria, nome) VALUES (?, ?)",
+                        (cat, nome)
+                    )
+
     if "anotacoes" in dados:
         for a in dados["anotacoes"]:
+            materia = (a.get("materia") or "").strip()
+            subcategoria = (a.get("subcategoria") or "").strip()
+            if materia and subcategoria:
+                cursor.execute(
+                    "INSERT OR IGNORE INTO subcategorias (categoria, nome) VALUES (?, ?)",
+                    (materia, subcategoria)
+                )
             cursor.execute("""
-            INSERT OR REPLACE INTO anotacoes (id, data, materia, topico, conteudo, tags, link, anexo_nome, anexo_url)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT OR REPLACE INTO anotacoes (id, data, materia, subcategoria, topico, conteudo, tags, link, anexo_nome, anexo_url)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (
                 a.get("id"),
                 a.get("data", ""),
-                a.get("materia", ""),
+                materia,
+                subcategoria,
                 a.get("topico", ""),
                 a.get("conteudo", ""),
                 a.get("tags", ""),
@@ -193,9 +236,12 @@ def importar_arquivo_json(caminho_arquivo: str):
 
     if "tarefas" in dados:
         for t in dados["tarefas"]:
+            eisenhower = (t.get("eisenhower") or "").strip().lower()
+            if eisenhower not in QUADRANTES_EISENHOWER:
+                eisenhower = ""
             cursor.execute("""
-            INSERT OR REPLACE INTO tarefas (id, data_criacao, titulo, categoria, status, prazo, prioridade, descricao, anexo_nome, anexo_url)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT OR REPLACE INTO tarefas (id, data_criacao, titulo, categoria, status, prazo, prioridade, descricao, anexo_nome, anexo_url, eisenhower)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (
                 t.get("id"),
                 t.get("dataCriacao", t.get("data_criacao", "")),
@@ -206,7 +252,8 @@ def importar_arquivo_json(caminho_arquivo: str):
                 t.get("prioridade", "Média"),
                 t.get("descricao", ""),
                 t.get("anexoNome", t.get("anexo_nome", "")),
-                t.get("anexoUrl", t.get("anexo_url", ""))
+                t.get("anexoUrl", t.get("anexo_url", "")),
+                eisenhower
             ))
             resumo["tarefas"] += 1
 
@@ -265,10 +312,17 @@ def exportar_todos_dados():
     cursor.execute("SELECT nome FROM categorias ORDER BY id ASC")
     categorias = [r[0] for r in cursor.fetchall()]
 
+    cursor.execute("SELECT id, categoria, nome FROM subcategorias ORDER BY categoria ASC, nome ASC")
+    subcategorias = [
+        {"id": r["id"], "categoria": r["categoria"], "nome": r["nome"]}
+        for r in cursor.fetchall()
+    ]
+
     cursor.execute("SELECT * FROM anotacoes ORDER BY rowid DESC")
     anotacoes = [
         {
-            "id": r["id"], "data": r["data"], "materia": r["materia"], "topico": r["topico"],
+            "id": r["id"], "data": r["data"], "materia": r["materia"],
+            "subcategoria": r["subcategoria"] or "", "topico": r["topico"],
             "conteudo": r["conteudo"], "tags": r["tags"], "link": r["link"],
             "anexoNome": r["anexo_nome"] or "", "anexoUrl": r["anexo_url"] or ""
         } for r in cursor.fetchall()
@@ -280,7 +334,8 @@ def exportar_todos_dados():
             "id": r["id"], "dataCriacao": r["data_criacao"], "titulo": r["titulo"],
             "categoria": r["categoria"], "status": r["status"], "prazo": r["prazo"],
             "prioridade": r["prioridade"], "descricao": r["descricao"] or "",
-            "anexoNome": r["anexo_nome"] or "", "anexoUrl": r["anexo_url"] or ""
+            "anexoNome": r["anexo_nome"] or "", "anexoUrl": r["anexo_url"] or "",
+            "eisenhower": r["eisenhower"] or ""
         } for r in cursor.fetchall()
     ]
 
@@ -337,9 +392,10 @@ def exportar_todos_dados():
     conn.close()
 
     return {
-        "versao": "3.0",
+        "versao": "3.1",
         "geradoEm": datetime.now().isoformat(),
         "categorias": categorias,
+        "subcategorias": subcategorias,
         "anotacoes": anotacoes,
         "tarefas": tarefas,
         "cursos": cursos,

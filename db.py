@@ -29,12 +29,23 @@ def init_db():
     )
     """)
 
+    # Tabela de Subcategorias (vinculadas a uma categoria pai)
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS subcategorias (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        categoria TEXT NOT NULL,
+        nome TEXT NOT NULL,
+        UNIQUE(categoria, nome)
+    )
+    """)
+
     # Tabela de Anotações
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS anotacoes (
         id TEXT PRIMARY KEY,
         data TEXT,
         materia TEXT,
+        subcategoria TEXT DEFAULT '',
         topico TEXT,
         conteudo TEXT,
         tags TEXT,
@@ -56,7 +67,8 @@ def init_db():
         prioridade TEXT,
         descricao TEXT,
         anexo_nome TEXT,
-        anexo_url TEXT
+        anexo_url TEXT,
+        eisenhower TEXT DEFAULT ''
     )
     """)
 
@@ -135,6 +147,17 @@ def init_db():
     )
     """)
 
+    # Migração idempotente para bancos já existentes
+    cursor.execute("PRAGMA table_info(anotacoes)")
+    anot_cols = {r[1] for r in cursor.fetchall()}
+    if "subcategoria" not in anot_cols:
+        cursor.execute("ALTER TABLE anotacoes ADD COLUMN subcategoria TEXT DEFAULT ''")
+
+    cursor.execute("PRAGMA table_info(tarefas)")
+    tar_cols = {r[1] for r in cursor.fetchall()}
+    if "eisenhower" not in tar_cols:
+        cursor.execute("ALTER TABLE tarefas ADD COLUMN eisenhower TEXT DEFAULT ''")
+
     conn.commit()
 
     # Categorias padrão caso a tabela esteja vazia
@@ -211,6 +234,59 @@ def adicionar_categoria(nome: str):
         return False, "Esta categoria já existe!"
     finally:
         conn.close()
+
+def get_todas_subcategorias(categoria: str = None):
+    """Retorna subcategorias cadastradas, filtradas por categoria se informada."""
+    conn = get_connection()
+    cursor = conn.cursor()
+    if categoria and str(categoria).strip():
+        cursor.execute(
+            "SELECT id, categoria, nome FROM subcategorias WHERE categoria = ? ORDER BY nome ASC",
+            (str(categoria).strip(),)
+        )
+    else:
+        cursor.execute("SELECT id, categoria, nome FROM subcategorias ORDER BY categoria ASC, nome ASC")
+    rows = [{"id": r["id"], "categoria": r["categoria"], "nome": r["nome"]} for r in cursor.fetchall()]
+    conn.close()
+    return rows
+
+def adicionar_subcategoria(categoria: str, nome: str):
+    """Cria uma nova subcategoria vinculada a uma categoria existente."""
+    cat = (categoria or "").strip()
+    sub = (nome or "").strip()
+    if not cat:
+        return False, "Categoria inválida."
+    if not sub:
+        return False, "Nome de subcategoria inválido."
+    conn = get_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("INSERT INTO subcategorias (categoria, nome) VALUES (?, ?)", (cat, sub))
+        conn.commit()
+        return True, "Subcategoria criada com sucesso!"
+    except sqlite3.IntegrityError:
+        return False, "Esta subcategoria já existe nesta categoria!"
+    finally:
+        conn.close()
+
+def excluir_subcategoria(sub_id: int):
+    """Remove uma subcategoria e limpa seu vínculo nas anotações existentes."""
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT categoria, nome FROM subcategorias WHERE id = ?", (sub_id,))
+    row = cursor.fetchone()
+    if not row:
+        conn.close()
+        return False, "Subcategoria não encontrada."
+    cat, nome = row["categoria"], row["nome"]
+    cursor.execute(
+        "UPDATE anotacoes SET subcategoria = '' WHERE materia = ? AND subcategoria = ?",
+        (cat, nome)
+    )
+    cursor.execute("DELETE FROM subcategorias WHERE id = ?", (sub_id,))
+    conn.commit()
+    conn.close()
+    return True, "Subcategoria removida com sucesso!"
 
 def get_dashboard():
     conn = get_connection()
@@ -567,12 +643,13 @@ def get_grafo_conhecimento():
     titulo_para_id = {}
 
     # 2. Anotações
-    cursor.execute("SELECT id, topico, materia, conteudo, tags FROM anotacoes")
+    cursor.execute("SELECT id, topico, materia, subcategoria, conteudo, tags FROM anotacoes")
     anotacoes = cursor.fetchall()
     for a in anotacoes:
         aid = a["id"]
         topico = a["topico"] or "Sem título"
         materia = a["materia"] or "Outros"
+        subcat = (a["subcategoria"] or "").strip()
         node_ids.add(aid)
         titulo_para_id[topico.strip().lower()] = aid
         nodes.append({
@@ -580,11 +657,26 @@ def get_grafo_conhecimento():
             "label": topico,
             "group": "anotacao",
             "categoria": materia,
+            "subcategoria": subcat,
             "rawId": aid,
             "val": 11
         })
         cat_id = f"CAT:{materia}"
-        if cat_id in node_ids:
+        if subcat:
+            sub_id = f"SUB:{materia}::{subcat}"
+            if sub_id not in node_ids:
+                node_ids.add(sub_id)
+                nodes.append({
+                    "id": sub_id,
+                    "label": subcat,
+                    "group": "subcategoria",
+                    "categoria": materia,
+                    "val": 14
+                })
+                if cat_id in node_ids:
+                    edges.append({"from": sub_id, "to": cat_id, "type": "subcategoria"})
+            edges.append({"from": aid, "to": sub_id, "type": "categoria"})
+        elif cat_id in node_ids:
             edges.append({"from": aid, "to": cat_id, "type": "categoria"})
 
     # 3. Leituras & Mídias

@@ -13,7 +13,9 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from db import (
     init_db, get_connection, get_config, set_config,
-    get_todas_categorias, adicionar_categoria, get_dashboard,
+    get_todas_categorias, adicionar_categoria,
+    get_todas_subcategorias, adicionar_subcategoria, excluir_subcategoria,
+    get_dashboard,
     get_todas_midias, salvar_midia_db, excluir_midia_db,
     get_habitos_dados, salvar_habito_db, alternar_registro_habito_db,
     excluir_habito_db, salvar_meta_leitura_db, get_grafo_conhecimento
@@ -73,6 +75,8 @@ def salvar_arquivo_base64(file_obj):
 
 # ================= HANDLERS DOS ENDPOINTS =================
 
+QUADRANTES_EISENHOWER = {"", "fazer", "agendar", "delegar", "eliminar"}
+
 def api_getDashboardData():
     return get_dashboard()
 
@@ -82,6 +86,20 @@ def api_getCategorias():
 def api_salvarCategoria(nome):
     sucesso, msg = adicionar_categoria(nome)
     return {"success": sucesso, "message": msg}
+
+def api_getSubcategorias(categoria=None):
+    return get_todas_subcategorias(categoria)
+
+def api_salvarSubcategoria(categoria, nome):
+    sucesso, msg = adicionar_subcategoria(categoria, nome)
+    return {"success": sucesso, "message": msg}
+
+def api_excluirSubcategoria(sub_id):
+    try:
+        sucesso, msg = excluir_subcategoria(int(sub_id))
+        return {"success": sucesso, "message": msg}
+    except (ValueError, TypeError):
+        return {"success": False, "message": "ID de subcategoria inválido."}
 
 def api_getAnotacoes():
     conn = get_connection()
@@ -96,6 +114,7 @@ def api_getAnotacoes():
             "id": r["id"],
             "data": r["data"],
             "materia": r["materia"],
+            "subcategoria": r["subcategoria"] or "",
             "topico": r["topico"],
             "conteudo": r["conteudo"],
             "tags": r["tags"],
@@ -117,15 +136,24 @@ def api_salvarAnotacao(dados):
             anexo = salvar_arquivo_base64(dados["arquivoData"])
             anexo_nome = anexo["name"]
             anexo_url = anexo["url"]
+
+        materia = (dados.get("materia") or "").strip()
+        subcategoria = (dados.get("subcategoria") or "").strip()
+        if materia and subcategoria:
+            cursor.execute(
+                "INSERT OR IGNORE INTO subcategorias (categoria, nome) VALUES (?, ?)",
+                (materia, subcategoria)
+            )
             
         aid = dados.get("id")
         if aid:
             cursor.execute("""
             UPDATE anotacoes 
-            SET materia = ?, topico = ?, conteudo = ?, tags = ?, link = ?, anexo_nome = ?, anexo_url = ?
+            SET materia = ?, subcategoria = ?, topico = ?, conteudo = ?, tags = ?, link = ?, anexo_nome = ?, anexo_url = ?
             WHERE id = ?
             """, (
-                dados.get("materia", ""),
+                materia,
+                subcategoria,
                 dados.get("topico", ""),
                 dados.get("conteudo", ""),
                 dados.get("tags", ""),
@@ -141,12 +169,13 @@ def api_salvarAnotacao(dados):
             novo_id = f"NOTE-{str(int(time.time() * 1000))[-6:]}"
             data_atual = datetime.now().strftime("%d/%m/%Y %H:%M")
             cursor.execute("""
-            INSERT INTO anotacoes (id, data, materia, topico, conteudo, tags, link, anexo_nome, anexo_url)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO anotacoes (id, data, materia, subcategoria, topico, conteudo, tags, link, anexo_nome, anexo_url)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (
                 novo_id,
                 data_atual,
-                dados.get("materia", ""),
+                materia,
+                subcategoria,
                 dados.get("topico", ""),
                 dados.get("conteudo", ""),
                 dados.get("tags", ""),
@@ -190,7 +219,8 @@ def api_getTarefas():
             "prioridade": r["prioridade"],
             "descricao": r["descricao"] or "",
             "anexoNome": r["anexo_nome"] or "",
-            "anexoUrl": r["anexo_url"] or ""
+            "anexoUrl": r["anexo_url"] or "",
+            "eisenhower": r["eisenhower"] or ""
         })
     return resultado
 
@@ -206,12 +236,16 @@ def api_salvarTarefa(dados):
             anexo = salvar_arquivo_base64(dados["arquivoData"])
             anexo_nome = anexo["name"]
             anexo_url = anexo["url"]
+
+        eisenhower = (dados.get("eisenhower") or "").strip().lower()
+        if eisenhower not in QUADRANTES_EISENHOWER:
+            eisenhower = ""
             
         tid = dados.get("id")
         if tid:
             cursor.execute("""
             UPDATE tarefas
-            SET titulo = ?, categoria = ?, status = ?, prazo = ?, prioridade = ?, descricao = ?, anexo_nome = ?, anexo_url = ?
+            SET titulo = ?, categoria = ?, status = ?, prazo = ?, prioridade = ?, descricao = ?, anexo_nome = ?, anexo_url = ?, eisenhower = ?
             WHERE id = ?
             """, (
                 dados.get("titulo", ""),
@@ -222,6 +256,7 @@ def api_salvarTarefa(dados):
                 dados.get("descricao", ""),
                 anexo_nome,
                 anexo_url,
+                eisenhower,
                 tid
             ))
             conn.commit()
@@ -231,8 +266,8 @@ def api_salvarTarefa(dados):
             novo_id = f"TASK-{str(int(time.time() * 1000))[-6:]}"
             data_atual = datetime.now().strftime("%d/%m/%Y")
             cursor.execute("""
-            INSERT INTO tarefas (id, data_criacao, titulo, categoria, status, prazo, prioridade, descricao, anexo_nome, anexo_url)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO tarefas (id, data_criacao, titulo, categoria, status, prazo, prioridade, descricao, anexo_nome, anexo_url, eisenhower)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (
                 novo_id,
                 data_atual,
@@ -243,7 +278,8 @@ def api_salvarTarefa(dados):
                 dados.get("prioridade", "Média"),
                 dados.get("descricao", ""),
                 anexo_nome,
-                anexo_url
+                anexo_url,
+                eisenhower
             ))
             conn.commit()
             conn.close()
@@ -259,6 +295,20 @@ def api_atualizarStatusTarefa(tid, novo_status):
         conn.commit()
         conn.close()
         return {"success": True, "message": "Status atualizado!"}
+    except Exception as e:
+        return {"success": False, "message": str(e)}
+
+def api_atualizarEisenhowerTarefa(tid, quadrante):
+    try:
+        q = (quadrante or "").strip().lower()
+        if q not in QUADRANTES_EISENHOWER:
+            return {"success": False, "message": "Quadrante inválido."}
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute("UPDATE tarefas SET eisenhower = ? WHERE id = ?", (q, tid))
+        conn.commit()
+        conn.close()
+        return {"success": True, "message": "Quadrante atualizado!"}
     except Exception as e:
         return {"success": False, "message": str(e)}
 
@@ -526,12 +576,16 @@ HANDLERS = {
     "getDashboardData": api_getDashboardData,
     "getCategorias": api_getCategorias,
     "salvarCategoria": api_salvarCategoria,
+    "getSubcategorias": api_getSubcategorias,
+    "salvarSubcategoria": api_salvarSubcategoria,
+    "excluirSubcategoria": api_excluirSubcategoria,
     "getAnotacoes": api_getAnotacoes,
     "salvarAnotacao": api_salvarAnotacao,
     "excluirAnotacao": api_excluirAnotacao,
     "getTarefas": api_getTarefas,
     "salvarTarefa": api_salvarTarefa,
     "atualizarStatusTarefa": api_atualizarStatusTarefa,
+    "atualizarEisenhowerTarefa": api_atualizarEisenhowerTarefa,
     "excluirTarefa": api_excluirTarefa,
     "getCursos": api_getCursos,
     "salvarCurso": api_salvarCurso,

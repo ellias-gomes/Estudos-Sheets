@@ -18,6 +18,9 @@ Transformação do sistema do Google Apps Script / Google Sheets para uma aplica
 - **🔥 Rastreador de Hábitos & Gamificação**: Grade semanal de hábitos, ofensiva de dias seguidos (*streaks*), desafio anual de leitura e Mapa de Calor (*Heatmap* estilo GitHub).
 - **📄 Exportador Acadêmico com 1 Clique (PDF/ABNT e Markdown)**: Gere documentos formatados nas normas ABNT prontos para impressão/PDF ou baixe em `.md` com frontmatter YAML.
 - **📱 Acesso no Celular / Tablet (Wi-Fi)**: Interface responsiva com QR Code integrado para estudar ou revisar flashcards pelo celular na mesma rede Wi-Fi.
+- **🗂️ Subcategorias nas Anotações**: Organize anotações em subcategorias dentro de cada categoria (como matérias dentro de Estudos), com visualização agrupada/grade, barra rápida, criação inline, modal de gerenciamento e reflexo no grafo de conhecimento e backups.
+- **🎯 Matriz de Eisenhower**: Página dedicada para priorização de tarefas por Urgência × Importância nos 4 quadrantes (Fazer Agora, Agendar, Delegar e Eliminar/Postergar) + Caixa de Entrada com arrastar e soltar (SortableJS) e classificação em 1 clique.
+- **🏷️ Tarefas por Categoria**: Filtro por categoria, busca textual, barra rápida de categorias e modo de visualização "Por Categoria" integrado às visualizações Lista e Kanban.
 
 ---
 
