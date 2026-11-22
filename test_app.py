@@ -478,6 +478,10 @@ def test_frontend_elementos_novos():
         "modalSubcategoria",
         "subcategoriaAnotacao",
         "eisenhowerTarefa",
+        "btnAlternarTema",
+        "alternarTema",
+        "study_hub_tema",
+        "html.dark",
     ]:
         assert elem_id in html, f"Elemento esperado ausente no HTML: {elem_id}"
     print("✅ Teste 20: Todos os elementos de interface novos presentes no frontend!")

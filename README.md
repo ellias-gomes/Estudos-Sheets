@@ -21,6 +21,7 @@ Transformação do sistema do Google Apps Script / Google Sheets para uma aplica
 - **🗂️ Subcategorias nas Anotações**: Organize anotações em subcategorias dentro de cada categoria (como matérias dentro de Estudos), com visualização agrupada/grade, barra rápida, criação inline, modal de gerenciamento e reflexo no grafo de conhecimento e backups.
 - **🎯 Matriz de Eisenhower**: Página dedicada para priorização de tarefas por Urgência × Importância nos 4 quadrantes (Fazer Agora, Agendar, Delegar e Eliminar/Postergar) + Caixa de Entrada com arrastar e soltar (SortableJS) e classificação em 1 clique.
 - **🏷️ Tarefas por Categoria**: Filtro por categoria, busca textual, barra rápida de categorias e modo de visualização "Por Categoria" integrado às visualizações Lista e Kanban.
+- **🌙 Modo Noturno (Dark Mode)**: Alternância instantânea no cabeçalho com persistência em `localStorage` sem flash ao recarregar e adaptação visual completa de todos os módulos, modais, editor Quill, FullCalendar, Chart.js, Kanban, Matriz de Eisenhower e Heatmap.
 
 ---
 
