@@ -2,6 +2,10 @@
 <html lang="pt-PT">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0f172a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>Study Hub & Life OS</title>
   <script>
     (function() {
@@ -36,9 +40,14 @@
       color: #1e293b;
       display: flex;
       height: 100vh;
+      height: 100dvh;
       overflow: hidden;
     }
     .hidden, .view-hidden { display: none !important; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .mobile-bnav-btn { color: #64748b; }
+    .mobile-bnav-btn.mobile-bnav-active { color: #4f46e5 !important; }
     
     /* Cores e Utilitários Modernos (Compatibilidade Tailwind v2/v3) */
     .bg-slate-950 { background-color: #020617; }
@@ -284,7 +293,8 @@
       color: #c7d2fe !important;
     }
     html.dark .text-teal-600,
-    html.dark .text-teal-700 {
+    html.dark .text-teal-700,
+    html.dark .text-teal-800 {
       color: #5eead4 !important;
     }
     html.dark .text-emerald-600,
@@ -297,6 +307,7 @@
     html.dark .text-red-700 {
       color: #fca5a5 !important;
     }
+    html.dark .text-red-800,
     html.dark .text-red-900 {
       color: #fecaca !important;
     }
@@ -315,7 +326,8 @@
       color: #93c5fd !important;
     }
     html.dark .text-purple-600,
-    html.dark .text-purple-700 {
+    html.dark .text-purple-700,
+    html.dark .text-purple-800 {
       color: #d8b4fe !important;
     }
     html.dark .text-rose-600,
@@ -582,16 +594,158 @@
     html.dark #btnAlternarTema:hover {
       background-color: #334155 !important;
     }
+    html.dark #mobileBottomNav {
+      background-color: rgba(15, 23, 42, 0.96) !important;
+      border-color: #1e293b !important;
+    }
+    html.dark .mobile-bnav-btn {
+      color: #94a3b8;
+    }
+    html.dark .mobile-bnav-btn.mobile-bnav-active {
+      color: #a5b4fc !important;
+    }
+    html.dark #mobileBottomNav .mobile-fab-plus {
+      border-color: #0f172a !important;
+    }
+
+    /* ================= EXPERIÊNCIA MOBILE NATIVA (< 768px) ================= */
+    @media (max-width: 767px) {
+      * {
+        -webkit-tap-highlight-color: transparent;
+      }
+      main {
+        overflow-x: hidden;
+      }
+      input, select, textarea {
+        font-size: 16px !important;
+      }
+
+      /* Modais estilo Bottom Sheet */
+      .modal-backdrop {
+        padding: 0 !important;
+        align-items: flex-end !important;
+      }
+      .modal-backdrop > div {
+        width: 100% !important;
+        max-width: 100% !important;
+        max-height: 92dvh !important;
+        border-radius: 1.25rem 1.25rem 0 0 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        overflow: hidden !important;
+      }
+      .modal-backdrop > div > form,
+      .modal-backdrop > div > .modal-scroll-body {
+        overflow-y: auto !important;
+        flex: 1 1 auto !important;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      /* Modais de Tela Cheia no Mobile */
+      #modalAnotacao > div,
+      #modalLeituraAnotacao > div,
+      #modalLeituraMidia > div {
+        height: 100dvh !important;
+        max-height: 100dvh !important;
+        border-radius: 0 !important;
+      }
+
+      /* Editor Quill */
+      .ql-editor {
+        min-height: 240px !important;
+        padding: 16px !important;
+      }
+      .ql-toolbar.ql-snow {
+        padding: 8px 10px !important;
+      }
+
+      /* Cards de Anotação com altura fluida */
+      .nota-card-item {
+        height: auto !important;
+        min-height: 210px;
+      }
+
+      /* Kanban deslizável horizontal estilo Trello */
+      #containerKanbanTarefas:not(.view-hidden) {
+        display: flex !important;
+        overflow-x: auto !important;
+        scroll-snap-type: x mandatory;
+        gap: 0.75rem !important;
+        padding-bottom: 0.5rem;
+        -webkit-overflow-scrolling: touch;
+      }
+      #containerKanbanTarefas > div {
+        flex: 0 0 86vw !important;
+        max-width: 86vw !important;
+        scroll-snap-align: center;
+        height: 64dvh !important;
+      }
+
+      /* Matriz de Eisenhower sem caixas presas */
+      #view-eisenhower .eisenhower-zone {
+        max-height: none !important;
+        min-height: 96px !important;
+      }
+
+      /* FullCalendar */
+      .fc .fc-header-toolbar {
+        flex-wrap: wrap !important;
+        gap: 0.5rem !important;
+      }
+      .fc .fc-toolbar-title {
+        font-size: 1rem !important;
+      }
+      .fc .fc-button {
+        padding: 0.35rem 0.6rem !important;
+        font-size: 0.75rem !important;
+      }
+
+      /* Tabela de Hábitos com coluna fixa à esquerda */
+      #view-habitos table th:first-child,
+      #view-habitos table td:first-child {
+        position: sticky;
+        left: 0;
+        z-index: 2;
+        max-width: 170px;
+      }
+      #view-habitos table thead th:first-child {
+        background-color: #f8fafc;
+      }
+      #view-habitos table tbody td:first-child {
+        background-color: #ffffff;
+      }
+      html.dark #view-habitos table thead th:first-child {
+        background-color: #0f172a;
+      }
+      html.dark #view-habitos table tbody td:first-child {
+        background-color: #162032;
+      }
+
+      /* Grafo mais confortável no mobile */
+      #view-grafo .grafo-canvas-wrap {
+        height: 60dvh !important;
+      }
+
+      /* Safe area na barra inferior */
+      #mobileBottomNav {
+        padding-bottom: env(safe-area-inset-bottom);
+      }
+    }
   </style>
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans flex h-screen overflow-hidden">
 
   <!-- ================= MENU LATERAL + POMODORO ================= -->
   <div id="backdropMobileMenu" onclick="alternarMenuMobile()" class="fixed inset-0 bg-slate-950/60 z-30 hidden md:hidden"></div>
-  <aside id="sidebarPrincipal" class="fixed md:static inset-y-0 left-0 z-40 w-64 bg-slate-900 text-white flex flex-col transition-transform duration-300 transform -translate-x-full md:translate-x-0 flex-shrink-0">
-    <div class="p-5 text-2xl font-bold bg-slate-950 flex items-center space-x-3">
-      <i class="fa-solid fa-brain text-indigo-500"></i>
-      <span>Life OS</span>
+  <aside id="sidebarPrincipal" class="fixed md:static inset-y-0 left-0 z-40 w-64 max-w-[85vw] h-full bg-slate-900 text-white flex flex-col transition-transform duration-300 transform -translate-x-full md:translate-x-0 flex-shrink-0">
+    <div class="p-5 text-2xl font-bold bg-slate-950 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <i class="fa-solid fa-brain text-indigo-500"></i>
+        <span>Life OS</span>
+      </div>
+      <button type="button" onclick="alternarMenuMobile()" class="md:hidden text-slate-400 hover:text-white p-1.5 rounded-lg" aria-label="Fechar menu">
+        <i class="fa-solid fa-xmark text-lg"></i>
+      </button>
     </div>
 
     <nav class="flex-1 px-4 py-3 space-y-1.5 overflow-y-auto">
@@ -653,15 +807,27 @@
   </aside>
 
   <!-- ================= CONTEÚDO PRINCIPAL ================= -->
-  <main class="flex-1 flex flex-col h-screen overflow-y-auto">
-    <header class="bg-white p-4 shadow-sm flex flex-wrap justify-between items-center gap-3 border-b border-gray-200 sticky top-0 z-20">
-      <div class="flex items-center space-x-3">
-        <button type="button" onclick="alternarMenuMobile()" class="md:hidden text-slate-700 hover:text-indigo-600 p-2 rounded-lg border border-gray-200">
+  <main class="flex-1 flex flex-col h-screen overflow-y-auto min-w-0">
+    <header class="bg-white px-3.5 py-3 md:p-4 shadow-sm flex justify-between items-center gap-2 border-b border-gray-200 sticky top-0 z-20">
+      <div class="flex items-center space-x-2.5 min-w-0 flex-1">
+        <button type="button" onclick="alternarMenuMobile()" class="md:hidden text-slate-700 hover:text-indigo-600 p-2 rounded-lg border border-gray-200 flex-shrink-0" aria-label="Abrir menu">
           <i class="fa-solid fa-bars text-lg"></i>
         </button>
-        <h1 class="text-lg sm:text-2xl font-semibold text-slate-800" id="titulo-pagina">Visão Geral dos Estudos</h1>
+        <h1 class="text-base sm:text-2xl font-semibold text-slate-800 truncate" id="titulo-pagina">Visão Geral dos Estudos</h1>
       </div>
-      <div class="flex items-center space-x-2">
+
+      <!-- Ações Compactas no Mobile -->
+      <div class="flex md:hidden items-center space-x-1.5 flex-shrink-0">
+        <button type="button" onclick="alternarTema()" class="w-10 h-10 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-gray-200 rounded-lg flex items-center justify-center shadow-sm" title="Alternar Tema">
+          <i id="iconeTemaMobile" class="fa-solid fa-moon text-indigo-600"></i>
+        </button>
+        <button type="button" onclick="abrirModal('modalImportarBackup')" class="w-10 h-10 bg-slate-800 hover:bg-slate-900 text-white rounded-lg flex items-center justify-center shadow-sm" title="Importar / Backup">
+          <i class="fa-solid fa-file-import text-indigo-400"></i>
+        </button>
+      </div>
+
+      <!-- Ações Completas no Desktop -->
+      <div class="hidden md:flex items-center space-x-2 flex-shrink-0">
         <button type="button" id="btnAlternarTema" onclick="alternarTema()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 border border-gray-200 px-3 py-2 rounded-lg font-medium shadow-sm transition-all flex items-center space-x-1.5 text-xs sm:text-sm" title="Alternar entre Modo Claro e Modo Noturno">
           <i id="iconeTema" class="fa-solid fa-moon text-indigo-600"></i>
           <span id="textoTema" class="hidden md:inline">Modo Noturno</span>
@@ -687,27 +853,27 @@
       </div>
     </header>
 
-    <div class="p-6">
+    <div class="p-3.5 pb-24 md:p-6 md:pb-6">
       <!-- ================= 1. DASHBOARD ================= -->
       <div id="view-dashboard" class="space-y-6">
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-          <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200" style="border-left: 4px solid #6366f1;">
+        <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-5 gap-3 md:gap-4">
+          <div class="bg-white p-4 md:p-5 rounded-xl shadow-sm border border-gray-200" style="border-left: 4px solid #6366f1;">
             <p class="text-xs text-gray-500 font-medium">Anotações</p>
             <h3 class="text-2xl font-bold text-slate-800 mt-1" id="card-anotacoes">0</h3>
           </div>
-          <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200" style="border-left: 4px solid #f97316;">
+          <div class="bg-white p-4 md:p-5 rounded-xl shadow-sm border border-gray-200" style="border-left: 4px solid #f97316;">
             <p class="text-xs text-gray-500 font-medium">Tarefas Pendentes</p>
             <h3 class="text-2xl font-bold text-slate-800 mt-1" id="card-pendentes">0</h3>
           </div>
-          <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200" style="border-left: 4px solid #10b981;">
+          <div class="bg-white p-4 md:p-5 rounded-xl shadow-sm border border-gray-200" style="border-left: 4px solid #10b981;">
             <p class="text-xs text-gray-500 font-medium">Tarefas Concluídas</p>
             <h3 class="text-2xl font-bold text-slate-800 mt-1" id="card-concluidas">0</h3>
           </div>
-          <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200" style="border-left: 4px solid #8b5cf6;">
+          <div class="bg-white p-4 md:p-5 rounded-xl shadow-sm border border-gray-200" style="border-left: 4px solid #8b5cf6;">
             <p class="text-xs text-gray-500 font-medium">Cursos Ativos</p>
             <h3 class="text-2xl font-bold text-slate-800 mt-1" id="card-cursos">0</h3>
           </div>
-          <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200" style="border-left: 4px solid #ec4899;">
+          <div class="col-span-2 lg:col-span-1 bg-white p-4 md:p-5 rounded-xl shadow-sm border border-gray-200" style="border-left: 4px solid #ec4899;">
             <p class="text-xs text-gray-500 font-medium">Tempo Focado (Pomodoro)</p>
             <h3 class="text-2xl font-bold text-slate-800 mt-1" id="card-pomodoro">0h</h3>
           </div>
@@ -738,35 +904,35 @@
 
       <!-- ================= 2. ANOTAÇÕES ================= -->
       <div id="view-anotacoes" class="view-hidden space-y-4">
-        <div class="flex flex-wrap gap-3 justify-between items-center bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
-          <div class="flex flex-wrap gap-3 flex-1 items-center" style="min-width: 280px;">
-            <input type="text" id="buscaAnotacao" oninput="filtrarAnotacoes()" placeholder="Pesquisar por título, conteúdo, subcategoria ou tag..." class="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none" style="min-width: 200px;">
-            <select id="filtroCategoriaAnotacao" onchange="aoMudarFiltroCategoriaAnotacao()" class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none">
+        <div class="flex flex-col md:flex-row flex-wrap gap-3 justify-between items-stretch md:items-center bg-white p-3.5 md:p-4 rounded-xl border border-gray-200 shadow-sm">
+          <div class="flex flex-wrap gap-2.5 flex-1 items-center min-w-0">
+            <input type="text" id="buscaAnotacao" oninput="filtrarAnotacoes()" placeholder="Pesquisar por título, conteúdo, subcategoria ou tag..." class="w-full md:flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none">
+            <select id="filtroCategoriaAnotacao" onchange="aoMudarFiltroCategoriaAnotacao()" class="flex-1 md:flex-initial min-w-0 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none">
               <option value="">Todas as Categorias</option>
             </select>
-            <select id="filtroSubcategoriaAnotacao" onchange="filtrarAnotacoes()" class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none">
+            <select id="filtroSubcategoriaAnotacao" onchange="filtrarAnotacoes()" class="flex-1 md:flex-initial min-w-0 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none">
               <option value="">Todas as Subcategorias</option>
             </select>
-            <div class="bg-slate-100 p-1 rounded-lg flex items-center">
-              <button type="button" id="btnModoAnotacoesAgrupado" onclick="alternarModoAnotacoes('agrupado')" class="px-3 py-1.5 rounded-md text-xs font-semibold bg-white text-slate-800 shadow-sm flex items-center space-x-1.5">
+            <div class="bg-slate-100 p-1 rounded-lg flex items-center w-full sm:w-auto">
+              <button type="button" id="btnModoAnotacoesAgrupado" onclick="alternarModoAnotacoes('agrupado')" class="flex-1 sm:flex-initial justify-center px-3 py-1.5 rounded-md text-xs font-semibold bg-white text-slate-800 shadow-sm flex items-center space-x-1.5">
                 <i class="fa-solid fa-folder-tree"></i> <span>Agrupado</span>
               </button>
-              <button type="button" id="btnModoAnotacoesGrade" onclick="alternarModoAnotacoes('grade')" class="px-3 py-1.5 rounded-md text-xs font-semibold text-slate-600 hover:text-slate-800 flex items-center space-x-1.5">
+              <button type="button" id="btnModoAnotacoesGrade" onclick="alternarModoAnotacoes('grade')" class="flex-1 sm:flex-initial justify-center px-3 py-1.5 rounded-md text-xs font-semibold text-slate-600 hover:text-slate-800 flex items-center space-x-1.5">
                 <i class="fa-solid fa-grip"></i> <span>Grade</span>
               </button>
             </div>
           </div>
-          <div class="flex items-center space-x-2">
-            <button type="button" onclick="abrirModalSubcategoria()" class="bg-teal-600 hover:bg-teal-700 text-white px-3.5 py-2 rounded-lg text-sm font-medium transition-colors flex items-center space-x-1.5">
+          <div class="flex items-center gap-2">
+            <button type="button" onclick="abrirModalSubcategoria()" class="flex-1 md:flex-initial justify-center bg-teal-600 hover:bg-teal-700 text-white px-3.5 py-2 rounded-lg text-sm font-medium transition-colors flex items-center space-x-1.5">
               <i class="fa-solid fa-folder-plus"></i> <span>+ Subcategoria</span>
             </button>
-            <button type="button" onclick="abrirModalAnotacao()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+            <button type="button" onclick="abrirModalAnotacao()" class="flex-1 md:flex-initial bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors text-center">
               + Nova Anotação
             </button>
           </div>
         </div>
 
-        <div id="barraSubcategoriasAnotacao" class="hidden bg-white px-4 py-2.5 rounded-xl border border-gray-200 shadow-sm flex flex-wrap items-center gap-2"></div>
+        <div id="barraSubcategoriasAnotacao" class="hidden bg-white px-3.5 md:px-4 py-2.5 rounded-xl border border-gray-200 shadow-sm flex flex-nowrap overflow-x-auto no-scrollbar md:flex-wrap items-center gap-2"></div>
 
         <div id="listaAnotacoes" class="space-y-6">
           <div class="text-center py-12 text-gray-400">A carregar anotações...</div>
@@ -775,44 +941,44 @@
 
       <!-- ================= 3. TAREFAS (LISTA + CATEGORIAS + KANBAN) ================= -->
       <div id="view-tarefas" class="view-hidden space-y-4">
-        <div class="flex flex-wrap justify-between items-center gap-3 bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
-          <div class="flex flex-wrap items-center gap-2 flex-1">
+        <div class="flex flex-col md:flex-row flex-wrap justify-between items-stretch md:items-center gap-3 bg-white p-3.5 md:p-4 rounded-xl border border-gray-200 shadow-sm">
+          <div class="flex flex-wrap items-center gap-2 flex-1 min-w-0">
             <!-- Alternador Lista / Por Categoria / Kanban -->
-            <div class="bg-slate-100 p-1 rounded-lg flex items-center mr-1">
-              <button type="button" id="btnModoLista" onclick="alternarModoVisualizacaoTarefas('lista')" class="px-3 py-1.5 rounded-md text-xs font-semibold bg-white text-slate-800 shadow-sm flex items-center space-x-1.5">
+            <div class="bg-slate-100 p-1 rounded-lg flex items-center w-full md:w-auto md:mr-1">
+              <button type="button" id="btnModoLista" onclick="alternarModoVisualizacaoTarefas('lista')" class="flex-1 md:flex-initial justify-center px-3 py-1.5 rounded-md text-xs font-semibold bg-white text-slate-800 shadow-sm flex items-center space-x-1.5">
                 <i class="fa-solid fa-list"></i> <span>Lista</span>
               </button>
-              <button type="button" id="btnModoCategorias" onclick="alternarModoVisualizacaoTarefas('categorias')" class="px-3 py-1.5 rounded-md text-xs font-semibold text-slate-600 hover:text-slate-800 flex items-center space-x-1.5">
+              <button type="button" id="btnModoCategorias" onclick="alternarModoVisualizacaoTarefas('categorias')" class="flex-1 md:flex-initial justify-center px-3 py-1.5 rounded-md text-xs font-semibold text-slate-600 hover:text-slate-800 flex items-center space-x-1.5">
                 <i class="fa-solid fa-folder-open"></i> <span>Por Categoria</span>
               </button>
-              <button type="button" id="btnModoKanban" onclick="alternarModoVisualizacaoTarefas('kanban')" class="px-3 py-1.5 rounded-md text-xs font-semibold text-slate-600 hover:text-slate-800 flex items-center space-x-1.5">
+              <button type="button" id="btnModoKanban" onclick="alternarModoVisualizacaoTarefas('kanban')" class="flex-1 md:flex-initial justify-center px-3 py-1.5 rounded-md text-xs font-semibold text-slate-600 hover:text-slate-800 flex items-center space-x-1.5">
                 <i class="fa-solid fa-table-columns"></i> <span>Quadro Kanban</span>
               </button>
             </div>
 
-            <input type="text" id="buscaTarefa" oninput="renderizarTarefas()" placeholder="Pesquisar tarefa..." class="border border-gray-300 rounded-lg px-3 py-1.5 text-xs sm:text-sm focus:outline-none w-44 sm:w-52">
-            <select id="filtroCategoriaTarefa" onchange="renderizarTarefas()" class="border border-gray-300 rounded-lg px-3 py-1.5 text-xs sm:text-sm focus:outline-none">
+            <input type="text" id="buscaTarefa" oninput="renderizarTarefas()" placeholder="Pesquisar tarefa..." class="w-full sm:w-44 md:w-52 border border-gray-300 rounded-lg px-3 py-1.5 text-xs sm:text-sm focus:outline-none">
+            <select id="filtroCategoriaTarefa" onchange="renderizarTarefas()" class="w-full sm:w-auto border border-gray-300 rounded-lg px-3 py-1.5 text-xs sm:text-sm focus:outline-none">
               <option value="">Todas as Categorias</option>
             </select>
 
-            <div id="filtrosListaTarefas" class="flex flex-wrap gap-1.5">
-              <button type="button" data-status="" onclick="filtrarStatusTarefa('')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-indigo-50 text-indigo-700">Todas</button>
-              <button type="button" data-status="Pendente" onclick="filtrarStatusTarefa('Pendente')" class="px-3 py-1.5 rounded-lg text-xs font-medium text-gray-600 hover:bg-gray-100">Pendentes</button>
-              <button type="button" data-status="Em Andamento" onclick="filtrarStatusTarefa('Em Andamento')" class="px-3 py-1.5 rounded-lg text-xs font-medium text-gray-600 hover:bg-gray-100">Em Andamento</button>
-              <button type="button" data-status="Concluído" onclick="filtrarStatusTarefa('Concluído')" class="px-3 py-1.5 rounded-lg text-xs font-medium text-gray-600 hover:bg-gray-100">Concluídas</button>
+            <div id="filtrosListaTarefas" class="flex flex-nowrap overflow-x-auto no-scrollbar md:flex-wrap gap-1.5 w-full md:w-auto">
+              <button type="button" data-status="" onclick="filtrarStatusTarefa('')" class="whitespace-nowrap flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold bg-indigo-50 text-indigo-700">Todas</button>
+              <button type="button" data-status="Pendente" onclick="filtrarStatusTarefa('Pendente')" class="whitespace-nowrap flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium text-gray-600 hover:bg-gray-100">Pendentes</button>
+              <button type="button" data-status="Em Andamento" onclick="filtrarStatusTarefa('Em Andamento')" class="whitespace-nowrap flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium text-gray-600 hover:bg-gray-100">Em Andamento</button>
+              <button type="button" data-status="Concluído" onclick="filtrarStatusTarefa('Concluído')" class="whitespace-nowrap flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium text-gray-600 hover:bg-gray-100">Concluídas</button>
             </div>
           </div>
 
-          <button type="button" onclick="abrirModalTarefa()" class="bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+          <button type="button" onclick="abrirModalTarefa()" class="w-full md:w-auto bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors text-center">
             + Nova Tarefa
           </button>
         </div>
 
-        <div id="barraCategoriasTarefas" class="bg-white px-4 py-2.5 rounded-xl border border-gray-200 shadow-sm flex flex-wrap items-center gap-2"></div>
+        <div id="barraCategoriasTarefas" class="bg-white px-3.5 md:px-4 py-2.5 rounded-xl border border-gray-200 shadow-sm flex flex-nowrap overflow-x-auto no-scrollbar md:flex-wrap items-center gap-2"></div>
 
-        <!-- MODO TABELA -->
+        <!-- MODO TABELA (DESKTOP) & CARDS (MOBILE) -->
         <div id="containerTabelaTarefas" class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-          <table class="w-full text-left text-sm text-gray-600">
+          <table class="hidden md:table w-full text-left text-sm text-gray-600">
             <thead class="bg-slate-50 text-slate-700 font-semibold border-b border-gray-200">
               <tr>
                 <th class="p-4 w-10">Status</th>
@@ -828,6 +994,9 @@
               <tr><td colspan="7" class="text-center py-8 text-gray-400">A carregar tarefas...</td></tr>
             </tbody>
           </table>
+          <div id="tabelaTarefasMobile" class="md:hidden divide-y divide-gray-100">
+            <div class="text-center py-8 text-gray-400 text-sm">A carregar tarefas...</div>
+          </div>
         </div>
 
         <!-- MODO POR CATEGORIA -->
@@ -869,7 +1038,7 @@
 
       <!-- ================= 3B. MATRIZ DE EISENHOWER ================= -->
       <div id="view-eisenhower" class="view-hidden space-y-5">
-        <div class="flex flex-wrap justify-between items-center gap-3 bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+        <div class="flex flex-col md:flex-row flex-wrap justify-between items-stretch md:items-center gap-3 bg-white p-3.5 md:p-4 rounded-xl border border-gray-200 shadow-sm">
           <div>
             <h2 class="font-bold text-slate-800 text-base flex items-center space-x-2">
               <i class="fa-solid fa-border-all text-indigo-600"></i>
@@ -878,19 +1047,28 @@
             <p class="text-xs text-slate-500">Arraste suas tarefas entre os quadrantes ou classifique direto da caixa de entrada para priorizar seu dia.</p>
           </div>
 
-          <div class="flex flex-wrap items-center gap-2">
-            <input type="text" id="buscaEisenhower" oninput="renderizarEisenhower()" placeholder="Pesquisar tarefa..." class="border border-gray-300 rounded-lg px-3 py-1.5 text-xs sm:text-sm focus:outline-none w-44 sm:w-52">
-            <select id="filtroCategoriaEisenhower" onchange="renderizarEisenhower()" class="border border-gray-300 rounded-lg px-3 py-1.5 text-xs sm:text-sm focus:outline-none">
+          <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
+            <input type="text" id="buscaEisenhower" oninput="renderizarEisenhower()" placeholder="Pesquisar tarefa..." class="border border-gray-300 rounded-lg px-3 py-1.5 text-xs sm:text-sm focus:outline-none w-full sm:w-44 md:w-52">
+            <select id="filtroCategoriaEisenhower" onchange="renderizarEisenhower()" class="border border-gray-300 rounded-lg px-3 py-1.5 text-xs sm:text-sm focus:outline-none flex-1 md:flex-initial min-w-0">
               <option value="">Todas as Categorias</option>
             </select>
-            <label class="inline-flex items-center space-x-1.5 text-xs text-slate-600 bg-slate-100 px-3 py-1.5 rounded-lg cursor-pointer select-none">
+            <label class="inline-flex items-center space-x-1.5 text-xs text-slate-600 bg-slate-100 px-3 py-2 md:py-1.5 rounded-lg cursor-pointer select-none">
               <input type="checkbox" id="mostrarConcluidasEisenhower" onchange="renderizarEisenhower()" class="rounded text-indigo-600">
               <span>Mostrar concluídas</span>
             </label>
-            <button type="button" onclick="abrirModalTarefa()" class="bg-emerald-600 text-white px-3.5 py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors">
+            <button type="button" onclick="abrirModalTarefa()" class="w-full sm:w-auto bg-emerald-600 text-white px-3.5 py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors text-center">
               + Nova Tarefa
             </button>
           </div>
+        </div>
+
+        <!-- Barra rápida mobile de salto entre quadrantes -->
+        <div class="flex md:hidden items-center gap-1.5 overflow-x-auto no-scrollbar pb-1">
+          <button type="button" onclick="irParaQuadranteEisenhower('quadrante-card-fazer')" class="whitespace-nowrap flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-bold bg-red-100 text-red-700 border border-red-200">Q1 Fazer (<span id="mob-count-eisen-fazer">0</span>)</button>
+          <button type="button" onclick="irParaQuadranteEisenhower('quadrante-card-agendar')" class="whitespace-nowrap flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-bold bg-indigo-100 text-indigo-700 border border-indigo-200">Q2 Agendar (<span id="mob-count-eisen-agendar">0</span>)</button>
+          <button type="button" onclick="irParaQuadranteEisenhower('quadrante-card-delegar')" class="whitespace-nowrap flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-200">Q3 Delegar (<span id="mob-count-eisen-delegar">0</span>)</button>
+          <button type="button" onclick="irParaQuadranteEisenhower('quadrante-card-eliminar')" class="whitespace-nowrap flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-bold bg-gray-200 text-slate-700 border border-gray-300">Q4 Postergar (<span id="mob-count-eisen-eliminar">0</span>)</button>
+          <button type="button" onclick="irParaQuadranteEisenhower('quadrante-card-sem')" class="whitespace-nowrap flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-bold bg-white text-slate-700 border border-gray-200">Entrada (<span id="mob-count-eisen-sem">0</span>)</button>
         </div>
 
         <!-- Rótulos de eixo superior (Urgente vs Não Urgente) -->
@@ -906,7 +1084,7 @@
         <!-- Grade 2x2 dos Quadrantes -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <!-- Q1: Fazer Agora (Urgente + Importante) -->
-          <div class="bg-red-50 rounded-2xl border border-red-200 p-4 flex flex-col shadow-sm">
+          <div id="quadrante-card-fazer" class="bg-red-50 rounded-2xl border border-red-200 p-4 flex flex-col shadow-sm">
             <div class="flex justify-between items-start gap-2 mb-3">
               <div>
                 <div class="flex items-center space-x-2">
@@ -926,7 +1104,7 @@
           </div>
 
           <!-- Q2: Agendar / Planejar (Não Urgente + Importante) -->
-          <div class="bg-indigo-50 rounded-2xl border border-indigo-200 p-4 flex flex-col shadow-sm">
+          <div id="quadrante-card-agendar" class="bg-indigo-50 rounded-2xl border border-indigo-200 p-4 flex flex-col shadow-sm">
             <div class="flex justify-between items-start gap-2 mb-3">
               <div>
                 <div class="flex items-center space-x-2">
@@ -946,7 +1124,7 @@
           </div>
 
           <!-- Q3: Delegar (Urgente + Não Importante) -->
-          <div class="bg-amber-50 rounded-2xl border border-amber-200 p-4 flex flex-col shadow-sm">
+          <div id="quadrante-card-delegar" class="bg-amber-50 rounded-2xl border border-amber-200 p-4 flex flex-col shadow-sm">
             <div class="flex justify-between items-start gap-2 mb-3">
               <div>
                 <div class="flex items-center space-x-2">
@@ -966,7 +1144,7 @@
           </div>
 
           <!-- Q4: Eliminar / Postergar (Não Urgente + Não Importante) -->
-          <div class="bg-slate-100 rounded-2xl border border-gray-200 p-4 flex flex-col shadow-sm">
+          <div id="quadrante-card-eliminar" class="bg-slate-100 rounded-2xl border border-gray-200 p-4 flex flex-col shadow-sm">
             <div class="flex justify-between items-start gap-2 mb-3">
               <div>
                 <div class="flex items-center space-x-2">
@@ -987,7 +1165,7 @@
         </div>
 
         <!-- Caixa de Entrada (Tarefas ainda não classificadas) -->
-        <div class="bg-white rounded-2xl border border-gray-200 p-4 shadow-sm">
+        <div id="quadrante-card-sem" class="bg-white rounded-2xl border border-gray-200 p-4 shadow-sm">
           <div class="flex justify-between items-center mb-3">
             <div>
               <h3 class="font-bold text-slate-800 text-sm sm:text-base flex items-center space-x-2">
@@ -1012,45 +1190,45 @@
             </h2>
             <p class="text-xs text-slate-500">Prazos de tarefas sincronizados automaticamente com a sua agenda do Google</p>
           </div>
-          <button type="button" onclick="sincronizarComGoogleCalendar()" id="btnSyncGoogleCal" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3.5 py-2 rounded-lg text-xs font-semibold shadow-sm flex items-center space-x-1.5 transition-all">
+          <button type="button" onclick="sincronizarComGoogleCalendar()" id="btnSyncGoogleCal" class="w-full sm:w-auto justify-center bg-indigo-600 hover:bg-indigo-700 text-white px-3.5 py-2 rounded-lg text-xs font-semibold shadow-sm flex items-center space-x-1.5 transition-all">
             <i class="fa-solid fa-rotate mr-1"></i> <span>Sincronizar com Google Agenda</span>
           </button>
         </div>
-        <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+        <div class="bg-white p-3 md:p-6 rounded-xl border border-gray-200 shadow-sm">
           <div id="calendarioContainer"></div>
         </div>
       </div>
 
       <!-- ================= 5. FLASHCARDS (REPETIÇÃO ESPAÇADA) ================= -->
       <div id="view-flashcards" class="view-hidden space-y-6">
-        <div class="flex flex-wrap justify-between items-center gap-3 bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
-          <div class="flex items-center space-x-3">
-            <select id="filtroCategoriaFlashcard" onchange="filtrarFlashcards()" class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none">
+        <div class="flex flex-col md:flex-row flex-wrap justify-between items-stretch md:items-center gap-3 bg-white p-3.5 md:p-4 rounded-xl border border-gray-200 shadow-sm">
+          <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
+            <select id="filtroCategoriaFlashcard" onchange="filtrarFlashcards()" class="flex-1 md:flex-initial min-w-0 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none">
               <option value="">Todas as Matérias</option>
             </select>
-            <button type="button" onclick="iniciarModoEstudoFlashcards()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-sm flex items-center space-x-2">
+            <button type="button" onclick="iniciarModoEstudoFlashcards()" class="flex-1 md:flex-initial justify-center bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-sm flex items-center space-x-2">
               <i class="fa-solid fa-play"></i> <span>Praticar Agora (Modo Estudo)</span>
             </button>
           </div>
-          <button type="button" onclick="abrirModal('modalFlashcard')" class="bg-amber-500 text-white px-4 py-2 rounded-lg text-sm font-medium">
+          <button type="button" onclick="abrirModal('modalFlashcard')" class="w-full md:w-auto bg-amber-500 text-white px-4 py-2 rounded-lg text-sm font-medium text-center">
             + Criar Flashcard
           </button>
         </div>
 
         <!-- Arena de Estudo Ativo -->
-        <div id="arenaEstudoFlashcard" class="hidden bg-slate-900 text-white p-8 rounded-2xl shadow-xl max-w-2xl mx-auto text-center space-y-6">
+        <div id="arenaEstudoFlashcard" class="hidden bg-slate-900 text-white p-4 md:p-8 rounded-2xl shadow-xl max-w-2xl mx-auto text-center space-y-6">
           <div class="flex justify-between items-center text-xs text-slate-400">
             <span id="estudoFlashcardCategoria" class="bg-indigo-900 text-indigo-300 px-3 py-1 rounded-full"></span>
             <span id="estudoFlashcardProgresso">Cartão 1 de X</span>
             <button type="button" onclick="fecharArenaFlashcards()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
           </div>
 
-          <div onclick="virarCartaoEstudo()" class="bg-slate-800 border border-slate-700 rounded-xl p-8 flex flex-col items-center justify-center cursor-pointer hover:border-indigo-500 transition-all select-none" style="min-height: 220px;">
+          <div onclick="virarCartaoEstudo()" class="bg-slate-800 border border-slate-700 rounded-xl p-5 md:p-8 flex flex-col items-center justify-center cursor-pointer hover:border-indigo-500 transition-all select-none" style="min-height: 220px;">
             <span id="labelLadoCartao" class="text-xs uppercase tracking-widest text-indigo-400 mb-3 font-bold">PERGUNTA (Clique para virar)</span>
-            <div id="textoCartaoEstudo" class="text-xl font-semibold leading-relaxed"></div>
+            <div id="textoCartaoEstudo" class="text-lg md:text-xl font-semibold leading-relaxed"></div>
           </div>
 
-          <div id="botoesAvaliacaoFlashcard" class="hidden flex justify-center space-x-4 pt-2">
+          <div id="botoesAvaliacaoFlashcard" class="hidden flex flex-col sm:flex-row justify-center gap-2.5 sm:gap-4 pt-2">
             <button type="button" onclick="avaliarFlashcardAtual('Difícil')" class="bg-red-600 hover:bg-red-500 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all">
               <i class="fa-solid fa-rotate-left mr-1"></i> Errei / Rever Breve
             </button>
@@ -1070,9 +1248,9 @@
 
       <!-- ================= 6. CURSOS ================= -->
       <div id="view-cursos" class="view-hidden space-y-4">
-        <div class="flex justify-between items-center bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+        <div class="flex flex-wrap gap-2 justify-between items-center bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
           <h2 class="font-semibold text-slate-700">Os Seus Cursos & Certificações</h2>
-          <button type="button" onclick="abrirModal('modalCurso')" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+          <button type="button" onclick="abrirModal('modalCurso')" class="w-full sm:w-auto bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors text-center">
             + Novo Curso
           </button>
         </div>
@@ -1084,10 +1262,10 @@
 
       <!-- ================= 7. LEITURAS, ACERVO & REVIEWS ================= -->
       <div id="view-leituras" class="view-hidden space-y-6">
-        <div class="flex flex-wrap justify-between items-center gap-3 bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
-          <div class="flex flex-wrap items-center gap-2">
-            <input type="text" id="filtroPesquisaMidia" oninput="filtrarMidias()" placeholder="🔍 Pesquisar título ou autor..." class="border border-gray-300 rounded-lg px-3 py-1.5 text-xs sm:text-sm focus:outline-none w-48 sm:w-64">
-            <select id="filtroTipoMidia" onchange="filtrarMidias()" class="border border-gray-300 rounded-lg px-3 py-1.5 text-xs sm:text-sm focus:outline-none">
+        <div class="flex flex-col md:flex-row flex-wrap justify-between items-stretch md:items-center gap-3 bg-white p-3.5 md:p-4 rounded-xl border border-gray-200 shadow-sm">
+          <div class="flex flex-wrap items-center gap-2 w-full md:w-auto flex-1">
+            <input type="text" id="filtroPesquisaMidia" oninput="filtrarMidias()" placeholder="🔍 Pesquisar título ou autor..." class="border border-gray-300 rounded-lg px-3 py-1.5 text-xs sm:text-sm focus:outline-none w-full sm:w-64">
+            <select id="filtroTipoMidia" onchange="filtrarMidias()" class="flex-1 sm:flex-initial min-w-[130px] border border-gray-300 rounded-lg px-3 py-1.5 text-xs sm:text-sm focus:outline-none">
               <option value="">Todos os Tipos</option>
               <option value="Livro">📚 Livros</option>
               <option value="Artigo">📄 Artigos</option>
@@ -1095,18 +1273,18 @@
               <option value="Filme">🎬 Filmes / Docs</option>
               <option value="Podcast">🎙️ Podcasts</option>
             </select>
-            <select id="filtroStatusMidia" onchange="filtrarMidias()" class="border border-gray-300 rounded-lg px-3 py-1.5 text-xs sm:text-sm focus:outline-none">
+            <select id="filtroStatusMidia" onchange="filtrarMidias()" class="flex-1 sm:flex-initial min-w-[130px] border border-gray-300 rounded-lg px-3 py-1.5 text-xs sm:text-sm focus:outline-none">
               <option value="">Todos os Status</option>
               <option value="Quero Ler/Ver">📌 Quero Ler/Ver</option>
               <option value="Em Andamento">⏳ Em Andamento</option>
               <option value="Concluído">✅ Concluído</option>
               <option value="Abandonado">⛔ Abandonado</option>
             </select>
-            <select id="filtroCategoriaMidia" onchange="filtrarMidias()" class="border border-gray-300 rounded-lg px-3 py-1.5 text-xs sm:text-sm focus:outline-none">
+            <select id="filtroCategoriaMidia" onchange="filtrarMidias()" class="w-full sm:w-auto border border-gray-300 rounded-lg px-3 py-1.5 text-xs sm:text-sm focus:outline-none">
               <option value="">Todas as Categorias</option>
             </select>
           </div>
-          <button type="button" onclick="abrirModalMidia()" class="bg-rose-600 hover:bg-rose-700 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-sm flex items-center space-x-1.5 transition-colors">
+          <button type="button" onclick="abrirModalMidia()" class="w-full md:w-auto justify-center bg-rose-600 hover:bg-rose-700 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-sm flex items-center space-x-1.5 transition-colors">
             <i class="fa-solid fa-plus"></i> <span>Novo Item</span>
           </button>
         </div>
@@ -1126,22 +1304,22 @@
             </h2>
             <p class="text-xs text-slate-500">Use <b>[[Nome de Outra Nota ou Livro]]</b> no texto das suas anotações para conectar ideias diretamente!</p>
           </div>
-          <div class="flex flex-wrap items-center gap-2">
-            <input type="text" id="buscaNoGrafo" oninput="filtrarDestaqueGrafo()" placeholder="🔍 Localizar nó no grafo..." class="border border-gray-300 rounded-lg px-3 py-1.5 text-xs focus:outline-none w-48">
-            <button type="button" onclick="centralizarGrafo()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1">
+          <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
+            <input type="text" id="buscaNoGrafo" oninput="filtrarDestaqueGrafo()" placeholder="🔍 Localizar nó no grafo..." class="border border-gray-300 rounded-lg px-3 py-1.5 text-xs focus:outline-none w-full sm:w-48">
+            <button type="button" onclick="centralizarGrafo()" class="flex-1 sm:flex-initial justify-center bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1">
               <i class="fa-solid fa-compress"></i> <span>Centralizar</span>
             </button>
-            <button type="button" onclick="carregarGrafo()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1">
+            <button type="button" onclick="carregarGrafo()" class="flex-1 sm:flex-initial justify-center bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1">
               <i class="fa-solid fa-rotate"></i> <span>Atualizar</span>
             </button>
           </div>
         </div>
 
-        <div class="relative bg-slate-950 rounded-2xl border border-slate-800 shadow-xl overflow-hidden" style="height: 72vh;">
+        <div class="grafo-canvas-wrap relative bg-slate-950 rounded-2xl border border-slate-800 shadow-xl overflow-hidden" style="height: 72vh;">
           <canvas id="canvasGrafo" class="w-full h-full cursor-grab active:cursor-grabbing"></canvas>
 
           <!-- Legenda do Grafo -->
-          <div class="absolute bottom-4 left-4 bg-slate-900/90 backdrop-blur-md border border-slate-700 p-3 rounded-xl text-xs text-slate-300 space-y-1.5 pointer-events-none">
+          <div class="absolute bottom-3 left-3 md:bottom-4 md:left-4 bg-slate-900/90 backdrop-blur-md border border-slate-700 p-2.5 md:p-3 rounded-xl text-[10px] md:text-xs text-slate-300 space-y-1 md:space-y-1.5 pointer-events-none max-w-[70vw]">
             <div class="font-bold text-white uppercase tracking-wider text-[10px] mb-1">Legenda de Nós & Conexões</div>
             <div class="flex items-center space-x-2"><span class="w-3 h-3 rounded-full bg-indigo-500 inline-block"></span> <span>Matéria / Categoria Central</span></div>
             <div class="flex items-center space-x-2"><span class="w-3 h-3 rounded-full inline-block" style="background-color: #14b8a6;"></span> <span>Subcategoria de Anotação</span></div>
@@ -1151,9 +1329,15 @@
             <div class="flex items-center space-x-2 pt-1 border-t border-slate-800"><span class="w-4 h-0.5 bg-amber-400 inline-block"></span> <span class="text-amber-300 font-semibold">Conexão Direta [[Backlink]]</span></div>
           </div>
 
-          <!-- Dica Interativa -->
-          <div class="absolute top-4 right-4 bg-slate-900/80 text-slate-300 text-xs px-3 py-1.5 rounded-lg border border-slate-700 pointer-events-none">
-            💡 Arraste os nós • Role o mouse para Zoom • <b>Clique duplo para abrir</b>
+          <!-- Controles de Zoom Táteis + Dica Desktop -->
+          <div class="absolute top-3 right-3 md:top-4 md:right-4 flex items-center space-x-2">
+            <div class="hidden md:block bg-slate-900/80 text-slate-300 text-xs px-3 py-1.5 rounded-lg border border-slate-700 pointer-events-none">
+              💡 Arraste os nós • Role o mouse para Zoom • <b>Clique duplo para abrir</b>
+            </div>
+            <div class="flex items-center space-x-1 bg-slate-900/90 border border-slate-700 rounded-lg p-1">
+              <button type="button" onclick="ajustarZoomGrafo(1.2)" class="w-8 h-8 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 text-sm font-bold flex items-center justify-center" title="Aumentar Zoom">+</button>
+              <button type="button" onclick="ajustarZoomGrafo(0.8)" class="w-8 h-8 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 text-sm font-bold flex items-center justify-center" title="Diminuir Zoom">−</button>
+            </div>
           </div>
         </div>
       </div>
@@ -1260,23 +1444,50 @@
     </div>
   </main>
 
+  <!-- ================= BARRA DE NAVEGAÇÃO INFERIOR (APENAS MOBILE) ================= -->
+  <nav id="mobileBottomNav" class="fixed bottom-0 inset-x-0 z-30 md:hidden bg-white/95 backdrop-blur-md border-t border-gray-200 shadow-lg">
+    <div class="grid grid-cols-5 items-center h-16 px-1">
+      <button type="button" id="bnav-dashboard" onclick="mudarAba('dashboard')" class="mobile-bnav-btn mobile-bnav-active flex flex-col items-center justify-center py-1 text-[11px] font-semibold">
+        <i class="fa-solid fa-chart-pie text-base mb-0.5"></i>
+        <span>Início</span>
+      </button>
+      <button type="button" id="bnav-anotacoes" onclick="mudarAba('anotacoes')" class="mobile-bnav-btn flex flex-col items-center justify-center py-1 text-[11px] font-semibold">
+        <i class="fa-solid fa-book-open text-base mb-0.5"></i>
+        <span>Notas</span>
+      </button>
+      <div class="flex justify-center items-center">
+        <button type="button" onclick="abrirModal('modalAcaoRapidaMobile')" class="mobile-fab-plus w-12 h-12 -mt-5 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg flex items-center justify-center text-xl border-4 border-white" aria-label="Criar novo item">
+          <i class="fa-solid fa-plus"></i>
+        </button>
+      </div>
+      <button type="button" id="bnav-tarefas" onclick="mudarAba('tarefas')" class="mobile-bnav-btn flex flex-col items-center justify-center py-1 text-[11px] font-semibold">
+        <i class="fa-solid fa-list-check text-base mb-0.5"></i>
+        <span>Tarefas</span>
+      </button>
+      <button type="button" id="bnav-mais" onclick="alternarMenuMobile()" class="mobile-bnav-btn flex flex-col items-center justify-center py-1 text-[11px] font-semibold">
+        <i class="fa-solid fa-bars text-base mb-0.5"></i>
+        <span>Menu</span>
+      </button>
+    </div>
+  </nav>
+
   <!-- ================= MODAL DE LEITURA (VISUALIZAÇÃO EXPANDIDA) ================= -->
   <div id="modalLeituraAnotacao" class="modal-backdrop hidden">
     <div class="bg-white w-full max-w-4xl rounded-2xl shadow-2xl flex flex-col overflow-hidden" style="max-height: 90vh;">
-      <div class="bg-slate-900 px-6 py-4 flex justify-between items-center text-white flex-shrink-0">
-        <div class="flex items-center space-x-2 flex-wrap gap-y-1">
+      <div class="bg-slate-900 px-4 py-3 md:px-6 md:py-4 flex justify-between items-center text-white flex-shrink-0 gap-2">
+        <div class="flex items-center space-x-2 flex-wrap gap-y-1 min-w-0">
           <span id="leituraMateria" class="text-xs font-semibold bg-indigo-900 text-indigo-200 px-3 py-1 rounded-full"></span>
           <span id="leituraSubcategoria" class="hidden text-xs font-semibold bg-teal-900 text-teal-200 px-3 py-1 rounded-full"></span>
           <span id="leituraData" class="text-xs text-slate-400"></span>
         </div>
-        <div class="flex items-center space-x-3">
-          <button type="button" id="btnExportarABNT" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-3 py-1.5 rounded-lg font-medium flex items-center space-x-1.5 transition-colors" title="Gerar Documento Formatado nas Normas ABNT / Imprimir PDF">
+        <div class="flex items-center space-x-2 md:space-x-3 flex-shrink-0">
+          <button type="button" id="btnExportarABNT" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-2.5 md:px-3 py-1.5 rounded-lg font-medium flex items-center space-x-1.5 transition-colors" title="Gerar Documento Formatado nas Normas ABNT / Imprimir PDF">
             <i class="fa-solid fa-file-pdf"></i> <span class="hidden sm:inline">PDF / ABNT</span>
           </button>
-          <button type="button" id="btnExportarMD" class="bg-slate-700 hover:bg-slate-600 text-white text-xs px-3 py-1.5 rounded-lg font-medium flex items-center space-x-1.5 transition-colors" title="Baixar em formato Markdown (.md)">
+          <button type="button" id="btnExportarMD" class="bg-slate-700 hover:bg-slate-600 text-white text-xs px-2.5 md:px-3 py-1.5 rounded-lg font-medium flex items-center space-x-1.5 transition-colors" title="Baixar em formato Markdown (.md)">
             <i class="fa-brands fa-markdown"></i> <span class="hidden sm:inline">.MD</span>
           </button>
-          <button type="button" id="btnEditarDaLeitura" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3 py-1.5 rounded-lg font-medium flex items-center space-x-1.5 transition-colors">
+          <button type="button" id="btnEditarDaLeitura" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-2.5 md:px-3 py-1.5 rounded-lg font-medium flex items-center space-x-1.5 transition-colors">
             <i class="fa-solid fa-pen"></i> <span>Editar</span>
           </button>
           <button type="button" onclick="fecharModal('modalLeituraAnotacao')" class="text-slate-400 hover:text-white p-1">
@@ -1285,8 +1496,8 @@
         </div>
       </div>
 
-      <div class="p-8 overflow-y-auto flex-1 space-y-6">
-        <h1 id="leituraTopico" class="text-3xl font-bold text-slate-800 border-b border-gray-100 pb-4"></h1>
+      <div class="p-4 md:p-8 overflow-y-auto flex-1 space-y-6 modal-scroll-body">
+        <h1 id="leituraTopico" class="text-xl md:text-3xl font-bold text-slate-800 border-b border-gray-100 pb-4"></h1>
         <div id="leituraConteudo" class="rich-content text-slate-700"></div>
         <!-- SEÇÃO DE CONEXÕES E BACKLINKS DA ANOTAÇÃO -->
         <div id="leituraBacklinksContainer" class="mt-8 pt-6 border-t border-gray-200 space-y-3 hidden">
@@ -1297,7 +1508,7 @@
         </div>
       </div>
 
-      <div class="bg-slate-50 px-8 py-4 border-t border-gray-200 flex flex-wrap justify-between items-center gap-4 flex-shrink-0">
+      <div class="bg-slate-50 px-4 md:px-8 py-3 md:py-4 border-t border-gray-200 flex flex-wrap justify-between items-center gap-3 flex-shrink-0">
         <div id="leituraTags" class="flex flex-wrap gap-1.5"></div>
         <div class="flex items-center space-x-4" id="leituraLinks"></div>
       </div>
@@ -1308,50 +1519,62 @@
   <div id="modalAnotacao" class="modal-backdrop hidden">
     <div class="bg-white w-full max-w-6xl rounded-2xl shadow-2xl flex flex-col overflow-hidden" style="height: 92vh;">
       <!-- Topbar do Editor -->
-      <div class="bg-slate-900 px-6 py-3.5 flex justify-between items-center text-white flex-shrink-0">
-        <div class="flex items-center space-x-3">
-          <i class="fa-solid fa-file-word text-indigo-400 text-xl"></i>
-          <h2 class="text-lg font-bold" id="tituloModalAnotacao">Estúdio de Anotação</h2>
-          <span id="badgeUploadImagem" class="hidden text-xs bg-amber-500 text-white px-2.5 py-0.5 rounded-full">
+      <div class="bg-slate-900 px-4 py-3 md:px-6 md:py-3.5 flex justify-between items-center text-white flex-shrink-0 gap-2">
+        <div class="flex items-center space-x-2.5 min-w-0">
+          <i class="fa-solid fa-file-word text-indigo-400 text-lg md:text-xl flex-shrink-0"></i>
+          <h2 class="text-sm md:text-lg font-bold truncate" id="tituloModalAnotacao">Estúdio de Anotação</h2>
+          <span id="badgeUploadImagem" class="hidden text-xs bg-amber-500 text-white px-2.5 py-0.5 rounded-full flex-shrink-0">
             <i class="fa-solid fa-cloud-arrow-up mr-1"></i> A processar...
           </span>
         </div>
-        <div class="flex items-center space-x-3">
-          <button type="button" onclick="fecharModal('modalAnotacao')" class="px-4 py-2 text-sm text-slate-300 hover:text-white rounded-lg transition-colors">Cancelar</button>
-          <button type="button" onclick="dispararSubmitAnotacao()" id="btnSalvarAnotacao" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm rounded-lg font-medium shadow-md flex items-center space-x-2 transition-all">
-            <i class="fa-solid fa-floppy-disk"></i> <span>Guardar Documento</span>
+        <div class="flex items-center space-x-2 md:space-x-3 flex-shrink-0">
+          <button type="button" onclick="fecharModal('modalAnotacao')" class="px-3 md:px-4 py-1.5 md:py-2 text-xs md:text-sm text-slate-300 hover:text-white rounded-lg transition-colors">Cancelar</button>
+          <button type="button" onclick="dispararSubmitAnotacao()" id="btnSalvarAnotacao" class="px-3.5 md:px-5 py-1.5 md:py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs md:text-sm rounded-lg font-medium shadow-md flex items-center space-x-1.5 md:space-x-2 transition-all">
+            <i class="fa-solid fa-floppy-disk"></i>
+            <span class="sm:hidden">Salvar</span>
+            <span class="hidden sm:inline">Guardar Documento</span>
           </button>
         </div>
       </div>
 
-      <form id="formAnotacao" class="flex-1 flex flex-col lg:flex-row overflow-hidden" onsubmit="processarAnotacao(event)">
+      <!-- Abas Exclusivas Mobile/Tablet do Editor -->
+      <div class="lg:hidden grid grid-cols-2 border-b border-gray-200 bg-slate-50 flex-shrink-0">
+        <button type="button" id="tabEditorConteudo" onclick="alternarAbaEditorMobile('conteudo')" class="py-2.5 text-xs font-bold text-indigo-600 border-b-2 border-indigo-600 bg-white flex items-center justify-center space-x-1.5">
+          <i class="fa-solid fa-pen-nib"></i> <span>Conteúdo</span>
+        </button>
+        <button type="button" id="tabEditorDetalhes" onclick="alternarAbaEditorMobile('detalhes')" class="py-2.5 text-xs font-semibold text-slate-500 border-b-2 border-transparent flex items-center justify-center space-x-1.5">
+          <i class="fa-solid fa-sliders"></i> <span>Detalhes &amp; Anexos</span>
+        </button>
+      </div>
+
+      <form id="formAnotacao" class="flex-1 min-h-0 flex flex-col lg:flex-row overflow-hidden" onsubmit="processarAnotacao(event)">
         <input type="hidden" id="anotacaoId">
         <input type="hidden" id="anotacaoAnexoUrl">
         <input type="hidden" id="anotacaoAnexoNome">
 
         <!-- Coluna Principal: Título + Barra IA + Editor -->
-        <div class="flex-1 flex flex-col h-full overflow-hidden border-r border-gray-200 bg-white">
-          <div class="px-8 pt-5 pb-3 border-b border-gray-100 flex flex-wrap justify-between items-center gap-3">
-            <input type="text" id="topico" placeholder="Título do Documento..." required class="flex-1 text-2xl font-bold text-slate-800 placeholder-gray-400 focus:outline-none" style="min-width: 240px;">
+        <div id="editorColunaPrincipal" class="flex-1 flex flex-col min-h-0 lg:h-full overflow-hidden lg:border-r border-gray-200 bg-white">
+          <div class="px-4 md:px-8 pt-4 md:pt-5 pb-3 border-b border-gray-100 flex flex-wrap justify-between items-center gap-2.5">
+            <input type="text" id="topico" placeholder="Título do Documento..." required class="w-full md:flex-1 min-w-0 text-xl md:text-2xl font-bold text-slate-800 placeholder-gray-400 focus:outline-none">
 
             <!-- BARRA DO ASSISTENTE IA GEMINI -->
-            <div class="flex items-center space-x-1.5 bg-indigo-50 border border-indigo-100 px-2.5 py-1.5 rounded-xl">
-              <span class="text-xs font-bold text-indigo-700 mr-1 flex items-center space-x-1">
+            <div id="barraIAModalAnotacao" class="w-full md:w-auto flex items-center space-x-1.5 overflow-x-auto no-scrollbar bg-indigo-50 border border-indigo-100 px-2.5 py-1.5 rounded-xl">
+              <span class="text-xs font-bold text-indigo-700 mr-1 flex items-center space-x-1 flex-shrink-0">
                 <i class="fa-solid fa-wand-magic-sparkles"></i> <span>IA:</span>
               </span>
-              <button type="button" onclick="executarAcaoIA('resumir')" class="text-xs bg-white hover:bg-indigo-600 text-indigo-700 hover:text-white border border-indigo-200 px-2.5 py-1 rounded-lg font-medium transition-colors">
+              <button type="button" onclick="executarAcaoIA('resumir')" class="whitespace-nowrap flex-shrink-0 text-xs bg-white hover:bg-indigo-600 text-indigo-700 hover:text-white border border-indigo-200 px-2.5 py-1 rounded-lg font-medium transition-colors">
                 Resumir
               </button>
-              <button type="button" onclick="executarAcaoIA('topicos')" class="text-xs bg-white hover:bg-indigo-600 text-indigo-700 hover:text-white border border-indigo-200 px-2.5 py-1 rounded-lg font-medium transition-colors">
+              <button type="button" onclick="executarAcaoIA('topicos')" class="whitespace-nowrap flex-shrink-0 text-xs bg-white hover:bg-indigo-600 text-indigo-700 hover:text-white border border-indigo-200 px-2.5 py-1 rounded-lg font-medium transition-colors">
                 Extrair Conceitos
               </button>
-              <button type="button" onclick="executarAcaoIA('flashcards')" class="text-xs bg-white hover:bg-amber-500 text-yellow-700 hover:text-white border border-yellow-300 px-2.5 py-1 rounded-lg font-medium transition-colors" title="Gera 4 flashcards automaticamente a partir deste texto">
+              <button type="button" onclick="executarAcaoIA('flashcards')" class="whitespace-nowrap flex-shrink-0 text-xs bg-white hover:bg-amber-500 text-yellow-700 hover:text-white border border-yellow-300 px-2.5 py-1 rounded-lg font-medium transition-colors" title="Gera 4 flashcards automaticamente a partir deste texto">
                 + Gerar Flashcards
               </button>
-              <button type="button" onclick="inserirBacklinkNoEditor()" class="text-xs bg-white hover:bg-slate-800 text-slate-700 hover:text-white border border-slate-300 px-2.5 py-1 rounded-lg font-medium transition-colors" title="Inserir link [[...]] para outra anotação ou livro">
+              <button type="button" onclick="inserirBacklinkNoEditor()" class="whitespace-nowrap flex-shrink-0 text-xs bg-white hover:bg-slate-800 text-slate-700 hover:text-white border border-slate-300 px-2.5 py-1 rounded-lg font-medium transition-colors" title="Inserir link [[...]] para outra anotação ou livro">
                 🔗 [[Conectar]]
               </button>
-              <button type="button" onclick="configurarChaveAPI()" class="text-xs text-indigo-500 hover:text-indigo-800 px-1.5 py-1" title="Configurar Chave da API Gemini">
+              <button type="button" onclick="configurarChaveAPI()" class="flex-shrink-0 text-xs text-indigo-500 hover:text-indigo-800 px-1.5 py-1" title="Configurar Chave da API Gemini">
                 <i class="fa-solid fa-gear"></i>
               </button>
             </div>
@@ -1362,8 +1585,8 @@
           </div>
         </div>
 
-        <!-- Barra Lateral Direita -->
-        <div class="w-full lg:w-80 bg-slate-50 p-6 overflow-y-auto space-y-5 flex-shrink-0">
+        <!-- Barra Lateral Direita (Propriedades) -->
+        <div id="editorColunaPropriedades" class="hidden lg:block w-full lg:w-80 bg-slate-50 p-4 lg:p-6 overflow-y-auto space-y-5 flex-shrink-0">
           <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">Propriedades do Documento</h3>
 
           <div>
@@ -1447,7 +1670,7 @@
         <h2 class="text-xl font-bold" id="tituloModalTarefa">Nova Tarefa</h2>
         <button type="button" onclick="fecharModal('modalTarefa')" class="text-gray-300 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
       </div>
-      <form id="formTarefa" class="p-6 space-y-4" onsubmit="processarTarefa(event)">
+      <form id="formTarefa" class="p-4 sm:p-6 space-y-4" onsubmit="processarTarefa(event)">
         <input type="hidden" id="tarefaId">
         <input type="hidden" id="tarefaAnexoUrl">
         <input type="hidden" id="tarefaAnexoNome">
@@ -1462,7 +1685,7 @@
           <textarea id="descricaoTarefa" rows="3" placeholder="Detalhes adicionais da tarefa..." class="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none"></textarea>
         </div>
 
-        <div class="grid grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Categoria</label>
             <select id="categoriaTarefa" required class="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none select-categorias"></select>
@@ -1473,7 +1696,7 @@
           </div>
         </div>
 
-        <div class="grid grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Prioridade</label>
             <select id="prioridadeTarefa" class="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none">
@@ -1524,12 +1747,12 @@
         <h2 class="text-xl font-bold">Registar Curso / Certificação</h2>
         <button type="button" onclick="fecharModal('modalCurso')" class="text-gray-300 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
       </div>
-      <form id="formCurso" class="p-6 space-y-4" onsubmit="processarCurso(event)">
+      <form id="formCurso" class="p-4 sm:p-6 space-y-4" onsubmit="processarCurso(event)">
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Nome do Curso / Certificação</label>
           <input type="text" id="nomeCurso" placeholder="Ex: Formação Cloud DevOps" required class="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none">
         </div>
-        <div class="grid grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Instituição / Plataforma</label>
             <input type="text" id="instituicaoCurso" placeholder="Ex: Alura, AWS" required class="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none">
@@ -1539,7 +1762,7 @@
             <select id="categoriaCurso" required class="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none select-categorias"></select>
           </div>
         </div>
-        <div class="grid grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Carga Horária (Horas)</label>
             <input type="number" id="cargaHorariaCurso" placeholder="Ex: 40" required class="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none">
@@ -1568,8 +1791,8 @@
     <!-- MODAL: REGISTAR / EDITAR MÍDIA & LEITURA -->
   <div id="modalMidia" class="modal-backdrop hidden">
     <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden flex flex-col" style="max-height: 90vh;">
-      <div class="bg-slate-900 p-5 flex justify-between items-center text-white flex-shrink-0">
-        <h2 class="text-xl font-bold flex items-center space-x-2" id="tituloModalMidia">
+      <div class="bg-slate-900 p-4 md:p-5 flex justify-between items-center text-white flex-shrink-0">
+        <h2 class="text-base md:text-xl font-bold flex items-center space-x-2" id="tituloModalMidia">
           <i class="fa-solid fa-bookmark text-rose-500"></i>
           <span>Registar Leitura ou Review de Mídia</span>
         </h2>
@@ -1577,12 +1800,12 @@
       </div>
 
       <!-- BARRA DE AUTO-PREENCHIMENTO INTELIGENTE -->
-      <div class="bg-rose-50/60 p-4 border-b border-rose-100 flex-shrink-0">
+      <div class="bg-rose-50/60 p-3 md:p-4 border-b border-rose-100 flex-shrink-0">
         <label class="block text-xs font-bold uppercase tracking-wider text-rose-700 mb-1.5 flex items-center space-x-1">
           <i class="fa-solid fa-wand-magic-sparkles"></i> <span>Auto-Preenchimento Automático (Livros ou YouTube)</span>
         </label>
         <div class="flex gap-2">
-          <input type="text" id="termoAutoBusca" placeholder="Digite o nome do livro ou cole o link do YouTube..." class="flex-1 border border-rose-200 rounded-lg p-2 text-xs bg-white focus:outline-none focus:border-rose-400">
+          <input type="text" id="termoAutoBusca" placeholder="Digite o nome do livro ou cole o link do YouTube..." class="flex-1 min-w-0 border border-rose-200 rounded-lg p-2 text-xs bg-white focus:outline-none focus:border-rose-400">
           <button type="button" onclick="executarAutoBuscaMidia()" id="btnAutoBusca" class="bg-rose-600 hover:bg-rose-700 text-white px-3.5 py-2 rounded-lg text-xs font-semibold shadow-sm flex items-center space-x-1 whitespace-nowrap transition-all">
             <i class="fa-solid fa-magnifying-glass"></i> <span>Buscar Dados</span>
           </button>
@@ -1590,7 +1813,7 @@
         <p class="text-[11px] text-rose-600 mt-1">Localiza título, autores, ano e capa automaticamente para poupar o seu tempo!</p>
       </div>
 
-      <form id="formMidia" class="p-6 space-y-4 overflow-y-auto flex-1" onsubmit="processarMidia(event)">
+      <form id="formMidia" class="p-4 md:p-6 space-y-4 overflow-y-auto flex-1" onsubmit="processarMidia(event)">
         <input type="hidden" id="midiaId">
 
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -1696,7 +1919,7 @@
         </div>
       </div>
 
-      <div class="p-6 overflow-y-auto flex-1 space-y-6">
+      <div class="p-4 sm:p-6 overflow-y-auto flex-1 space-y-6 modal-scroll-body">
         <div class="flex flex-col sm:flex-row gap-5 items-start">
           <div id="viewMidiaCapaContainer" class="w-32 h-44 rounded-xl overflow-hidden shadow-md flex-shrink-0 bg-slate-100 border border-gray-200 flex items-center justify-center">
             <img id="viewMidiaCapa" src="" alt="Capa" class="w-full h-full object-cover">
@@ -1742,12 +1965,12 @@
         </h2>
         <button type="button" onclick="fecharModal('modalNovoHabito')" class="text-gray-300 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
       </div>
-      <form id="formNovoHabito" class="p-6 space-y-4" onsubmit="processarNovoHabito(event)">
+      <form id="formNovoHabito" class="p-4 sm:p-6 space-y-4" onsubmit="processarNovoHabito(event)">
         <div>
           <label class="block text-xs font-semibold text-gray-700 mb-1">Nome do Hábito</label>
           <input type="text" id="nomeHabitoInput" placeholder="Ex: Ler 20 páginas, Resolver 2 exercícios..." required class="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:outline-none">
         </div>
-        <div class="grid grid-cols-2 gap-3">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
             <label class="block text-xs font-semibold text-gray-700 mb-1">Ícone</label>
             <select id="iconeHabitoInput" class="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:outline-none">
@@ -1789,7 +2012,7 @@
         </h2>
         <button type="button" onclick="fecharModal('modalAcessoMobile')" class="text-gray-300 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
       </div>
-      <div class="p-6 space-y-4">
+      <div class="p-6 space-y-4 modal-scroll-body">
         <p class="text-xs text-slate-600 leading-relaxed">
           Conecte seu celular ou tablet na <b>mesma rede Wi-Fi</b> deste computador e escaneie o QR Code abaixo (ou digite o endereço no navegador do celular):
         </p>
@@ -1841,7 +2064,7 @@
         <button type="button" onclick="fecharModal('modalSubcategoria')" class="text-gray-300 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
       </div>
 
-      <div class="p-6 space-y-5 overflow-y-auto flex-1">
+      <div class="p-4 sm:p-6 space-y-5 overflow-y-auto flex-1 modal-scroll-body">
         <form id="formSubcategoria" class="space-y-3 bg-teal-50/70 p-4 rounded-xl border border-teal-200" onsubmit="processarNovaSubcategoriaModal(event)">
           <div>
             <label class="block text-xs font-semibold text-gray-700 mb-1">Categoria Principal</label>
@@ -1881,7 +2104,7 @@
         </h2>
         <button type="button" onclick="fecharModal('modalImportarBackup')" class="text-gray-300 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
       </div>
-      <div class="p-6 space-y-6">
+      <div class="p-4 sm:p-6 space-y-5 sm:space-y-6 modal-scroll-body">
         <!-- SEÇÃO 1: IMPORTAR DO GOOGLE SHEETS -->
         <div class="border border-indigo-100 bg-indigo-50/50 p-5 rounded-xl space-y-3">
           <h3 class="font-bold text-slate-800 text-base flex items-center space-x-2">
@@ -1942,6 +2165,57 @@
       </div>
       <div class="p-4 bg-gray-50 border-t border-gray-200 flex justify-end">
         <button type="button" onclick="fecharModal('modalImportarBackup')" class="px-5 py-2 text-gray-600 bg-gray-200 hover:bg-gray-300 rounded-lg text-xs font-medium">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: AÇÃO RÁPIDA (BOTTOM SHEET MOBILE) -->
+  <div id="modalAcaoRapidaMobile" class="modal-backdrop hidden">
+    <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden">
+      <div class="bg-slate-900 px-5 pt-3 pb-4 text-white flex-shrink-0">
+        <div class="w-10 h-1 bg-slate-600 rounded-full mx-auto mb-3"></div>
+        <div class="flex justify-between items-center">
+          <h2 class="text-base font-bold flex items-center space-x-2">
+            <i class="fa-solid fa-bolt text-indigo-400"></i>
+            <span>Criar ou Acessar Rápido</span>
+          </h2>
+          <button type="button" onclick="fecharModal('modalAcaoRapidaMobile')" class="text-slate-300 hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
+        </div>
+      </div>
+
+      <div class="p-4 grid grid-cols-2 gap-3 modal-scroll-body">
+        <button type="button" onclick="fecharModal('modalAcaoRapidaMobile'); abrirModalAnotacao()" class="p-3.5 rounded-xl bg-indigo-50 border border-indigo-200 text-indigo-800 flex items-center space-x-2.5 text-left font-semibold text-sm active:scale-95 transition-transform">
+          <i class="fa-solid fa-pen-to-square text-indigo-600 text-lg"></i>
+          <span>Nova Anotação</span>
+        </button>
+        <button type="button" onclick="fecharModal('modalAcaoRapidaMobile'); abrirModalTarefa()" class="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 flex items-center space-x-2.5 text-left font-semibold text-sm active:scale-95 transition-transform">
+          <i class="fa-solid fa-square-check text-emerald-600 text-lg"></i>
+          <span>Nova Tarefa</span>
+        </button>
+        <button type="button" onclick="fecharModal('modalAcaoRapidaMobile'); abrirModal('modalFlashcard')" class="p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 flex items-center space-x-2.5 text-left font-semibold text-sm active:scale-95 transition-transform">
+          <i class="fa-solid fa-layer-group text-amber-600 text-lg"></i>
+          <span>Novo Flashcard</span>
+        </button>
+        <button type="button" onclick="fecharModal('modalAcaoRapidaMobile'); abrirModal('modalCurso')" class="p-3.5 rounded-xl bg-purple-50 border border-purple-200 text-purple-800 flex items-center space-x-2.5 text-left font-semibold text-sm active:scale-95 transition-transform">
+          <i class="fa-solid fa-graduation-cap text-purple-600 text-lg"></i>
+          <span>Novo Curso</span>
+        </button>
+        <button type="button" onclick="fecharModal('modalAcaoRapidaMobile'); abrirModalMidia()" class="p-3.5 rounded-xl bg-rose-50/60 border border-rose-200 text-rose-800 flex items-center space-x-2.5 text-left font-semibold text-sm active:scale-95 transition-transform">
+          <i class="fa-solid fa-bookmark text-rose-600 text-lg"></i>
+          <span>Nova Leitura</span>
+        </button>
+        <button type="button" onclick="fecharModal('modalAcaoRapidaMobile'); abrirModalSubcategoria()" class="p-3.5 rounded-xl bg-teal-50 border border-teal-200 text-teal-800 flex items-center space-x-2.5 text-left font-semibold text-sm active:scale-95 transition-transform">
+          <i class="fa-solid fa-folder-tree text-teal-600 text-lg"></i>
+          <span>Subcategoria</span>
+        </button>
+        <button type="button" onclick="fecharModal('modalAcaoRapidaMobile'); abrirModal('modalCategoria')" class="p-3.5 rounded-xl bg-slate-100 border border-gray-200 text-slate-800 flex items-center space-x-2.5 text-left font-semibold text-sm active:scale-95 transition-transform">
+          <i class="fa-solid fa-folder-plus text-slate-600 text-lg"></i>
+          <span>Nova Categoria</span>
+        </button>
+        <button type="button" onclick="fecharModal('modalAcaoRapidaMobile'); mudarAba('eisenhower')" class="p-3.5 rounded-xl bg-red-50 border border-red-200 text-red-800 flex items-center space-x-2.5 text-left font-semibold text-sm active:scale-95 transition-transform">
+          <i class="fa-solid fa-border-all text-red-600 text-lg"></i>
+          <span>Matriz Eisenhower</span>
+        </button>
       </div>
     </div>
   </div>
@@ -2179,10 +2453,11 @@
     function aplicarTemaUI(ehEscuro) {
       document.documentElement.classList.toggle('dark', ehEscuro);
       const icone = document.getElementById('iconeTema');
+      const iconeMobile = document.getElementById('iconeTemaMobile');
       const texto = document.getElementById('textoTema');
-      if (icone) {
-        icone.className = ehEscuro ? 'fa-solid fa-sun text-amber-400' : 'fa-solid fa-moon text-indigo-600';
-      }
+      const classeIcone = ehEscuro ? 'fa-solid fa-sun text-amber-400' : 'fa-solid fa-moon text-indigo-600';
+      if (icone) icone.className = classeIcone;
+      if (iconeMobile) iconeMobile.className = classeIcone;
       if (texto) {
         texto.innerText = ehEscuro ? 'Modo Claro' : 'Modo Noturno';
       }
@@ -2388,6 +2663,19 @@
         menuBtnAtivo.classList.add('nav-item-active');
       }
       document.getElementById('titulo-pagina').innerText = titulos[abaSelecionada];
+
+      // Atualiza barra inferior mobile
+      ['dashboard', 'anotacoes', 'tarefas', 'mais'].forEach(key => {
+        const b = document.getElementById(`bnav-${key}`);
+        if (b) b.classList.remove('mobile-bnav-active');
+      });
+      const bnavAlvo = ['dashboard', 'anotacoes', 'tarefas'].includes(abaSelecionada)
+        ? document.getElementById(`bnav-${abaSelecionada}`)
+        : document.getElementById('bnav-mais');
+      if (bnavAlvo) bnavAlvo.classList.add('mobile-bnav-active');
+
+      const mainEl = document.querySelector('main');
+      if (mainEl) mainEl.scrollTo({ top: 0 });
 
       if (abaSelecionada === 'anotacoes') {
         carregarSubcategorias();
@@ -2702,19 +2990,19 @@
       const clsAtiva = 'bg-teal-600 text-white border-teal-600 shadow-sm';
       const clsInativa = 'bg-slate-50 text-slate-700 border-gray-200 hover:bg-teal-50 hover:text-teal-700 hover:border-teal-200';
 
-      let html = `<span class="text-xs font-bold uppercase tracking-wider text-slate-400 mr-1"><i class="fa-solid fa-folder-tree text-teal-600 mr-1"></i>Subcategorias:</span>`;
-      html += `<button type="button" data-sub="" onclick="selecionarSubcategoriaRapidaAnotacao(this.dataset.sub)" class="px-3 py-1 rounded-full text-xs font-semibold border transition-colors ${subAtiva === '' ? clsAtiva : clsInativa}">Todas (${notasDaCat.length})</button>`;
+      let html = `<span class="whitespace-nowrap flex-shrink-0 text-xs font-bold uppercase tracking-wider text-slate-400 mr-1"><i class="fa-solid fa-folder-tree text-teal-600 mr-1"></i>Subcategorias:</span>`;
+      html += `<button type="button" data-sub="" onclick="selecionarSubcategoriaRapidaAnotacao(this.dataset.sub)" class="whitespace-nowrap flex-shrink-0 px-3 py-1 rounded-full text-xs font-semibold border transition-colors ${subAtiva === '' ? clsAtiva : clsInativa}">Todas (${notasDaCat.length})</button>`;
 
       subs.forEach(s => {
         const count = notasDaCat.filter(a => (a.subcategoria || '').trim() === s).length;
-        html += `<button type="button" data-sub="${escapeHtml(s)}" onclick="selecionarSubcategoriaRapidaAnotacao(this.dataset.sub)" class="px-3 py-1 rounded-full text-xs font-semibold border transition-colors ${subAtiva === s ? clsAtiva : clsInativa}">${escapeHtml(s)} (${count})</button>`;
+        html += `<button type="button" data-sub="${escapeHtml(s)}" onclick="selecionarSubcategoriaRapidaAnotacao(this.dataset.sub)" class="whitespace-nowrap flex-shrink-0 px-3 py-1 rounded-full text-xs font-semibold border transition-colors ${subAtiva === s ? clsAtiva : clsInativa}">${escapeHtml(s)} (${count})</button>`;
       });
 
       if (semSubCount > 0) {
-        html += `<button type="button" data-sub="__SEM_SUB__" onclick="selecionarSubcategoriaRapidaAnotacao(this.dataset.sub)" class="px-3 py-1 rounded-full text-xs font-semibold border transition-colors ${subAtiva === '__SEM_SUB__' ? clsAtiva : clsInativa}">Sem subcategoria (${semSubCount})</button>`;
+        html += `<button type="button" data-sub="__SEM_SUB__" onclick="selecionarSubcategoriaRapidaAnotacao(this.dataset.sub)" class="whitespace-nowrap flex-shrink-0 px-3 py-1 rounded-full text-xs font-semibold border transition-colors ${subAtiva === '__SEM_SUB__' ? clsAtiva : clsInativa}">Sem subcategoria (${semSubCount})</button>`;
       }
 
-      html += `<button type="button" data-cat="${escapeHtml(cat)}" onclick="abrirModalSubcategoria(this.dataset.cat)" class="ml-auto px-2.5 py-1 rounded-full text-xs font-semibold bg-teal-50 text-teal-700 border border-teal-200 hover:bg-teal-600 hover:text-white transition-colors"><i class="fa-solid fa-plus mr-1"></i>Nova Subcategoria</button>`;
+      html += `<button type="button" data-cat="${escapeHtml(cat)}" onclick="abrirModalSubcategoria(this.dataset.cat)" class="whitespace-nowrap flex-shrink-0 md:ml-auto px-2.5 py-1 rounded-full text-xs font-semibold bg-teal-50 text-teal-700 border border-teal-200 hover:bg-teal-600 hover:text-white transition-colors"><i class="fa-solid fa-plus mr-1"></i>Nova Subcategoria</button>`;
 
       barra.innerHTML = html;
       barra.classList.remove('hidden');
@@ -2741,7 +3029,7 @@
         : '';
 
       return `
-        <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all flex flex-col justify-between" style="height: 330px;">
+        <div class="nota-card-item bg-white p-4 md:p-5 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all flex flex-col justify-between" style="height: 330px;">
           <div class="overflow-hidden flex flex-col flex-1 cursor-pointer" onclick="abrirLeituraAnotacao('${item.id}')">
             <div class="flex justify-between items-start gap-2 mb-2 flex-shrink-0">
               <div class="flex flex-wrap items-center gap-1 min-w-0" style="max-width: 72%;">
@@ -3155,7 +3443,34 @@
       }).excluirSubcategoria(subId);
     }
 
+    function alternarAbaEditorMobile(aba) {
+      const colPrincipal = document.getElementById('editorColunaPrincipal');
+      const colProps = document.getElementById('editorColunaPropriedades');
+      const tabConteudo = document.getElementById('tabEditorConteudo');
+      const tabDetalhes = document.getElementById('tabEditorDetalhes');
+      if (!colPrincipal || !colProps) return;
+
+      const ehDetalhes = aba === 'detalhes';
+      if (ehDetalhes) {
+        colPrincipal.classList.add('hidden', 'lg:flex');
+        colProps.classList.remove('hidden');
+        colProps.classList.add('flex-1', 'lg:flex-initial');
+      } else {
+        colPrincipal.classList.remove('hidden');
+        colProps.classList.add('hidden');
+        colProps.classList.remove('flex-1', 'lg:flex-initial');
+      }
+
+      if (tabConteudo && tabDetalhes) {
+        const clsAtiva = 'py-2.5 text-xs font-bold text-indigo-600 border-b-2 border-indigo-600 bg-white flex items-center justify-center space-x-1.5';
+        const clsInativa = 'py-2.5 text-xs font-semibold text-slate-500 border-b-2 border-transparent flex items-center justify-center space-x-1.5';
+        tabConteudo.className = ehDetalhes ? clsInativa : clsAtiva;
+        tabDetalhes.className = ehDetalhes ? clsAtiva : clsInativa;
+      }
+    }
+
     function abrirModalAnotacao(id = null, catPadrao = null, subPadrao = null) {
+      alternarAbaEditorMobile('conteudo');
       document.getElementById('formAnotacao').reset();
       document.getElementById('anotacaoId').value = '';
       document.getElementById('anotacaoAnexoUrl').value = '';
@@ -3674,12 +3989,12 @@
       const clsAtiva = 'bg-emerald-600 text-white border-emerald-600 shadow-sm';
       const clsInativa = 'bg-slate-50 text-slate-700 border-gray-200 hover:bg-emerald-50 hover:text-emerald-700';
 
-      let html = `<span class="text-xs font-bold uppercase tracking-wider text-slate-400 mr-1"><i class="fa-solid fa-folder text-emerald-600 mr-1"></i>Categorias:</span>`;
-      html += `<button type="button" data-cat="" onclick="selecionarCategoriaTarefaRapida(this.dataset.cat)" class="px-3 py-1 rounded-full text-xs font-semibold border transition-colors ${catAtiva === '' ? clsAtiva : clsInativa}">Todas (${listaTarefasGlobal.length})</button>`;
+      let html = `<span class="whitespace-nowrap flex-shrink-0 text-xs font-bold uppercase tracking-wider text-slate-400 mr-1"><i class="fa-solid fa-folder text-emerald-600 mr-1"></i>Categorias:</span>`;
+      html += `<button type="button" data-cat="" onclick="selecionarCategoriaTarefaRapida(this.dataset.cat)" class="whitespace-nowrap flex-shrink-0 px-3 py-1 rounded-full text-xs font-semibold border transition-colors ${catAtiva === '' ? clsAtiva : clsInativa}">Todas (${listaTarefasGlobal.length})</button>`;
 
       cats.forEach(cat => {
         const count = listaTarefasGlobal.filter(t => t.categoria === cat).length;
-        html += `<button type="button" data-cat="${escapeHtml(cat)}" onclick="selecionarCategoriaTarefaRapida(this.dataset.cat)" class="px-3 py-1 rounded-full text-xs font-semibold border transition-colors ${catAtiva === cat ? clsAtiva : clsInativa}">${escapeHtml(cat)} (${count})</button>`;
+        html += `<button type="button" data-cat="${escapeHtml(cat)}" onclick="selecionarCategoriaTarefaRapida(this.dataset.cat)" class="whitespace-nowrap flex-shrink-0 px-3 py-1 rounded-full text-xs font-semibold border transition-colors ${catAtiva === cat ? clsAtiva : clsInativa}">${escapeHtml(cat)} (${count})</button>`;
       });
 
       barra.innerHTML = html;
@@ -3694,11 +4009,13 @@
 
     function renderizarTabelaTarefas() {
       const el = document.getElementById('tabelaTarefas');
-      if (!el) return;
+      const elMob = document.getElementById('tabelaTarefasMobile');
+      if (!el && !elMob) return;
       const lista = obterTarefasFiltradas(true);
 
       if (!lista || lista.length === 0) {
-        el.innerHTML = `<tr><td colspan="7" class="text-center py-8 text-gray-400">Nenhuma tarefa encontrada.</td></tr>`;
+        if (el) el.innerHTML = `<tr><td colspan="7" class="text-center py-8 text-gray-400">Nenhuma tarefa encontrada.</td></tr>`;
+        if (elMob) elMob.innerHTML = `<div class="text-center py-8 text-gray-400 text-sm">Nenhuma tarefa encontrada.</div>`;
         return;
       }
 
@@ -3708,32 +4025,65 @@
         'Baixa': 'bg-gray-100 text-gray-600 border-gray-200'
       };
 
-      el.innerHTML = lista.map(t => `
-        <tr class="border-b border-gray-100 hover:bg-gray-50 transition-colors">
-          <td class="p-4">
-            <button type="button" onclick="alternarStatusTarefa('${t.id}', '${t.status}')" class="text-lg">
-              ${t.status === 'Concluído' ? '<i class="fa-solid fa-circle-check text-emerald-500"></i>' : '<i class="fa-regular fa-circle text-gray-300 hover:text-emerald-500"></i>'}
-            </button>
-          </td>
-          <td class="p-4">
-            <div class="flex flex-wrap items-center gap-2">
-              <span class="font-medium ${t.status === 'Concluído' ? 'line-through text-gray-400' : 'text-slate-800'}">${escapeHtml(t.titulo)}</span>
-              ${obterBadgeEisenhowerHtml(t.eisenhower)}
+      if (el) {
+        el.innerHTML = lista.map(t => `
+          <tr class="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+            <td class="p-4">
+              <button type="button" onclick="alternarStatusTarefa('${t.id}', '${t.status}')" class="text-lg">
+                ${t.status === 'Concluído' ? '<i class="fa-solid fa-circle-check text-emerald-500"></i>' : '<i class="fa-regular fa-circle text-gray-300 hover:text-emerald-500"></i>'}
+              </button>
+            </td>
+            <td class="p-4">
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="font-medium ${t.status === 'Concluído' ? 'line-through text-gray-400' : 'text-slate-800'}">${escapeHtml(t.titulo)}</span>
+                ${obterBadgeEisenhowerHtml(t.eisenhower)}
+              </div>
+              ${t.descricao ? `<div class="text-xs text-gray-500 mt-1 whitespace-pre-line">${escapeHtml(t.descricao)}</div>` : ''}
+            </td>
+            <td class="p-4"><span class="text-xs bg-slate-100 text-slate-700 px-2.5 py-1 rounded-md font-medium">${escapeHtml(t.categoria)}</span></td>
+            <td class="p-4 text-xs text-gray-500"><i class="fa-regular fa-calendar mr-1"></i>${escapeHtml(t.prazo || 'Sem prazo')}</td>
+            <td class="p-4"><span class="text-xs px-2.5 py-1 rounded-full border font-semibold ${prioridadeCores[t.prioridade] || prioridadeCores['Média']}">${escapeHtml(t.prioridade)}</span></td>
+            <td class="p-4 text-xs">
+              ${t.anexoUrl ? `<a href="${escapeHtml(t.anexoUrl)}" target="_blank" class="text-emerald-600 hover:underline flex items-center space-x-1"><i class="fa-solid fa-paperclip"></i> <span>${escapeHtml(t.anexoNome)}</span></a>` : '<span class="text-gray-300">-</span>'}
+            </td>
+            <td class="p-4 text-right space-x-2">
+              <button type="button" onclick="abrirModalTarefa('${t.id}')" class="text-indigo-600 hover:text-indigo-800 p-1 text-xs font-medium"><i class="fa-solid fa-pen"></i></button>
+              <button type="button" onclick="deletarTarefa('${t.id}')" class="text-red-500 hover:text-red-700 p-1 text-xs"><i class="fa-solid fa-trash"></i></button>
+            </td>
+          </tr>
+        `).join('');
+      }
+
+      if (elMob) {
+        elMob.innerHTML = lista.map(t => `
+          <div class="p-4 space-y-2.5">
+            <div class="flex items-start gap-3">
+              <button type="button" onclick="alternarStatusTarefa('${t.id}', '${t.status}')" class="text-xl mt-0.5 flex-shrink-0 p-1">
+                ${t.status === 'Concluído' ? '<i class="fa-solid fa-circle-check text-emerald-500"></i>' : '<i class="fa-regular fa-circle text-gray-300 hover:text-emerald-500"></i>'}
+              </button>
+              <div class="flex-1 min-w-0 space-y-1">
+                <div class="font-semibold text-sm ${t.status === 'Concluído' ? 'line-through text-gray-400' : 'text-slate-800'} break-words">${escapeHtml(t.titulo)}</div>
+                ${t.descricao ? `<p class="text-xs text-gray-500 whitespace-pre-line">${escapeHtml(t.descricao)}</p>` : ''}
+                <div class="flex flex-wrap items-center gap-1.5 pt-1">
+                  <span class="text-[11px] bg-slate-100 text-slate-700 px-2 py-0.5 rounded font-medium">${escapeHtml(t.categoria)}</span>
+                  <span class="text-[11px] px-2 py-0.5 rounded-full border font-semibold ${prioridadeCores[t.prioridade] || prioridadeCores['Média']}">${escapeHtml(t.prioridade)}</span>
+                  ${obterBadgeEisenhowerHtml(t.eisenhower)}
+                  <span class="text-[11px] text-gray-500"><i class="fa-regular fa-calendar mr-1"></i>${escapeHtml(t.prazo || 'S/ prazo')}</span>
+                </div>
+              </div>
             </div>
-            ${t.descricao ? `<div class="text-xs text-gray-500 mt-1 whitespace-pre-line">${escapeHtml(t.descricao)}</div>` : ''}
-          </td>
-          <td class="p-4"><span class="text-xs bg-slate-100 text-slate-700 px-2.5 py-1 rounded-md font-medium">${escapeHtml(t.categoria)}</span></td>
-          <td class="p-4 text-xs text-gray-500"><i class="fa-regular fa-calendar mr-1"></i>${escapeHtml(t.prazo || 'Sem prazo')}</td>
-          <td class="p-4"><span class="text-xs px-2.5 py-1 rounded-full border font-semibold ${prioridadeCores[t.prioridade] || prioridadeCores['Média']}">${escapeHtml(t.prioridade)}</span></td>
-          <td class="p-4 text-xs">
-            ${t.anexoUrl ? `<a href="${escapeHtml(t.anexoUrl)}" target="_blank" class="text-emerald-600 hover:underline flex items-center space-x-1"><i class="fa-solid fa-paperclip"></i> <span>${escapeHtml(t.anexoNome)}</span></a>` : '<span class="text-gray-300">-</span>'}
-          </td>
-          <td class="p-4 text-right space-x-2">
-            <button type="button" onclick="abrirModalTarefa('${t.id}')" class="text-indigo-600 hover:text-indigo-800 p-1 text-xs font-medium"><i class="fa-solid fa-pen"></i></button>
-            <button type="button" onclick="deletarTarefa('${t.id}')" class="text-red-500 hover:text-red-700 p-1 text-xs"><i class="fa-solid fa-trash"></i></button>
-          </td>
-        </tr>
-      `).join('');
+            <div class="flex justify-between items-center pt-1 pl-9">
+              <div class="text-xs">
+                ${t.anexoUrl ? `<a href="${escapeHtml(t.anexoUrl)}" target="_blank" class="text-emerald-600 hover:underline flex items-center space-x-1"><i class="fa-solid fa-paperclip"></i> <span class="truncate max-w-[170px]">${escapeHtml(t.anexoNome)}</span></a>` : ''}
+              </div>
+              <div class="flex items-center space-x-3">
+                <button type="button" onclick="abrirModalTarefa('${t.id}')" class="text-xs text-indigo-600 hover:text-indigo-800 font-semibold px-2 py-1"><i class="fa-solid fa-pen mr-1"></i>Editar</button>
+                <button type="button" onclick="deletarTarefa('${t.id}')" class="text-xs text-red-500 hover:text-red-700 px-2 py-1"><i class="fa-solid fa-trash"></i></button>
+              </div>
+            </div>
+          </div>
+        `).join('');
+      }
     }
 
     function renderizarTarefasPorCategoria() {
@@ -3840,9 +4190,14 @@
             <h4 class="font-bold text-slate-800 text-sm">${escapeHtml(t.titulo)}</h4>
             ${obterBadgeEisenhowerHtml(t.eisenhower)}
             ${t.descricao ? `<p class="text-xs text-gray-500 truncate">${escapeHtml(t.descricao)}</p>` : ''}
-            <div class="flex justify-between items-center pt-2 border-t border-gray-100 text-xs text-gray-400">
+            <div class="flex flex-wrap justify-between items-center gap-2 pt-2 border-t border-gray-100 text-xs text-gray-400">
               <span><i class="fa-regular fa-calendar mr-1"></i>${escapeHtml(t.prazo || 'S/ prazo')}</span>
-              <div class="flex space-x-2">
+              <div class="flex items-center space-x-2">
+                <select onchange="alterarStatusTarefaDireto('${t.id}', this.value)" class="md:hidden text-xs border border-gray-300 rounded-lg px-2 py-1 bg-slate-50 text-slate-700" aria-label="Mover status">
+                  <option value="Pendente" ${t.status === 'Pendente' || !t.status ? 'selected' : ''}>Pendente</option>
+                  <option value="Em Andamento" ${t.status === 'Em Andamento' ? 'selected' : ''}>Em Andamento</option>
+                  <option value="Concluído" ${t.status === 'Concluído' ? 'selected' : ''}>Concluído</option>
+                </select>
                 <button type="button" onclick="abrirModalTarefa('${t.id}')" class="text-indigo-600 hover:text-indigo-800"><i class="fa-solid fa-pen"></i></button>
                 <button type="button" onclick="deletarTarefa('${t.id}')" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button>
               </div>
@@ -3852,6 +4207,16 @@
       });
 
       atualizarContadoresKanban();
+    }
+
+    function alterarStatusTarefaDireto(id, novoStatus) {
+      const t = listaTarefasGlobal.find(x => x.id === id);
+      if (t) {
+        t.status = novoStatus;
+        renderizarTarefas();
+        renderizarEisenhower();
+      }
+      google.script.run.atualizarStatusTarefa(id, novoStatus);
     }
 
     function atualizarContadoresKanban() {
@@ -3999,6 +4364,11 @@
       });
     }
 
+    function irParaQuadranteEisenhower(elId) {
+      const el = document.getElementById(elId);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
     function moverQuadranteEisenhower(id, quadrante) {
       const t = listaTarefasGlobal.find(x => x.id === id);
       if (t) {
@@ -4072,8 +4442,15 @@
                 </span>
               </div>
               <div class="flex items-center space-x-1.5">
+                <select onchange="moverQuadranteEisenhower('${t.id}', this.value)" class="md:hidden text-[11px] border border-gray-300 rounded-md px-1.5 py-0.5 bg-slate-50 text-slate-700" aria-label="Mover quadrante">
+                  <option value="fazer" ${(t.eisenhower || '') === 'fazer' ? 'selected' : ''}>Q1 Fazer</option>
+                  <option value="agendar" ${(t.eisenhower || '') === 'agendar' ? 'selected' : ''}>Q2 Agendar</option>
+                  <option value="delegar" ${(t.eisenhower || '') === 'delegar' ? 'selected' : ''}>Q3 Delegar</option>
+                  <option value="eliminar" ${(t.eisenhower || '') === 'eliminar' ? 'selected' : ''}>Q4 Postergar</option>
+                  <option value="">Entrada</option>
+                </select>
                 <button type="button" onclick="abrirModalTarefa('${t.id}')" class="text-indigo-600 hover:text-indigo-800 p-1" title="Editar tarefa"><i class="fa-solid fa-pen"></i></button>
-                <button type="button" onclick="moverQuadranteEisenhower('${t.id}', '')" class="text-slate-400 hover:text-slate-700 p-1" title="Mover para Caixa de Entrada"><i class="fa-solid fa-inbox"></i></button>
+                <button type="button" onclick="moverQuadranteEisenhower('${t.id}', '')" class="hidden md:inline-block text-slate-400 hover:text-slate-700 p-1" title="Mover para Caixa de Entrada"><i class="fa-solid fa-inbox"></i></button>
                 <button type="button" onclick="deletarTarefa('${t.id}')" class="text-red-500 hover:text-red-700 p-1" title="Excluir tarefa"><i class="fa-solid fa-trash"></i></button>
               </div>
             </div>
@@ -4119,7 +4496,9 @@
       ['fazer', 'agendar', 'delegar', 'eliminar'].forEach(q => {
         const zoneEl = document.getElementById(`eisenhower-${q}`);
         const countEl = document.getElementById(`count-eisen-${q}`);
+        const mobCountEl = document.getElementById(`mob-count-eisen-${q}`);
         if (countEl) countEl.innerText = buckets[q].length;
+        if (mobCountEl) mobCountEl.innerText = buckets[q].length;
         if (!zoneEl) return;
         zoneEl.innerHTML = buckets[q].length > 0
           ? buckets[q].map(criarCardQuadrante).join('')
@@ -4128,7 +4507,9 @@
 
       const semEl = document.getElementById('eisenhower-sem-quadrante');
       const countSem = document.getElementById('count-eisen-sem-quadrante');
+      const mobCountSem = document.getElementById('mob-count-eisen-sem');
       if (countSem) countSem.innerText = buckets.sem.length;
+      if (mobCountSem) mobCountSem.innerText = buckets.sem.length;
       if (semEl) {
         semEl.innerHTML = buckets.sem.length > 0
           ? buckets.sem.map(criarCardCaixaEntrada).join('')
@@ -4167,10 +4548,12 @@
 
       if (calendarInstancia) calendarInstancia.destroy();
 
+      const isMobileCal = window.innerWidth < 768;
+
       calendarInstancia = new FullCalendar.Calendar(calendarEl, {
-        initialView: 'dayGridMonth',
+        initialView: isMobileCal ? 'listMonth' : 'dayGridMonth',
         locale: 'pt-br',
-        height: 620,
+        height: isMobileCal ? 'auto' : 620,
         headerToolbar: {
           left: 'prev,next today',
           center: 'title',
@@ -4685,22 +5068,31 @@
       grafoAnimFrame = requestAnimationFrame(loopDesenhoGrafo);
     }
 
+    function ajustarZoomGrafo(fator) {
+      grafoCamera.zoom = Math.min(2.5, Math.max(0.4, grafoCamera.zoom * fator));
+    }
+
     function obterNoSobMouse(canvas, evt) {
       const rect = canvas.getBoundingClientRect();
-      const mx = evt.clientX - rect.left;
-      const my = evt.clientY - rect.top;
+      const pt = evt.touches ? evt.touches[0] : (evt.changedTouches ? evt.changedTouches[0] : evt);
+      const mx = pt.clientX - rect.left;
+      const my = pt.clientY - rect.top;
       const wx = (mx - canvas.width / 2 - grafoCamera.x) / grafoCamera.zoom + canvas.width / 2;
       const wy = (my - canvas.height / 2 - grafoCamera.y) / grafoCamera.zoom + canvas.height / 2;
 
       for (let i = grafoDados.nodes.length - 1; i >= 0; i--) {
         const n = grafoDados.nodes[i];
-        const r = (n.val || 12) + 4;
+        const r = (n.val || 12) + 8;
         if (Math.hypot(wx - n.x, wy - n.y) <= r) return { node: n, wx, wy };
       }
       return { node: null, wx, wy };
     }
 
     function configurarEventosCanvasGrafo(canvas) {
+      let ultimoToqueTempo = 0;
+      let ultimoToqueNoId = null;
+      let pinchDistInicial = null;
+
       canvas.onmousedown = (e) => {
         const { node } = obterNoSobMouse(canvas, e);
         if (node) {
@@ -4742,6 +5134,74 @@
         } else if (node.group === 'midia' && node.rawId) {
           abrirLeituraMidia(node.rawId);
         }
+      };
+
+      // Suporte completo a toque (arrastar nós, mover câmera, pinça de zoom e duplo toque)
+      canvas.ontouchstart = (e) => {
+        if (e.touches.length === 2) {
+          e.preventDefault();
+          noArrastado = null;
+          arrastandoCanvas = false;
+          pinchDistInicial = Math.hypot(
+            e.touches[0].clientX - e.touches[1].clientX,
+            e.touches[0].clientY - e.touches[1].clientY
+          );
+          return;
+        }
+        if (e.touches.length === 1) {
+          e.preventDefault();
+          const { node } = obterNoSobMouse(canvas, e);
+          const agora = Date.now();
+          if (node) {
+            if (ultimoToqueNoId === node.id && (agora - ultimoToqueTempo) < 350) {
+              if (node.group === 'anotacao' && node.rawId) abrirLeituraAnotacao(node.rawId);
+              else if (node.group === 'midia' && node.rawId) abrirLeituraMidia(node.rawId);
+              ultimoToqueTempo = 0;
+              ultimoToqueNoId = null;
+              return;
+            }
+            ultimoToqueTempo = agora;
+            ultimoToqueNoId = node.id;
+            noArrastado = node;
+          } else {
+            ultimoToqueNoId = null;
+            arrastandoCanvas = true;
+            ultimoMouse = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+          }
+        }
+      };
+
+      canvas.ontouchmove = (e) => {
+        if (e.touches.length === 2 && pinchDistInicial) {
+          e.preventDefault();
+          const novaDist = Math.hypot(
+            e.touches[0].clientX - e.touches[1].clientX,
+            e.touches[0].clientY - e.touches[1].clientY
+          );
+          if (novaDist > 0) {
+            ajustarZoomGrafo(novaDist / pinchDistInicial);
+            pinchDistInicial = novaDist;
+          }
+          return;
+        }
+        if (e.touches.length === 1) {
+          e.preventDefault();
+          if (noArrastado) {
+            const { wx, wy } = obterNoSobMouse(canvas, e);
+            noArrastado.x = wx;
+            noArrastado.y = wy;
+          } else if (arrastandoCanvas) {
+            grafoCamera.x += e.touches[0].clientX - ultimoMouse.x;
+            grafoCamera.y += e.touches[0].clientY - ultimoMouse.y;
+            ultimoMouse = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+          }
+        }
+      };
+
+      canvas.ontouchend = () => {
+        noArrastado = null;
+        arrastandoCanvas = false;
+        pinchDistInicial = null;
       };
     }
 
@@ -5014,6 +5474,7 @@
 
     // ================= MODAIS =================
     function abrirModal(id) {
+      fecharMenuMobileSeAberto();
       const el = document.getElementById(id);
       if (el) {
         el.classList.remove('hidden');

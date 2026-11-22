@@ -482,6 +482,11 @@ def test_frontend_elementos_novos():
         "alternarTema",
         "study_hub_tema",
         "html.dark",
+        'name="viewport"',
+        "mobileBottomNav",
+        "modalAcaoRapidaMobile",
+        "tabelaTarefasMobile",
+        "alternarAbaEditorMobile",
     ]:
         assert elem_id in html, f"Elemento esperado ausente no HTML: {elem_id}"
     print("✅ Teste 20: Todos os elementos de interface novos presentes no frontend!")
