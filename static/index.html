@@ -731,9 +731,145 @@
         padding-bottom: env(safe-area-inset-bottom);
       }
     }
+
+    /* ================= TELA DE AUTENTICAÇÃO & COMPARTILHAMENTOS ================= */
+    #telaAuth {
+      background: radial-gradient(circle at top left, #eef2ff 0%, #f8fafc 45%, #e2e8f0 100%);
+    }
+    html.dark #telaAuth {
+      background: radial-gradient(circle at top left, #1e1b4b 0%, #0b1120 50%, #020617 100%);
+    }
+    html.dark #telaAuthCard {
+      background-color: #0f172a !important;
+      border-color: #1e293b !important;
+      color: #e2e8f0;
+    }
+    html.dark #telaAuthTabs {
+      background-color: #1e293b !important;
+    }
+    html.dark #bannerMigracaoAuth {
+      background-color: rgba(245, 158, 11, 0.14) !important;
+      border-color: rgba(245, 158, 11, 0.35) !important;
+      color: #fde68a !important;
+    }
+    html.dark #boxPrimeiroAcesso {
+      background-color: rgba(79, 70, 229, 0.14) !important;
+      border-color: rgba(99, 102, 241, 0.35) !important;
+    }
+    html.dark .badge-shared-recv {
+      background-color: rgba(56, 189, 248, 0.14) !important;
+      border-color: rgba(56, 189, 248, 0.3) !important;
+      color: #7dd3fc !important;
+    }
+    html.dark .badge-shared-sent {
+      background-color: rgba(16, 185, 129, 0.14) !important;
+      border-color: rgba(16, 185, 129, 0.3) !important;
+      color: #6ee7b7 !important;
+    }
   </style>
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans flex h-screen overflow-hidden">
+
+  <!-- ================= TELA DE AUTENTICAÇÃO (LOGIN / CADASTRO / 1º ACESSO) ================= -->
+  <div id="telaAuth" class="fixed inset-0 z-50 hidden flex items-start sm:items-center justify-center p-4 overflow-y-auto">
+    <button type="button" onclick="alternarTema()" class="fixed top-4 right-4 z-10 w-10 h-10 rounded-xl bg-white/90 border border-gray-200 shadow-sm text-slate-700 flex items-center justify-center hover:scale-105 transition-transform" title="Alternar Tema">
+      <i id="iconeTemaAuth" class="fa-solid fa-moon text-indigo-600"></i>
+    </button>
+
+    <div id="telaAuthCard" class="bg-white w-full max-w-md rounded-2xl shadow-2xl border border-gray-200 overflow-hidden my-auto">
+      <div class="bg-slate-900 px-6 py-6 text-white text-center space-y-1.5">
+        <div class="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-indigo-600 text-white text-2xl shadow-lg mb-1">
+          <i class="fa-solid fa-brain"></i>
+        </div>
+        <h1 class="text-xl font-bold tracking-tight">Study Hub &amp; Life OS</h1>
+        <p class="text-xs text-slate-400">Seu segundo cérebro individual e colaborativo</p>
+      </div>
+
+      <div class="p-6 space-y-4">
+        <div id="bannerMigracaoAuth" class="hidden p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs leading-relaxed flex items-start space-x-2.5">
+          <i class="fa-solid fa-shield-heart text-amber-600 text-base mt-0.5 flex-shrink-0"></i>
+          <div>
+            <b>Dados anteriores preservados!</b> Se você já utilizava o hub antes do sistema de contas, entre ou cadastre-se com o seu e-mail principal para definir sua senha de 1º acesso e recuperar tudo.
+          </div>
+        </div>
+
+        <div id="telaAuthTabs" class="grid grid-cols-2 bg-slate-100 p-1 rounded-xl">
+          <button type="button" id="tabAuthLogin" onclick="alternarAbaAuth('login')" class="py-2 rounded-lg text-xs font-bold bg-white text-slate-800 shadow-sm transition-all">Entrar</button>
+          <button type="button" id="tabAuthRegistro" onclick="alternarAbaAuth('registro')" class="py-2 rounded-lg text-xs font-semibold text-slate-500 hover:text-slate-800 transition-all">Criar Conta</button>
+        </div>
+
+        <div id="authFeedback" class="hidden text-xs font-semibold p-3 rounded-xl border"></div>
+
+        <!-- Formulário de Login -->
+        <form id="formLogin" class="space-y-3.5" onsubmit="processarLogin(event)">
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">E-mail</label>
+            <input type="email" id="loginEmail" required autocomplete="email" placeholder="seu@email.com" class="w-full border border-gray-300 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:border-indigo-500">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">Senha</label>
+            <input type="password" id="loginSenha" required autocomplete="current-password" placeholder="Sua senha" class="w-full border border-gray-300 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:border-indigo-500">
+          </div>
+          <button type="submit" id="btnAuthLogin" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2.5 rounded-xl text-sm font-bold shadow-md transition-colors flex items-center justify-center space-x-2">
+            <i class="fa-solid fa-right-to-bracket"></i> <span>Entrar no Study Hub</span>
+          </button>
+        </form>
+
+        <!-- Formulário de Cadastro -->
+        <form id="formRegistro" class="hidden space-y-3.5" onsubmit="processarRegistro(event)">
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">Seu Nome</label>
+            <input type="text" id="regNome" required autocomplete="name" placeholder="Ex: Ellias Augusto" class="w-full border border-gray-300 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:border-indigo-500">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">E-mail</label>
+            <input type="email" id="regEmail" required autocomplete="email" placeholder="seu@email.com" class="w-full border border-gray-300 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:border-indigo-500">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">Senha (mínimo 6 caracteres)</label>
+            <input type="password" id="regSenha" required minlength="6" autocomplete="new-password" placeholder="Crie uma senha" class="w-full border border-gray-300 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:border-indigo-500">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">Confirmar Senha</label>
+            <input type="password" id="regConfirmarSenha" required minlength="6" autocomplete="new-password" placeholder="Repita a senha" class="w-full border border-gray-300 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:border-indigo-500">
+          </div>
+          <button type="submit" id="btnAuthRegistro" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2.5 rounded-xl text-sm font-bold shadow-md transition-colors flex items-center justify-center space-x-2">
+            <i class="fa-solid fa-user-plus"></i> <span>Criar Minha Conta</span>
+          </button>
+        </form>
+
+        <!-- Primeiro Acesso para Conta Migrada -->
+        <form id="boxPrimeiroAcesso" class="hidden p-4 rounded-xl bg-indigo-50 border border-indigo-200 space-y-3" onsubmit="processarPrimeiroAcesso(event)">
+          <input type="hidden" id="setupEmail">
+          <div class="flex items-start space-x-2">
+            <i class="fa-solid fa-key text-indigo-600 text-base mt-0.5"></i>
+            <div>
+              <h3 class="text-sm font-bold text-indigo-900">Primeiro Acesso Detectado</h3>
+              <p class="text-xs text-indigo-700">Conta: <b id="setupEmailTexto"></b>. Defina sua senha abaixo para liberar seus dados.</p>
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">Seu Nome</label>
+            <input type="text" id="setupNome" required class="w-full bg-white border border-gray-300 rounded-xl px-3 py-2 text-sm focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">Nova Senha (mínimo 6 caracteres)</label>
+            <input type="password" id="setupSenha" required minlength="6" autocomplete="new-password" placeholder="Crie sua senha pessoal" class="w-full bg-white border border-gray-300 rounded-xl px-3 py-2 text-sm focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">Confirmar Nova Senha</label>
+            <input type="password" id="setupConfirmarSenha" required minlength="6" autocomplete="new-password" placeholder="Repita a nova senha" class="w-full bg-white border border-gray-300 rounded-xl px-3 py-2 text-sm focus:outline-none">
+          </div>
+          <div class="flex gap-2 pt-1">
+            <button type="button" onclick="voltarParaLoginAuth()" class="px-3.5 py-2 rounded-xl text-xs font-semibold bg-white border border-gray-300 text-gray-700">Voltar</button>
+            <button type="submit" id="btnAuthSetup" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-xl text-xs font-bold shadow-sm">
+              Definir Senha e Acessar Meus Dados
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
 
   <!-- ================= MENU LATERAL + POMODORO ================= -->
   <div id="backdropMobileMenu" onclick="alternarMenuMobile()" class="fixed inset-0 bg-slate-950/60 z-30 hidden md:hidden"></div>
@@ -759,6 +895,10 @@
       <a href="javascript:void(0)" id="menu-leituras" onclick="mudarAba('leituras')" class="flex items-center space-x-3 p-2.5 rounded-lg font-medium text-sm transition-colors nav-item-inactive"><i class="fa-solid fa-bookmark w-5 text-center"></i> <span>Leituras & Acervo</span></a>
       <a href="javascript:void(0)" id="menu-grafo" onclick="mudarAba('grafo')" class="flex items-center space-x-3 p-2.5 rounded-lg font-medium text-sm transition-colors nav-item-inactive"><i class="fa-solid fa-diagram-project w-5 text-center"></i> <span>Grafo & Conexões</span></a>
       <a href="javascript:void(0)" id="menu-habitos" onclick="mudarAba('habitos')" class="flex items-center space-x-3 p-2.5 rounded-lg font-medium text-sm transition-colors nav-item-inactive"><i class="fa-solid fa-fire-flame-curved w-5 text-center"></i> <span>Hábitos & Metas</span></a>
+      <a href="javascript:void(0)" id="menu-compartilhamentos" onclick="mudarAba('compartilhamentos')" class="flex items-center justify-between p-2.5 rounded-lg font-medium text-sm transition-colors nav-item-inactive">
+        <span class="flex items-center space-x-3"><i class="fa-solid fa-share-nodes w-5 text-center"></i> <span>Compartilhamentos</span></span>
+        <span id="badgeCompartilhadosMenu" class="hidden text-[11px] bg-indigo-500 text-white px-2 py-0.5 rounded-full font-bold">0</span>
+      </a>
     </nav>
 
     <!-- WIDGET POMODORO INTEGRADO -->
@@ -804,6 +944,24 @@
         <i class="fa-solid fa-folder-tree text-teal-400"></i> <span>Subcategorias (Notas)</span>
       </button>
     </div>
+
+    <div id="sidebarUsuarioCard" class="p-3 bg-slate-950 border-t border-slate-800 flex items-center justify-between gap-2">
+      <div class="flex items-center space-x-2.5 min-w-0 cursor-pointer flex-1" onclick="abrirModalConta()" title="Configurações da Conta">
+        <div id="sidebarUsuarioIniciais" class="w-9 h-9 rounded-full bg-indigo-600 text-white font-bold text-xs flex items-center justify-center flex-shrink-0">--</div>
+        <div class="min-w-0">
+          <div id="sidebarUsuarioNome" class="text-xs font-bold text-white truncate">Visitante</div>
+          <div id="sidebarUsuarioEmail" class="text-[11px] text-slate-400 truncate">Não conectado</div>
+        </div>
+      </div>
+      <div class="flex items-center space-x-1 flex-shrink-0">
+        <button type="button" onclick="abrirModalConta()" class="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors" title="Minha Conta">
+          <i class="fa-solid fa-user-gear text-xs"></i>
+        </button>
+        <button type="button" onclick="fazerLogout()" class="p-1.5 text-slate-400 hover:text-rose-400 rounded-lg hover:bg-slate-800 transition-colors" title="Sair da Conta">
+          <i class="fa-solid fa-right-from-bracket text-xs"></i>
+        </button>
+      </div>
+    </div>
   </aside>
 
   <!-- ================= CONTEÚDO PRINCIPAL ================= -->
@@ -818,6 +976,9 @@
 
       <!-- Ações Compactas no Mobile -->
       <div class="flex md:hidden items-center space-x-1.5 flex-shrink-0">
+        <button type="button" id="btnContaMobile" onclick="abrirModalConta()" class="w-10 h-10 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-lg flex items-center justify-center shadow-sm" title="Minha Conta">
+          <i class="fa-solid fa-user text-sm"></i>
+        </button>
         <button type="button" onclick="alternarTema()" class="w-10 h-10 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-gray-200 rounded-lg flex items-center justify-center shadow-sm" title="Alternar Tema">
           <i id="iconeTemaMobile" class="fa-solid fa-moon text-indigo-600"></i>
         </button>
@@ -828,6 +989,10 @@
 
       <!-- Ações Completas no Desktop -->
       <div class="hidden md:flex items-center space-x-2 flex-shrink-0">
+        <button type="button" id="btnContaHeader" onclick="abrirModalConta()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 border border-gray-200 px-3 py-2 rounded-lg font-medium shadow-sm transition-all flex items-center space-x-1.5 text-xs sm:text-sm" title="Gerenciar Minha Conta e Senha">
+          <i class="fa-solid fa-circle-user text-indigo-600"></i>
+          <span id="headerUsuarioNome" class="max-w-[110px] truncate">Conta</span>
+        </button>
         <button type="button" id="btnAlternarTema" onclick="alternarTema()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 border border-gray-200 px-3 py-2 rounded-lg font-medium shadow-sm transition-all flex items-center space-x-1.5 text-xs sm:text-sm" title="Alternar entre Modo Claro e Modo Noturno">
           <i id="iconeTema" class="fa-solid fa-moon text-indigo-600"></i>
           <span id="textoTema" class="hidden md:inline">Modo Noturno</span>
@@ -841,10 +1006,10 @@
         <button type="button" onclick="abrirModalTarefa()" class="bg-emerald-600 text-white px-3.5 py-2 rounded-lg font-medium shadow-sm transition-all flex items-center space-x-1.5 text-xs sm:text-sm">
           <i class="fa-solid fa-square-check"></i> <span>+ Tarefa</span>
         </button>
-        <button type="button" onclick="abrirModal('modalFlashcard')" class="bg-amber-500 text-white px-3.5 py-2 rounded-lg font-medium shadow-sm transition-all flex items-center space-x-1.5 text-xs sm:text-sm">
+        <button type="button" onclick="abrirModalFlashcard()" class="bg-amber-500 text-white px-3.5 py-2 rounded-lg font-medium shadow-sm transition-all flex items-center space-x-1.5 text-xs sm:text-sm">
           <i class="fa-solid fa-layer-group"></i> <span>+ Flashcard</span>
         </button>
-        <button type="button" onclick="abrirModal('modalCurso')" class="bg-purple-600 hover:bg-purple-700 text-white px-3.5 py-2 rounded-lg font-medium shadow-sm transition-all flex items-center space-x-1.5 text-xs sm:text-sm">
+        <button type="button" onclick="abrirModalCurso()" class="bg-purple-600 hover:bg-purple-700 text-white px-3.5 py-2 rounded-lg font-medium shadow-sm transition-all flex items-center space-x-1.5 text-xs sm:text-sm">
           <i class="fa-solid fa-graduation-cap"></i> <span>+ Curso</span>
         </button>
         <button type="button" onclick="abrirModalMidia()" class="bg-rose-600 hover:bg-rose-700 text-white px-3.5 py-2 rounded-lg font-medium shadow-sm transition-all flex items-center space-x-1.5 text-xs sm:text-sm">
@@ -913,6 +1078,11 @@
             <select id="filtroSubcategoriaAnotacao" onchange="filtrarAnotacoes()" class="flex-1 md:flex-initial min-w-0 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none">
               <option value="">Todas as Subcategorias</option>
             </select>
+            <select id="filtroOrigemAnotacao" onchange="filtrarAnotacoes()" class="flex-1 md:flex-initial min-w-0 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none">
+              <option value="">Todas (Origem)</option>
+              <option value="meus">Somente Minhas</option>
+              <option value="compartilhados">Compartilhadas Comigo</option>
+            </select>
             <div class="bg-slate-100 p-1 rounded-lg flex items-center w-full sm:w-auto">
               <button type="button" id="btnModoAnotacoesAgrupado" onclick="alternarModoAnotacoes('agrupado')" class="flex-1 sm:flex-initial justify-center px-3 py-1.5 rounded-md text-xs font-semibold bg-white text-slate-800 shadow-sm flex items-center space-x-1.5">
                 <i class="fa-solid fa-folder-tree"></i> <span>Agrupado</span>
@@ -959,6 +1129,11 @@
             <input type="text" id="buscaTarefa" oninput="renderizarTarefas()" placeholder="Pesquisar tarefa..." class="w-full sm:w-44 md:w-52 border border-gray-300 rounded-lg px-3 py-1.5 text-xs sm:text-sm focus:outline-none">
             <select id="filtroCategoriaTarefa" onchange="renderizarTarefas()" class="w-full sm:w-auto border border-gray-300 rounded-lg px-3 py-1.5 text-xs sm:text-sm focus:outline-none">
               <option value="">Todas as Categorias</option>
+            </select>
+            <select id="filtroOrigemTarefa" onchange="renderizarTarefas()" class="w-full sm:w-auto border border-gray-300 rounded-lg px-3 py-1.5 text-xs sm:text-sm focus:outline-none">
+              <option value="">Todas (Origem)</option>
+              <option value="meus">Somente Minhas</option>
+              <option value="compartilhados">Compartilhadas Comigo</option>
             </select>
 
             <div id="filtrosListaTarefas" class="flex flex-nowrap overflow-x-auto no-scrollbar md:flex-wrap gap-1.5 w-full md:w-auto">
@@ -1206,11 +1381,16 @@
             <select id="filtroCategoriaFlashcard" onchange="filtrarFlashcards()" class="flex-1 md:flex-initial min-w-0 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none">
               <option value="">Todas as Matérias</option>
             </select>
+            <select id="filtroOrigemFlashcard" onchange="filtrarFlashcards()" class="flex-1 md:flex-initial min-w-0 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none">
+              <option value="">Todos (Origem)</option>
+              <option value="meus">Somente Meus</option>
+              <option value="compartilhados">Compartilhados Comigo</option>
+            </select>
             <button type="button" onclick="iniciarModoEstudoFlashcards()" class="flex-1 md:flex-initial justify-center bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-sm flex items-center space-x-2">
               <i class="fa-solid fa-play"></i> <span>Praticar Agora (Modo Estudo)</span>
             </button>
           </div>
-          <button type="button" onclick="abrirModal('modalFlashcard')" class="w-full md:w-auto bg-amber-500 text-white px-4 py-2 rounded-lg text-sm font-medium text-center">
+          <button type="button" onclick="abrirModalFlashcard()" class="w-full md:w-auto bg-amber-500 text-white px-4 py-2 rounded-lg text-sm font-medium text-center">
             + Criar Flashcard
           </button>
         </div>
@@ -1249,8 +1429,15 @@
       <!-- ================= 6. CURSOS ================= -->
       <div id="view-cursos" class="view-hidden space-y-4">
         <div class="flex flex-wrap gap-2 justify-between items-center bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
-          <h2 class="font-semibold text-slate-700">Os Seus Cursos & Certificações</h2>
-          <button type="button" onclick="abrirModal('modalCurso')" class="w-full sm:w-auto bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors text-center">
+          <div class="flex flex-wrap items-center gap-2.5">
+            <h2 class="font-semibold text-slate-700">Os Seus Cursos &amp; Certificações</h2>
+            <select id="filtroOrigemCurso" onchange="renderizarCursos()" class="border border-gray-300 rounded-lg px-3 py-1.5 text-xs sm:text-sm focus:outline-none">
+              <option value="">Todos (Origem)</option>
+              <option value="meus">Somente Meus</option>
+              <option value="compartilhados">Compartilhados Comigo</option>
+            </select>
+          </div>
+          <button type="button" onclick="abrirModalCurso()" class="w-full sm:w-auto bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors text-center">
             + Novo Curso
           </button>
         </div>
@@ -1282,6 +1469,11 @@
             </select>
             <select id="filtroCategoriaMidia" onchange="filtrarMidias()" class="w-full sm:w-auto border border-gray-300 rounded-lg px-3 py-1.5 text-xs sm:text-sm focus:outline-none">
               <option value="">Todas as Categorias</option>
+            </select>
+            <select id="filtroOrigemMidia" onchange="filtrarMidias()" class="w-full sm:w-auto border border-gray-300 rounded-lg px-3 py-1.5 text-xs sm:text-sm focus:outline-none">
+              <option value="">Todos (Origem)</option>
+              <option value="meus">Somente Meus</option>
+              <option value="compartilhados">Compartilhados Comigo</option>
             </select>
           </div>
           <button type="button" onclick="abrirModalMidia()" class="w-full md:w-auto justify-center bg-rose-600 hover:bg-rose-700 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-sm flex items-center space-x-1.5 transition-colors">
@@ -1399,7 +1591,7 @@
               <h3 class="font-bold text-slate-800 text-base">Grade Semanal de Hábitos</h3>
               <p class="text-xs text-slate-500">Clique nos círculos para marcar ou desmarcar seus hábitos cumpridos</p>
             </div>
-            <button type="button" onclick="abrirModal('modalNovoHabito')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-2 rounded-lg text-xs font-semibold shadow-sm flex items-center space-x-1.5">
+            <button type="button" onclick="abrirModalHabito()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-2 rounded-lg text-xs font-semibold shadow-sm flex items-center space-x-1.5">
               <i class="fa-solid fa-plus"></i> <span>+ Novo Hábito</span>
             </button>
           </div>
@@ -1438,6 +1630,119 @@
           </div>
 
           <div id="heatmapContainer" class="flex flex-wrap gap-1.5 pt-2"></div>
+        </div>
+      </div>
+
+      <!-- ================= 10. CENTRAL DE COMPARTILHAMENTOS ================= -->
+      <div id="view-compartilhamentos" class="view-hidden space-y-6">
+        <div class="bg-white p-4 md:p-6 rounded-2xl border border-gray-200 shadow-sm space-y-4">
+          <div class="flex flex-wrap justify-between items-start gap-3">
+            <div>
+              <h2 class="font-bold text-slate-800 text-base md:text-lg flex items-center space-x-2">
+                <i class="fa-solid fa-share-nodes text-indigo-600"></i>
+                <span>Compartilhar Módulo ou Categoria Inteira</span>
+              </h2>
+              <p class="text-xs text-slate-500">Conceda acesso a outro usuário cadastrado escolhendo visualização, edição, escrita/criação ou controle total. Para compartilhar um item avulso, use o botão <i class="fa-solid fa-share-nodes"></i> no próprio card.</p>
+            </div>
+          </div>
+
+          <form id="formCompartilharEscopo" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 pt-2" onsubmit="processarCompartilhamentoEscopo(event)">
+            <div>
+              <label class="block text-xs font-semibold text-gray-600 mb-1">Escopo</label>
+              <select id="shareEscopoSelect" onchange="atualizarFormularioCompartilharEscopo()" class="w-full border border-gray-300 rounded-lg p-2.5 text-xs sm:text-sm focus:outline-none">
+                <option value="modulo">Módulo Inteiro</option>
+                <option value="categoria">Categoria / Matéria Específica</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-gray-600 mb-1">Módulo / Área</label>
+              <select id="shareModuloSelect" class="w-full border border-gray-300 rounded-lg p-2.5 text-xs sm:text-sm focus:outline-none">
+                <option value="todos">Todos os Módulos (Hub Completo)</option>
+                <option value="anotacao">Anotações (Base de Conhecimento)</option>
+                <option value="tarefa">Tarefas &amp; Matriz de Eisenhower</option>
+                <option value="curso">Cursos &amp; Treinos</option>
+                <option value="midia">Leituras &amp; Acervo</option>
+                <option value="flashcard">Flashcards</option>
+                <option value="habito" id="optShareModuloHabito">Hábitos Diários</option>
+              </select>
+            </div>
+
+            <div id="wrapShareCategoriaSelect" class="hidden">
+              <label class="block text-xs font-semibold text-gray-600 mb-1">Categoria</label>
+              <select id="shareCategoriaSelect" class="w-full border border-gray-300 rounded-lg p-2.5 text-xs sm:text-sm focus:outline-none select-categorias"></select>
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-gray-600 mb-1">E-mail do Usuário</label>
+              <input type="email" id="shareEmailInput" list="datalistUsuariosShare" required placeholder="colega@email.com" class="w-full border border-gray-300 rounded-lg p-2.5 text-xs sm:text-sm focus:outline-none">
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-gray-600 mb-1">Nível de Permissão</label>
+              <select id="shareNivelSelect" onchange="sincronizarNivelParaFlags('share')" class="w-full border border-gray-300 rounded-lg p-2.5 text-xs sm:text-sm focus:outline-none">
+                <option value="visualizar">Visualização (só ler)</option>
+                <option value="editar">Edição (ler e alterar)</option>
+                <option value="escrever">Escrita / Colaboração (ler, criar e editar)</option>
+                <option value="admin">Controle Total (inclui excluir)</option>
+                <option value="personalizado">Personalizado</option>
+              </select>
+            </div>
+
+            <div class="md:col-span-2 lg:col-span-3 flex flex-wrap items-center gap-3 bg-slate-50 border border-gray-200 rounded-xl px-3.5 py-2.5">
+              <span class="text-xs font-bold text-slate-600 uppercase">Permissões granulares:</span>
+              <label class="inline-flex items-center space-x-1.5 text-xs text-slate-700 select-none">
+                <input type="checkbox" id="shareFlagVisualizar" checked disabled class="rounded text-indigo-600">
+                <span>Visualizar</span>
+              </label>
+              <label class="inline-flex items-center space-x-1.5 text-xs text-slate-700 cursor-pointer select-none">
+                <input type="checkbox" id="shareFlagEditar" onchange="sincronizarFlagsParaNivel('share')" class="rounded text-indigo-600">
+                <span>Editar existentes</span>
+              </label>
+              <label class="inline-flex items-center space-x-1.5 text-xs text-slate-700 cursor-pointer select-none">
+                <input type="checkbox" id="shareFlagCriar" onchange="sincronizarFlagsParaNivel('share')" class="rounded text-indigo-600">
+                <span>Escrever / Criar novos</span>
+              </label>
+              <label class="inline-flex items-center space-x-1.5 text-xs text-slate-700 cursor-pointer select-none">
+                <input type="checkbox" id="shareFlagExcluir" onchange="sincronizarFlagsParaNivel('share')" class="rounded text-indigo-600">
+                <span>Excluir</span>
+              </label>
+            </div>
+
+            <div class="flex items-end">
+              <button type="submit" id="btnSalvarCompartilhamentoEscopo" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold shadow-sm transition-colors flex items-center justify-center space-x-1.5">
+                <i class="fa-solid fa-paper-plane"></i> <span>Compartilhar</span>
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div class="bg-white p-4 md:p-5 rounded-2xl border border-gray-200 shadow-sm space-y-3">
+            <div class="flex justify-between items-center border-b border-gray-100 pb-3">
+              <h3 class="font-bold text-slate-800 text-sm sm:text-base flex items-center space-x-2">
+                <i class="fa-solid fa-arrow-up-right-from-square text-emerald-600"></i>
+                <span>Compartilhados por Mim</span>
+              </h3>
+              <span id="countCompartilhadosPorMim" class="text-xs font-bold bg-emerald-50 text-emerald-700 px-2.5 py-0.5 rounded-full">0</span>
+            </div>
+            <div id="listaCompartilhadosPorMim" class="space-y-3">
+              <div class="text-xs text-gray-400 text-center py-6">Carregando...</div>
+            </div>
+          </div>
+
+          <div class="bg-white p-4 md:p-5 rounded-2xl border border-gray-200 shadow-sm space-y-3">
+            <div class="flex justify-between items-center border-b border-gray-100 pb-3">
+              <h3 class="font-bold text-slate-800 text-sm sm:text-base flex items-center space-x-2">
+                <i class="fa-solid fa-users text-sky-600"></i>
+                <span>Compartilhados Comigo</span>
+              </h3>
+              <span id="countCompartilhadosComigo" class="text-xs font-bold bg-sky-50 text-sky-700 px-2.5 py-0.5 rounded-full">0</span>
+            </div>
+            <div id="listaCompartilhadosComigo" class="space-y-3">
+              <div class="text-xs text-gray-400 text-center py-6">Carregando...</div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -1589,6 +1894,11 @@
         <div id="editorColunaPropriedades" class="hidden lg:block w-full lg:w-80 bg-slate-50 p-4 lg:p-6 overflow-y-auto space-y-5 flex-shrink-0">
           <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">Propriedades do Documento</h3>
 
+          <div id="wrapOwnerAnotacao" class="hidden">
+            <label class="block text-xs font-semibold text-indigo-700 mb-1.5">Salvar no Espaço de</label>
+            <select id="ownerAnotacaoSelect" onchange="aoMudarOwnerDestino('anotacao')" class="w-full bg-white border border-indigo-200 rounded-lg p-2.5 text-sm focus:outline-none"></select>
+          </div>
+
           <div>
             <label class="block text-xs font-semibold text-gray-600 mb-1.5">Categoria / Matéria</label>
             <select id="materia" required onchange="atualizarSelectSubcategoriaModal()" class="w-full bg-white border border-gray-300 rounded-lg p-2.5 text-sm focus:outline-none select-categorias"></select>
@@ -1639,10 +1949,15 @@
   <div id="modalFlashcard" class="modal-backdrop hidden">
     <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden">
       <div class="bg-slate-900 p-5 flex justify-between items-center text-white">
-        <h2 class="text-xl font-bold"><i class="fa-solid fa-layer-group text-yellow-400 mr-2"></i>Novo Flashcard</h2>
+        <h2 class="text-xl font-bold" id="tituloModalFlashcard"><i class="fa-solid fa-layer-group text-yellow-400 mr-2"></i>Novo Flashcard</h2>
         <button type="button" onclick="fecharModal('modalFlashcard')" class="text-gray-300 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
       </div>
       <form id="formFlashcard" class="p-6 space-y-4" onsubmit="processarFlashcard(event)">
+        <input type="hidden" id="flashcardId">
+        <div id="wrapOwnerFlashcard" class="hidden">
+          <label class="block text-xs font-semibold text-indigo-700 mb-1">Salvar no Espaço de</label>
+          <select id="ownerFlashcardSelect" onchange="aoMudarOwnerDestino('flashcard')" class="w-full border border-indigo-200 rounded-lg p-2.5 text-sm focus:outline-none"></select>
+        </div>
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Categoria / Matéria</label>
           <select id="categoriaFlashcard" required class="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none select-categorias"></select>
@@ -1674,6 +1989,11 @@
         <input type="hidden" id="tarefaId">
         <input type="hidden" id="tarefaAnexoUrl">
         <input type="hidden" id="tarefaAnexoNome">
+
+        <div id="wrapOwnerTarefa" class="hidden">
+          <label class="block text-xs font-semibold text-indigo-700 mb-1">Salvar no Espaço de</label>
+          <select id="ownerTarefaSelect" onchange="aoMudarOwnerDestino('tarefa')" class="w-full border border-indigo-200 rounded-lg p-2.5 text-sm focus:outline-none"></select>
+        </div>
 
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Título da Tarefa</label>
@@ -1744,10 +2064,15 @@
   <div id="modalCurso" class="modal-backdrop hidden">
     <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden">
       <div class="bg-slate-900 p-5 flex justify-between items-center text-white">
-        <h2 class="text-xl font-bold">Registar Curso / Certificação</h2>
+        <h2 class="text-xl font-bold" id="tituloModalCurso">Registar Curso / Certificação</h2>
         <button type="button" onclick="fecharModal('modalCurso')" class="text-gray-300 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
       </div>
       <form id="formCurso" class="p-4 sm:p-6 space-y-4" onsubmit="processarCurso(event)">
+        <input type="hidden" id="cursoId">
+        <div id="wrapOwnerCurso" class="hidden">
+          <label class="block text-xs font-semibold text-indigo-700 mb-1">Salvar no Espaço de</label>
+          <select id="ownerCursoSelect" onchange="aoMudarOwnerDestino('curso')" class="w-full border border-indigo-200 rounded-lg p-2.5 text-sm focus:outline-none"></select>
+        </div>
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Nome do Curso / Certificação</label>
           <input type="text" id="nomeCurso" placeholder="Ex: Formação Cloud DevOps" required class="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none">
@@ -1815,6 +2140,10 @@
 
       <form id="formMidia" class="p-4 md:p-6 space-y-4 overflow-y-auto flex-1" onsubmit="processarMidia(event)">
         <input type="hidden" id="midiaId">
+        <div id="wrapOwnerMidia" class="hidden">
+          <label class="block text-xs font-semibold text-indigo-700 mb-1">Salvar no Espaço de</label>
+          <select id="ownerMidiaSelect" onchange="aoMudarOwnerDestino('midia')" class="w-full border border-indigo-200 rounded-lg p-2.5 text-xs focus:outline-none"></select>
+        </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div>
@@ -1959,13 +2288,18 @@
   <div id="modalNovoHabito" class="modal-backdrop hidden">
     <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden">
       <div class="bg-slate-900 p-5 flex justify-between items-center text-white">
-        <h2 class="text-xl font-bold flex items-center space-x-2">
+        <h2 class="text-xl font-bold flex items-center space-x-2" id="tituloModalHabito">
           <i class="fa-solid fa-fire text-amber-400"></i>
           <span>Criar Hábito Diário</span>
         </h2>
         <button type="button" onclick="fecharModal('modalNovoHabito')" class="text-gray-300 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
       </div>
       <form id="formNovoHabito" class="p-4 sm:p-6 space-y-4" onsubmit="processarNovoHabito(event)">
+        <input type="hidden" id="habitoId">
+        <div id="wrapOwnerHabito" class="hidden">
+          <label class="block text-xs font-semibold text-indigo-700 mb-1">Salvar no Espaço de</label>
+          <select id="ownerHabitoSelect" class="w-full border border-indigo-200 rounded-lg p-2.5 text-sm focus:outline-none"></select>
+        </div>
         <div>
           <label class="block text-xs font-semibold text-gray-700 mb-1">Nome do Hábito</label>
           <input type="text" id="nomeHabitoInput" placeholder="Ex: Ler 20 páginas, Resolver 2 exercícios..." required class="w-full border border-gray-300 rounded-lg p-2.5 text-sm focus:outline-none">
@@ -1996,7 +2330,7 @@
         </div>
         <div class="flex justify-end space-x-3 pt-4 border-t border-gray-200">
           <button type="button" onclick="fecharModal('modalNovoHabito')" class="px-4 py-2 text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg text-xs font-medium">Cancelar</button>
-          <button type="submit" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold shadow-md">Adicionar Hábito</button>
+          <button type="submit" id="btnSalvarHabito" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold shadow-md">Adicionar Hábito</button>
         </div>
       </form>
     </div>
@@ -2138,7 +2472,10 @@
           <p id="textoDescricaoDrive" class="text-xs text-slate-600 leading-relaxed">
             O programa sincroniza o banco de dados e as imagens com o Google Drive automaticamente ao <b>iniciar</b> e ao <b>desligar</b> o servidor.
           </p>
-          <div class="flex flex-wrap gap-2 pt-1">
+          <div id="avisoDriveNaoAdmin" class="hidden text-xs font-medium text-slate-600 bg-white border border-gray-200 rounded-lg p-2.5">
+            <i class="fa-solid fa-lock text-amber-600 mr-1"></i> Backup automático do servidor no Google Drive é gerenciado apenas pelo administrador. Você pode baixar e importar seus próprios backups JSON normalmente.
+          </div>
+          <div id="acoesDriveAdmin" class="flex flex-wrap gap-2 pt-1">
             <button type="button" id="btnSyncDrive" onclick="executarSincronizacaoDrive()" class="bg-blue-600 hover:bg-blue-700 text-white px-3.5 py-2 rounded-lg font-semibold text-xs flex items-center space-x-1.5 shadow-sm transition-all">
               <i class="fa-solid fa-cloud-arrow-up"></i> <span>Fazer Backup no Drive Agora</span>
             </button>
@@ -2192,11 +2529,11 @@
           <i class="fa-solid fa-square-check text-emerald-600 text-lg"></i>
           <span>Nova Tarefa</span>
         </button>
-        <button type="button" onclick="fecharModal('modalAcaoRapidaMobile'); abrirModal('modalFlashcard')" class="p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 flex items-center space-x-2.5 text-left font-semibold text-sm active:scale-95 transition-transform">
+        <button type="button" onclick="fecharModal('modalAcaoRapidaMobile'); abrirModalFlashcard()" class="p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 flex items-center space-x-2.5 text-left font-semibold text-sm active:scale-95 transition-transform">
           <i class="fa-solid fa-layer-group text-amber-600 text-lg"></i>
           <span>Novo Flashcard</span>
         </button>
-        <button type="button" onclick="fecharModal('modalAcaoRapidaMobile'); abrirModal('modalCurso')" class="p-3.5 rounded-xl bg-purple-50 border border-purple-200 text-purple-800 flex items-center space-x-2.5 text-left font-semibold text-sm active:scale-95 transition-transform">
+        <button type="button" onclick="fecharModal('modalAcaoRapidaMobile'); abrirModalCurso()" class="p-3.5 rounded-xl bg-purple-50 border border-purple-200 text-purple-800 flex items-center space-x-2.5 text-left font-semibold text-sm active:scale-95 transition-transform">
           <i class="fa-solid fa-graduation-cap text-purple-600 text-lg"></i>
           <span>Novo Curso</span>
         </button>
@@ -2216,6 +2553,150 @@
           <i class="fa-solid fa-border-all text-red-600 text-lg"></i>
           <span>Matriz Eisenhower</span>
         </button>
+        <button type="button" onclick="fecharModal('modalAcaoRapidaMobile'); mudarAba('compartilhamentos')" class="p-3.5 rounded-xl bg-indigo-50 border border-indigo-200 text-indigo-800 flex items-center space-x-2.5 text-left font-semibold text-sm active:scale-95 transition-transform">
+          <i class="fa-solid fa-share-nodes text-indigo-600 text-lg"></i>
+          <span>Compartilhar</span>
+        </button>
+        <button type="button" onclick="fecharModal('modalAcaoRapidaMobile'); abrirModalConta()" class="p-3.5 rounded-xl bg-slate-100 border border-gray-200 text-slate-800 flex items-center space-x-2.5 text-left font-semibold text-sm active:scale-95 transition-transform">
+          <i class="fa-solid fa-user-gear text-slate-600 text-lg"></i>
+          <span>Minha Conta</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Datalist compartilhada de usuários para autocompletar -->
+  <datalist id="datalistUsuariosShare"></datalist>
+
+  <!-- ================= MODAL: COMPARTILHAR ITEM ESPECÍFICO ================= -->
+  <div id="modalCompartilharItem" class="modal-backdrop hidden">
+    <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden flex flex-col" style="max-height: 90vh;">
+      <div class="bg-slate-900 p-4 sm:p-5 flex justify-between items-center text-white flex-shrink-0">
+        <div class="min-w-0">
+          <h2 class="text-base sm:text-lg font-bold flex items-center space-x-2">
+            <i class="fa-solid fa-share-nodes text-indigo-400"></i>
+            <span>Compartilhar Item</span>
+          </h2>
+          <p id="shareItemTitulo" class="text-xs text-slate-300 truncate mt-0.5"></p>
+        </div>
+        <button type="button" onclick="fecharModal('modalCompartilharItem')" class="text-gray-300 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
+      </div>
+
+      <div class="p-4 sm:p-6 space-y-5 overflow-y-auto flex-1 modal-scroll-body">
+        <form id="formCompartilharItem" class="space-y-3.5 bg-indigo-50/60 p-4 rounded-xl border border-indigo-100" onsubmit="processarCompartilharItem(event)">
+          <input type="hidden" id="shareItemTipo">
+          <input type="hidden" id="shareItemId">
+
+          <div>
+            <label class="block text-xs font-semibold text-gray-700 mb-1">E-mail do Usuário Destinatário</label>
+            <input type="email" id="shareItemEmail" list="datalistUsuariosShare" required placeholder="colega@email.com" class="w-full bg-white border border-gray-300 rounded-lg p-2.5 text-sm focus:outline-none">
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-gray-700 mb-1">Nível de Permissão</label>
+            <select id="shareItemNivel" onchange="sincronizarNivelParaFlags('shareItem')" class="w-full bg-white border border-gray-300 rounded-lg p-2.5 text-sm focus:outline-none">
+              <option value="visualizar">Visualização (só ler)</option>
+              <option value="editar">Edição (ler e alterar)</option>
+              <option value="escrever">Escrita / Colaboração (ler e editar)</option>
+              <option value="admin">Controle Total (inclui excluir)</option>
+              <option value="personalizado">Personalizado</option>
+            </select>
+          </div>
+
+          <div class="flex flex-wrap gap-3 bg-white border border-gray-200 rounded-lg px-3 py-2">
+            <label class="inline-flex items-center space-x-1.5 text-xs text-slate-700">
+              <input type="checkbox" id="shareItemFlagVisualizar" checked disabled class="rounded text-indigo-600">
+              <span>Visualizar</span>
+            </label>
+            <label class="inline-flex items-center space-x-1.5 text-xs text-slate-700 cursor-pointer">
+              <input type="checkbox" id="shareItemFlagEditar" onchange="sincronizarFlagsParaNivel('shareItem')" class="rounded text-indigo-600">
+              <span>Editar</span>
+            </label>
+            <label class="inline-flex items-center space-x-1.5 text-xs text-slate-700 cursor-pointer">
+              <input type="checkbox" id="shareItemFlagCriar" onchange="sincronizarFlagsParaNivel('shareItem')" class="rounded text-indigo-600">
+              <span>Escrever</span>
+            </label>
+            <label class="inline-flex items-center space-x-1.5 text-xs text-slate-700 cursor-pointer">
+              <input type="checkbox" id="shareItemFlagExcluir" onchange="sincronizarFlagsParaNivel('shareItem')" class="rounded text-indigo-600">
+              <span>Excluir</span>
+            </label>
+          </div>
+
+          <button type="submit" id="btnConfirmarShareItem" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2.5 rounded-lg text-xs sm:text-sm font-bold shadow-sm transition-colors">
+            <i class="fa-solid fa-user-plus mr-1"></i> Conceder Acesso
+          </button>
+        </form>
+
+        <div class="space-y-2">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500">Quem já tem acesso a este item</h3>
+          <div id="listaAcessosItem" class="space-y-2"></div>
+        </div>
+      </div>
+
+      <div class="p-4 bg-gray-50 border-t border-gray-200 flex justify-end flex-shrink-0">
+        <button type="button" onclick="fecharModal('modalCompartilharItem')" class="px-5 py-2 text-gray-600 bg-gray-200 hover:bg-gray-300 rounded-lg text-xs font-medium">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: MINHA CONTA & PERFIL ================= -->
+  <div id="modalConta" class="modal-backdrop hidden">
+    <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden flex flex-col" style="max-height: 90vh;">
+      <div class="bg-slate-900 p-4 sm:p-5 flex justify-between items-center text-white flex-shrink-0">
+        <h2 class="text-lg font-bold flex items-center space-x-2">
+          <i class="fa-solid fa-circle-user text-indigo-400"></i>
+          <span>Minha Conta</span>
+        </h2>
+        <button type="button" onclick="fecharModal('modalConta')" class="text-gray-300 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
+      </div>
+
+      <div class="p-4 sm:p-6 space-y-5 overflow-y-auto flex-1 modal-scroll-body">
+        <div class="flex flex-wrap items-center justify-between gap-2 bg-slate-50 border border-gray-200 p-4 rounded-xl">
+          <div class="min-w-0">
+            <p class="text-[11px] uppercase font-bold text-slate-400">E-mail da Conta</p>
+            <p id="contaEmailTexto" class="text-sm font-bold text-slate-800 break-all">---</p>
+          </div>
+          <span id="contaPapelBadge" class="text-xs font-bold px-2.5 py-1 rounded-full bg-indigo-100 text-indigo-800">Usuário</span>
+        </div>
+
+        <form id="formAtualizarPerfil" class="space-y-3 border border-gray-200 p-4 rounded-xl" onsubmit="processarAtualizarPerfil(event)">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500">Perfil</h3>
+          <div>
+            <label class="block text-xs font-semibold text-gray-700 mb-1">Nome de Exibição</label>
+            <div class="flex gap-2">
+              <input type="text" id="contaNomeInput" required class="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none">
+              <button type="submit" id="btnSalvarPerfil" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-semibold">Salvar</button>
+            </div>
+          </div>
+        </form>
+
+        <form id="formAlterarSenha" class="space-y-3 border border-gray-200 p-4 rounded-xl" onsubmit="processarAlterarSenha(event)">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500">Alterar Senha</h3>
+          <div>
+            <label class="block text-xs font-semibold text-gray-700 mb-1">Senha Atual</label>
+            <input type="password" id="contaSenhaAtual" required autocomplete="current-password" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none">
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-gray-700 mb-1">Nova Senha (mín. 6)</label>
+              <input type="password" id="contaNovaSenha" required minlength="6" autocomplete="new-password" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-gray-700 mb-1">Confirmar Nova Senha</label>
+              <input type="password" id="contaConfirmarNovaSenha" required minlength="6" autocomplete="new-password" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none">
+            </div>
+          </div>
+          <div class="flex justify-end">
+            <button type="submit" id="btnAlterarSenha" class="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-lg text-xs font-semibold">Atualizar Senha</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="p-4 bg-gray-50 border-t border-gray-200 flex justify-between items-center flex-shrink-0">
+        <button type="button" onclick="fazerLogout()" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-bold flex items-center space-x-1.5">
+          <i class="fa-solid fa-right-from-bracket"></i> <span>Sair da Conta</span>
+        </button>
+        <button type="button" onclick="fecharModal('modalConta')" class="px-5 py-2 text-gray-600 bg-gray-200 hover:bg-gray-300 rounded-lg text-xs font-medium">Fechar</button>
       </div>
     </div>
   </div>
@@ -2244,6 +2725,12 @@
                 });
                 if (!resp.ok) {
                   const errData = await resp.json().catch(() => ({ message: resp.statusText }));
+                  if (resp.status === 401) {
+                    tratarSessaoExpirada();
+                    const authErr = new Error(errData.message || 'Sessão expirada.');
+                    authErr.isAuth = true;
+                    throw authErr;
+                  }
                   throw new Error(errData.message || errData.error || ('Erro HTTP ' + resp.status));
                 }
                 const data = await resp.json();
@@ -2252,7 +2739,7 @@
               } catch (err) {
                 console.error('Erro na chamada da API (' + prop + '):', err);
                 if (onFailure) onFailure(err);
-                else alert('Erro ao processar ' + prop + ': ' + err.message);
+                else if (!err.isAuth) alert('Erro ao processar ' + prop + ': ' + err.message);
               }
             };
           }
@@ -2332,9 +2819,15 @@
     async function carregarStatusDrive() {
       try {
         const resp = await fetch('/api/statusDrive');
+        if (resp.status === 401) return;
         const st = await resp.json();
         const badge = document.getElementById('badgeStatusDrive');
         const desc = document.getElementById('textoDescricaoDrive');
+        const acoesAdmin = document.getElementById('acoesDriveAdmin');
+        const avisoNaoAdmin = document.getElementById('avisoDriveNaoAdmin');
+        const ehAdmin = st.isAdmin !== undefined ? Boolean(st.isAdmin) : Boolean(usuarioAtual && usuarioAtual.isAdmin);
+        if (acoesAdmin) acoesAdmin.classList.toggle('hidden', !ehAdmin);
+        if (avisoNaoAdmin) avisoNaoAdmin.classList.toggle('hidden', ehAdmin);
         if (!badge) return;
 
         if (st.status === 'conectado') {
@@ -2411,7 +2904,7 @@
       }
     }
 
-    const abas = ['dashboard', 'anotacoes', 'tarefas', 'eisenhower', 'calendario', 'flashcards', 'cursos', 'leituras', 'grafo', 'habitos'];
+    const abas = ['dashboard', 'anotacoes', 'tarefas', 'eisenhower', 'calendario', 'flashcards', 'cursos', 'leituras', 'grafo', 'habitos', 'compartilhamentos'];
     const titulos = {
       'dashboard': 'Visão Geral dos Estudos',
       'anotacoes': 'Base de Conhecimento Central',
@@ -2422,9 +2915,15 @@
       'cursos': 'Cursos & Treinos',
       'leituras': 'Acervo de Leituras & Reviews',
       'grafo': 'Grafo de Conhecimento & Conexões',
-      'habitos': 'Rastreador de Hábitos & Metas'
+      'habitos': 'Rastreador de Hábitos & Metas',
+      'compartilhamentos': 'Compartilhamentos & Colaboração'
     };
 
+    let usuarioAtual = null;
+    let sessaoExpiradaNotificada = false;
+    let compartilhamentosGlobal = { enviados: [], recebidos: [], espacosEscrita: [] };
+    let espacosEscritaGlobal = [];
+    let categoriasDonoCache = {};
     let listaAnotacoesGlobal = [];
     let listaTarefasGlobal = [];
     let listaCursosGlobal = [];
@@ -2454,10 +2953,12 @@
       document.documentElement.classList.toggle('dark', ehEscuro);
       const icone = document.getElementById('iconeTema');
       const iconeMobile = document.getElementById('iconeTemaMobile');
+      const iconeAuth = document.getElementById('iconeTemaAuth');
       const texto = document.getElementById('textoTema');
       const classeIcone = ehEscuro ? 'fa-solid fa-sun text-amber-400' : 'fa-solid fa-moon text-indigo-600';
       if (icone) icone.className = classeIcone;
       if (iconeMobile) iconeMobile.className = classeIcone;
+      if (iconeAuth) iconeAuth.className = classeIcone;
       if (texto) {
         texto.innerText = ehEscuro ? 'Modo Claro' : 'Modo Noturno';
       }
@@ -2480,12 +2981,365 @@
       try { inicializarQuill(); } catch(e) { console.error(e); }
       try { inicializarKanbanSortable(); } catch(e) { console.error(e); }
       try { inicializarEisenhowerSortable(); } catch(e) { console.error(e); }
+      verificarSessaoEInicializar();
+    };
+
+    // ================= AUTENTICAÇÃO, SESSÃO & CONTA =================
+    function limparFeedbackAuth() {
+      const box = document.getElementById('authFeedback');
+      if (box) {
+        box.classList.add('hidden');
+        box.innerText = '';
+      }
+    }
+
+    function exibirFeedbackAuth(msg, tipo = 'erro') {
+      const box = document.getElementById('authFeedback');
+      if (!box) return;
+      box.className = tipo === 'sucesso'
+        ? 'text-xs font-semibold p-3 rounded-xl border bg-emerald-50 border-emerald-200 text-emerald-800 block'
+        : 'text-xs font-semibold p-3 rounded-xl border bg-red-50 border-red-200 text-red-700 block';
+      box.innerText = msg;
+    }
+
+    function alternarAbaAuth(aba) {
+      limparFeedbackAuth();
+      document.getElementById('boxPrimeiroAcesso')?.classList.add('hidden');
+      document.getElementById('telaAuthTabs')?.classList.remove('hidden');
+      const formLogin = document.getElementById('formLogin');
+      const formRegistro = document.getElementById('formRegistro');
+      const tabLogin = document.getElementById('tabAuthLogin');
+      const tabReg = document.getElementById('tabAuthRegistro');
+
+      const clsAtiva = 'py-2 rounded-lg text-xs font-bold bg-white text-slate-800 shadow-sm transition-all';
+      const clsInativa = 'py-2 rounded-lg text-xs font-semibold text-slate-500 hover:text-slate-800 transition-all';
+      if (aba === 'registro') {
+        formLogin?.classList.add('hidden');
+        formRegistro?.classList.remove('hidden');
+        if (tabLogin) tabLogin.className = clsInativa;
+        if (tabReg) tabReg.className = clsAtiva;
+      } else {
+        formRegistro?.classList.add('hidden');
+        formLogin?.classList.remove('hidden');
+        if (tabLogin) tabLogin.className = clsAtiva;
+        if (tabReg) tabReg.className = clsInativa;
+      }
+    }
+
+    function voltarParaLoginAuth() {
+      document.getElementById('boxPrimeiroAcesso')?.classList.add('hidden');
+      document.getElementById('telaAuthTabs')?.classList.remove('hidden');
+      alternarAbaAuth('login');
+    }
+
+    function mostrarBoxPrimeiroAcesso(email, nome) {
+      limparFeedbackAuth();
+      document.getElementById('telaAuthTabs')?.classList.add('hidden');
+      document.getElementById('formLogin')?.classList.add('hidden');
+      document.getElementById('formRegistro')?.classList.add('hidden');
+      document.getElementById('setupEmail').value = email;
+      document.getElementById('setupEmailTexto').innerText = email;
+      document.getElementById('setupNome').value = nome || '';
+      document.getElementById('setupSenha').value = '';
+      document.getElementById('setupConfirmarSenha').value = '';
+      document.getElementById('boxPrimeiroAcesso')?.classList.remove('hidden');
+    }
+
+    function mostrarTelaAuth(hasPendingMigration = false) {
+      const tela = document.getElementById('telaAuth');
+      const banner = document.getElementById('bannerMigracaoAuth');
+      if (banner) banner.classList.toggle('hidden', !hasPendingMigration);
+      voltarParaLoginAuth();
+      if (tela) tela.classList.remove('hidden');
+    }
+
+    function ocultarTelaAuth() {
+      document.getElementById('telaAuth')?.classList.add('hidden');
+    }
+
+    async function verificarSessaoEInicializar() {
+      try {
+        const resp = await fetch('/api/auth/me');
+        const data = await resp.json();
+        if (data.authenticated && data.user) {
+          usuarioAtual = data.user;
+          sessaoExpiradaNotificada = false;
+          ocultarTelaAuth();
+          atualizarHeaderUsuarioUI();
+          carregarDadosIniciaisUsuario();
+        } else {
+          usuarioAtual = null;
+          mostrarTelaAuth(Boolean(data.hasPendingMigration));
+        }
+      } catch (e) {
+        console.error('Erro ao verificar sessão:', e);
+        mostrarTelaAuth(false);
+      }
+    }
+
+    async function processarLogin(e) {
+      e.preventDefault();
+      limparFeedbackAuth();
+      const email = document.getElementById('loginEmail').value.trim();
+      const senha = document.getElementById('loginSenha').value;
+      const btn = document.getElementById('btnAuthLogin');
+      btn.disabled = true;
+
+      try {
+        const resp = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, senha })
+        });
+        const res = await resp.json();
+        if (res.requirePasswordSetup) {
+          mostrarBoxPrimeiroAcesso(res.email || email, res.nome || '');
+          return;
+        }
+        if (!res.success) {
+          exibirFeedbackAuth(res.message || 'Falha ao entrar.');
+          return;
+        }
+        usuarioAtual = res.user;
+        sessaoExpiradaNotificada = false;
+        ocultarTelaAuth();
+        atualizarHeaderUsuarioUI();
+        carregarDadosIniciaisUsuario();
+      } catch (err) {
+        exibirFeedbackAuth('Erro ao conectar ao servidor: ' + err.message);
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    async function processarRegistro(e) {
+      e.preventDefault();
+      limparFeedbackAuth();
+      const nome = document.getElementById('regNome').value.trim();
+      const email = document.getElementById('regEmail').value.trim();
+      const senha = document.getElementById('regSenha').value;
+      const confirmar = document.getElementById('regConfirmarSenha').value;
+
+      if (senha !== confirmar) {
+        exibirFeedbackAuth('As senhas digitadas não coincidem.');
+        return;
+      }
+      const btn = document.getElementById('btnAuthRegistro');
+      btn.disabled = true;
+
+      try {
+        const resp = await fetch('/api/auth/registrar', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ nome, email, senha })
+        });
+        const res = await resp.json();
+        if (!res.success) {
+          exibirFeedbackAuth(res.message || 'Não foi possível criar a conta.');
+          return;
+        }
+        usuarioAtual = res.user;
+        sessaoExpiradaNotificada = false;
+        ocultarTelaAuth();
+        atualizarHeaderUsuarioUI();
+        carregarDadosIniciaisUsuario();
+      } catch (err) {
+        exibirFeedbackAuth('Erro ao criar conta: ' + err.message);
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    async function processarPrimeiroAcesso(e) {
+      e.preventDefault();
+      limparFeedbackAuth();
+      const email = document.getElementById('setupEmail').value.trim();
+      const nome = document.getElementById('setupNome').value.trim();
+      const senha = document.getElementById('setupSenha').value;
+      const confirmar = document.getElementById('setupConfirmarSenha').value;
+
+      if (senha !== confirmar) {
+        exibirFeedbackAuth('As senhas digitadas não coincidem.');
+        return;
+      }
+      const btn = document.getElementById('btnAuthSetup');
+      btn.disabled = true;
+
+      try {
+        const resp = await fetch('/api/auth/definirSenhaInicial', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, nome, senha })
+        });
+        const res = await resp.json();
+        if (!res.success) {
+          exibirFeedbackAuth(res.message || 'Erro ao definir senha inicial.');
+          return;
+        }
+        usuarioAtual = res.user;
+        sessaoExpiradaNotificada = false;
+        ocultarTelaAuth();
+        atualizarHeaderUsuarioUI();
+        carregarDadosIniciaisUsuario();
+      } catch (err) {
+        exibirFeedbackAuth('Erro ao ativar conta: ' + err.message);
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    function limparCacheEstadoUsuario() {
+      listaAnotacoesGlobal = [];
+      listaTarefasGlobal = [];
+      listaCursosGlobal = [];
+      listaMidiasGlobal = [];
+      listaFlashcardsGlobal = [];
+      if (typeof listaHabitosGlobal !== 'undefined') listaHabitosGlobal = [];
+      categoriasGlobal = [];
+      subcategoriasGlobal = [];
+      compartilhamentosGlobal = { enviados: [], recebidos: [], espacosEscrita: [] };
+      espacosEscritaGlobal = [];
+      categoriasDonoCache = {};
+      if (chartInstancia) {
+        chartInstancia.destroy();
+        chartInstancia = null;
+      }
+      if (calendarInstancia) {
+        calendarInstancia.destroy();
+        calendarInstancia = null;
+      }
+      if (typeof grafoAnimFrame !== 'undefined' && grafoAnimFrame) {
+        cancelAnimationFrame(grafoAnimFrame);
+        grafoAnimFrame = null;
+      }
+    }
+
+    function tratarSessaoExpirada() {
+      if (sessaoExpiradaNotificada) return;
+      sessaoExpiradaNotificada = true;
+      usuarioAtual = null;
+      limparCacheEstadoUsuario();
+      mostrarTelaAuth(false);
+      exibirFeedbackAuth('Sua sessão expirou. Faça login novamente para continuar.');
+    }
+
+    async function fazerLogout() {
+      try {
+        await fetch('/api/auth/logout', { method: 'POST' });
+      } catch (e) {}
+      fecharModal('modalConta');
+      fecharMenuMobileSeAberto();
+      usuarioAtual = null;
+      sessaoExpiradaNotificada = false;
+      limparCacheEstadoUsuario();
+      atualizarHeaderUsuarioUI();
+      verificarSessaoEInicializar();
+    }
+
+    function atualizarHeaderUsuarioUI() {
+      const nome = (usuarioAtual && usuarioAtual.nome) ? usuarioAtual.nome : 'Visitante';
+      const email = (usuarioAtual && usuarioAtual.email) ? usuarioAtual.email : 'Não conectado';
+      const partes = nome.trim().split(/\s+/).filter(Boolean);
+      const iniciais = partes.length >= 2
+        ? (partes[0][0] + partes[partes.length - 1][0]).toUpperCase()
+        : nome.slice(0, 2).toUpperCase();
+
+      const elIni = document.getElementById('sidebarUsuarioIniciais');
+      const elNome = document.getElementById('sidebarUsuarioNome');
+      const elEmail = document.getElementById('sidebarUsuarioEmail');
+      const elHeaderNome = document.getElementById('headerUsuarioNome');
+      if (elIni) elIni.innerText = iniciais || '--';
+      if (elNome) elNome.innerText = nome;
+      if (elEmail) elEmail.innerText = email;
+      if (elHeaderNome) elHeaderNome.innerText = partes[0] || nome;
+
+      const btnSyncCal = document.getElementById('btnSyncGoogleCal');
+      if (btnSyncCal) {
+        btnSyncCal.classList.toggle('hidden', !(usuarioAtual && usuarioAtual.isAdmin));
+      }
+    }
+
+    function abrirModalConta() {
+      if (!usuarioAtual) {
+        mostrarTelaAuth(false);
+        return;
+      }
+      document.getElementById('contaEmailTexto').innerText = usuarioAtual.email;
+      const badge = document.getElementById('contaPapelBadge');
+      if (badge) {
+        badge.innerText = usuarioAtual.isAdmin ? 'Administrador' : 'Usuário';
+        badge.className = usuarioAtual.isAdmin
+          ? 'text-xs font-bold px-2.5 py-1 rounded-full bg-amber-100 text-amber-800'
+          : 'text-xs font-bold px-2.5 py-1 rounded-full bg-indigo-100 text-indigo-800';
+      }
+      document.getElementById('contaNomeInput').value = usuarioAtual.nome || '';
+      document.getElementById('formAlterarSenha')?.reset();
+      abrirModal('modalConta');
+    }
+
+    async function processarAtualizarPerfil(e) {
+      e.preventDefault();
+      const nome = document.getElementById('contaNomeInput').value.trim();
+      if (!nome) return;
+      const btn = document.getElementById('btnSalvarPerfil');
+      btn.disabled = true;
+      try {
+        const resp = await fetch('/api/auth/atualizarPerfil', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ nome })
+        });
+        const res = await resp.json();
+        alert(res.message || 'Perfil atualizado.');
+        if (res.success && res.user) {
+          usuarioAtual = res.user;
+          atualizarHeaderUsuarioUI();
+        }
+      } catch (err) {
+        alert('Erro ao atualizar perfil: ' + err.message);
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    async function processarAlterarSenha(e) {
+      e.preventDefault();
+      const senhaAtual = document.getElementById('contaSenhaAtual').value;
+      const novaSenha = document.getElementById('contaNovaSenha').value;
+      const confirmar = document.getElementById('contaConfirmarNovaSenha').value;
+      if (novaSenha !== confirmar) {
+        alert('A nova senha e a confirmação não coincidem.');
+        return;
+      }
+      const btn = document.getElementById('btnAlterarSenha');
+      btn.disabled = true;
+      try {
+        const resp = await fetch('/api/auth/alterarSenha', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ senhaAtual, novaSenha })
+        });
+        const res = await resp.json();
+        alert(res.message || 'Operação concluída.');
+        if (res.success) {
+          document.getElementById('formAlterarSenha')?.reset();
+        }
+      } catch (err) {
+        alert('Erro ao alterar senha: ' + err.message);
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    function carregarDadosIniciaisUsuario() {
+      limparCacheEstadoUsuario();
       carregarCategorias();
       carregarSubcategorias();
+      carregarCompartilhamentos();
       carregarDashboard();
       carregarStatusDrive();
       mudarAba('dashboard');
-    };
+    }
 
     // ================= PROCESSAMENTO E COMPRESSÃO DE IMAGENS =================
     function comprimirImagemBase64(base64Str, maxDim = 1200, qualidade = 0.8) {
@@ -2690,6 +3544,7 @@
       if (abaSelecionada === 'leituras') carregarMidias();
       if (abaSelecionada === 'grafo') carregarGrafo();
       if (abaSelecionada === 'habitos') carregarHabitos();
+      if (abaSelecionada === 'compartilhamentos') carregarCompartilhamentos();
       fecharMenuMobileSeAberto();
     }
 
@@ -2788,6 +3643,526 @@
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#39;');
+    }
+
+    // ================= COMPARTILHAMENTOS & PERMISSÕES =================
+    function ehDonoItem(item) {
+      if (!item || !item.permissoes) return true;
+      return item.permissoes.isOwner !== false;
+    }
+
+    function podeEditarItem(item) {
+      if (!item || !item.permissoes) return true;
+      return Boolean(item.permissoes.podeEditar);
+    }
+
+    function podeExcluirItem(item) {
+      if (!item || !item.permissoes) return true;
+      return Boolean(item.permissoes.podeExcluir);
+    }
+
+    function descreverNivelPermissao(nivel) {
+      const mapa = {
+        'dono': 'Dono',
+        'visualizar': 'Visualização',
+        'editar': 'Edição',
+        'escrever': 'Escrita',
+        'admin': 'Controle Total',
+        'personalizado': 'Personalizado'
+      };
+      return mapa[(nivel || '').toLowerCase()] || 'Visualização';
+    }
+
+    function descreverTipoRecurso(tipo) {
+      const mapa = {
+        'todos': 'Hub Completo',
+        'anotacao': 'Anotações',
+        'tarefa': 'Tarefas',
+        'curso': 'Cursos',
+        'midia': 'Leituras/Mídias',
+        'flashcard': 'Flashcards',
+        'habito': 'Hábitos'
+      };
+      return mapa[(tipo || '').toLowerCase()] || tipo;
+    }
+
+    function renderizarBadgeCompartilhado(item) {
+      if (!item) return '';
+      if (item.compartilhado) {
+        const dono = escapeHtml(item.ownerNome || 'Colega');
+        const perm = escapeHtml(descreverNivelPermissao(item.permissoes && item.permissoes.nivel));
+        const email = escapeHtml(item.ownerEmail || item.ownerNome || '');
+        return `<span class="badge-shared-recv inline-flex items-center space-x-1 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-sky-50 text-sky-700 border border-sky-200" title="Compartilhado por ${email}"><i class="fa-solid fa-users text-[10px]"></i><span>de ${dono} • ${perm}</span></span>`;
+      }
+      if (item.compartilhadoComCount && item.compartilhadoComCount > 0) {
+        return `<span class="badge-shared-sent inline-flex items-center space-x-1 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200" title="Compartilhado com ${item.compartilhadoComCount} usuário(s)"><i class="fa-solid fa-share-nodes text-[10px]"></i><span>Compartilhado (${item.compartilhadoComCount})</span></span>`;
+      }
+      return '';
+    }
+
+    function filtrarPorOrigem(lista, selectId) {
+      const orig = document.getElementById(selectId)?.value || '';
+      if (orig === 'meus') return (lista || []).filter(x => !x.compartilhado);
+      if (orig === 'compartilhados') return (lista || []).filter(x => Boolean(x.compartilhado));
+      return lista || [];
+    }
+
+    const PRESETS_PERMISSAO_UI = {
+      'visualizar': { editar: false, criar: false, excluir: false },
+      'editar': { editar: true, criar: false, excluir: false },
+      'escrever': { editar: true, criar: true, excluir: false },
+      'admin': { editar: true, criar: true, excluir: true }
+    };
+
+    function _idsPermissaoUI(prefixo) {
+      if (prefixo === 'shareItem') {
+        return {
+          nivel: 'shareItemNivel',
+          editar: 'shareItemFlagEditar',
+          criar: 'shareItemFlagCriar',
+          excluir: 'shareItemFlagExcluir'
+        };
+      }
+      return {
+        nivel: 'shareNivelSelect',
+        editar: 'shareFlagEditar',
+        criar: 'shareFlagCriar',
+        excluir: 'shareFlagExcluir'
+      };
+    }
+
+    function sincronizarNivelParaFlags(prefixo) {
+      const ids = _idsPermissaoUI(prefixo);
+      const nivel = document.getElementById(ids.nivel)?.value || 'visualizar';
+      const preset = PRESETS_PERMISSAO_UI[nivel];
+      if (!preset) return;
+      document.getElementById(ids.editar).checked = preset.editar;
+      document.getElementById(ids.criar).checked = preset.criar;
+      document.getElementById(ids.excluir).checked = preset.excluir;
+    }
+
+    function sincronizarFlagsParaNivel(prefixo) {
+      const ids = _idsPermissaoUI(prefixo);
+      const ed = Boolean(document.getElementById(ids.editar)?.checked);
+      const cr = Boolean(document.getElementById(ids.criar)?.checked);
+      const ex = Boolean(document.getElementById(ids.excluir)?.checked);
+
+      let matched = 'personalizado';
+      Object.keys(PRESETS_PERMISSAO_UI).forEach(k => {
+        const p = PRESETS_PERMISSAO_UI[k];
+        if (p.editar === ed && p.criar === cr && p.excluir === ex) {
+          matched = k;
+        }
+      });
+      const sel = document.getElementById(ids.nivel);
+      if (sel) sel.value = matched;
+    }
+
+    function carregarUsuariosAutocomplete() {
+      google.script.run.withSuccessHandler(function(lista) {
+        const dl = document.getElementById('datalistUsuariosShare');
+        if (!dl) return;
+        dl.innerHTML = (lista || []).map(u => `<option value="${escapeHtml(u.email)}">${escapeHtml(u.nome)}</option>`).join('');
+      }).buscarUsuariosCompartilhamento('');
+    }
+
+    function carregarCompartilhamentos(callback) {
+      google.script.run.withSuccessHandler(function(dados) {
+        compartilhamentosGlobal = dados || { enviados: [], recebidos: [], espacosEscrita: [] };
+        espacosEscritaGlobal = compartilhamentosGlobal.espacosEscrita || [];
+        const badge = document.getElementById('badgeCompartilhadosMenu');
+        const qtdRec = (compartilhamentosGlobal.recebidos || []).length;
+        if (badge) {
+          badge.innerText = qtdRec;
+          badge.classList.toggle('hidden', qtdRec === 0);
+        }
+        carregarUsuariosAutocomplete();
+        renderizarCompartilhamentos();
+        if (typeof callback === 'function') callback();
+      }).getCompartilhamentos();
+    }
+
+    function atualizarFormularioCompartilharEscopo() {
+      const escopo = document.getElementById('shareEscopoSelect')?.value || 'modulo';
+      const wrapCat = document.getElementById('wrapShareCategoriaSelect');
+      const optHabito = document.getElementById('optShareModuloHabito');
+      const modSel = document.getElementById('shareModuloSelect');
+      if (wrapCat) wrapCat.classList.toggle('hidden', escopo !== 'categoria');
+      if (optHabito) {
+        optHabito.disabled = escopo === 'categoria';
+        optHabito.hidden = escopo === 'categoria';
+        if (escopo === 'categoria' && modSel && modSel.value === 'habito') {
+          modSel.value = 'todos';
+        }
+      }
+    }
+
+    function processarCompartilhamentoEscopo(e) {
+      e.preventDefault();
+      const escopo = document.getElementById('shareEscopoSelect').value;
+      const recursoTipo = document.getElementById('shareModuloSelect').value;
+      const recursoId = escopo === 'categoria' ? (document.getElementById('shareCategoriaSelect')?.value || '') : '';
+      const emailDestinatario = document.getElementById('shareEmailInput').value.trim();
+      const nivel = document.getElementById('shareNivelSelect').value;
+      const podeEditar = Boolean(document.getElementById('shareFlagEditar').checked);
+      const podeCriar = Boolean(document.getElementById('shareFlagCriar').checked);
+      const podeExcluir = Boolean(document.getElementById('shareFlagExcluir').checked);
+
+      const btn = document.getElementById('btnSalvarCompartilhamentoEscopo');
+      btn.disabled = true;
+
+      google.script.run.withSuccessHandler(function(resp) {
+        btn.disabled = false;
+        alert(resp.message);
+        if (resp.success) {
+          document.getElementById('shareEmailInput').value = '';
+          carregarCompartilhamentos();
+        }
+      }).withFailureHandler(function(err) {
+        btn.disabled = false;
+        alert(err.message || err);
+      }).criarOuAtualizarCompartilhamento({
+        escopo,
+        recursoTipo,
+        recursoId,
+        emailDestinatario,
+        nivel,
+        podeEditar,
+        podeCriar,
+        podeExcluir
+      });
+    }
+
+    function _renderChipsPermissao(s) {
+      const chips = ['<span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-semibold">Visualizar</span>'];
+      if (s.podeEditar) chips.push('<span class="px-2 py-0.5 rounded bg-indigo-50 text-indigo-700 font-semibold">Editar</span>');
+      if (s.podeCriar) chips.push('<span class="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 font-semibold">Escrever</span>');
+      if (s.podeExcluir) chips.push('<span class="px-2 py-0.5 rounded bg-rose-50 text-rose-700 font-semibold">Excluir</span>');
+      return chips.join(' ');
+    }
+
+    function renderizarCompartilhamentos() {
+      const envEl = document.getElementById('listaCompartilhadosPorMim');
+      const recEl = document.getElementById('listaCompartilhadosComigo');
+      const cntEnv = document.getElementById('countCompartilhadosPorMim');
+      const cntRec = document.getElementById('countCompartilhadosComigo');
+      if (!envEl || !recEl) return;
+
+      const enviados = compartilhamentosGlobal.enviados || [];
+      const recebidos = compartilhamentosGlobal.recebidos || [];
+      if (cntEnv) cntEnv.innerText = enviados.length;
+      if (cntRec) cntRec.innerText = recebidos.length;
+
+      if (enviados.length === 0) {
+        envEl.innerHTML = '<div class="text-xs text-gray-400 text-center py-8 border border-dashed border-gray-200 rounded-xl">Você ainda não compartilhou nenhum item, categoria ou módulo.</div>';
+      } else {
+        envEl.innerHTML = enviados.map(s => `
+          <div class="p-3.5 rounded-xl border border-gray-200 bg-slate-50/70 space-y-2">
+            <div class="flex justify-between items-start gap-2">
+              <div class="min-w-0">
+                <div class="flex flex-wrap items-center gap-1.5 mb-1">
+                  <span class="text-[11px] font-bold uppercase px-2 py-0.5 rounded bg-indigo-100 text-indigo-800">${escapeHtml(s.escopo)}</span>
+                  <span class="text-[11px] font-semibold px-2 py-0.5 rounded bg-white border border-gray-200 text-slate-700">${escapeHtml(descreverTipoRecurso(s.recursoTipo))}</span>
+                </div>
+                <p class="font-bold text-sm text-slate-800 truncate">${escapeHtml(s.recursoTitulo)}</p>
+                <p class="text-xs text-slate-500 truncate"><i class="fa-solid fa-user mr-1"></i>${escapeHtml(s.targetNome)} (${escapeHtml(s.targetEmail)})</p>
+              </div>
+              <button type="button" onclick="revogarShareConfirmado(${s.id})" class="text-xs text-red-600 hover:text-red-800 font-semibold px-2 py-1 rounded-lg hover:bg-red-50 flex-shrink-0" title="Revogar acesso">
+                <i class="fa-solid fa-xmark mr-1"></i>Revogar
+              </button>
+            </div>
+            <div class="flex flex-wrap justify-between items-center gap-2 pt-2 border-t border-gray-200/70">
+              <div class="flex flex-wrap gap-1 text-[11px]">${_renderChipsPermissao(s)}</div>
+              <select onchange="alterarPermissaoShare(${s.id}, this.value)" class="text-xs border border-gray-300 rounded-lg px-2 py-1 bg-white">
+                <option value="visualizar" ${s.nivel === 'visualizar' ? 'selected' : ''}>Visualização</option>
+                <option value="editar" ${s.nivel === 'editar' ? 'selected' : ''}>Edição</option>
+                <option value="escrever" ${s.nivel === 'escrever' ? 'selected' : ''}>Escrita</option>
+                <option value="admin" ${s.nivel === 'admin' ? 'selected' : ''}>Controle Total</option>
+                ${s.nivel === 'personalizado' ? '<option value="personalizado" selected>Personalizado</option>' : ''}
+              </select>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      if (recebidos.length === 0) {
+        recEl.innerHTML = '<div class="text-xs text-gray-400 text-center py-8 border border-dashed border-gray-200 rounded-xl">Nenhum outro usuário compartilhou recursos com você ainda.</div>';
+      } else {
+        recEl.innerHTML = recebidos.map(s => `
+          <div class="p-3.5 rounded-xl border border-gray-200 bg-slate-50/70 space-y-2">
+            <div class="flex justify-between items-start gap-2">
+              <div class="min-w-0">
+                <div class="flex flex-wrap items-center gap-1.5 mb-1">
+                  <span class="text-[11px] font-bold uppercase px-2 py-0.5 rounded bg-sky-100 text-sky-800">${escapeHtml(s.escopo)}</span>
+                  <span class="text-[11px] font-semibold px-2 py-0.5 rounded bg-white border border-gray-200 text-slate-700">${escapeHtml(descreverTipoRecurso(s.recursoTipo))}</span>
+                </div>
+                <p class="font-bold text-sm text-slate-800 truncate">${escapeHtml(s.recursoTitulo)}</p>
+                <p class="text-xs text-slate-500 truncate"><i class="fa-solid fa-user-shield mr-1"></i>Dono: ${escapeHtml(s.ownerNome)} (${escapeHtml(s.ownerEmail)})</p>
+              </div>
+              <button type="button" onclick="revogarShareConfirmado(${s.id}, true)" class="text-xs text-slate-600 hover:text-red-700 font-semibold px-2.5 py-1 rounded-lg bg-white border border-gray-200 flex-shrink-0">
+                <i class="fa-solid fa-door-open mr-1"></i>Sair
+              </button>
+            </div>
+            <div class="flex flex-wrap gap-1 pt-2 border-t border-gray-200/70 text-[11px]">
+              ${_renderChipsPermissao(s)}
+            </div>
+          </div>
+        `).join('');
+      }
+    }
+
+    function alterarPermissaoShare(shareId, novoNivel) {
+      if (novoNivel === 'personalizado') return;
+      google.script.run.withSuccessHandler(function(resp) {
+        if (!resp.success) alert(resp.message);
+        carregarCompartilhamentos();
+      }).atualizarPermissaoCompartilhamento(shareId, { nivel: novoNivel });
+    }
+
+    function revogarShareConfirmado(shareId, ehSaida = false) {
+      const msg = ehSaida ? 'Deseja sair deste compartilhamento?' : 'Revogar o acesso deste usuário?';
+      if (!confirm(msg)) return;
+      google.script.run.withSuccessHandler(function(resp) {
+        if (resp.message) alert(resp.message);
+        carregarCompartilhamentos();
+        carregarDashboard();
+        carregarAnotacoes();
+        carregarTarefas();
+        carregarCursos();
+        carregarMidias();
+        carregarFlashcards();
+        carregarHabitos();
+      }).revogarCompartilhamento(shareId);
+    }
+
+    function abrirModalCompartilharItem(recursoTipo, recursoId, titulo) {
+      document.getElementById('formCompartilharItem')?.reset();
+      document.getElementById('shareItemTipo').value = recursoTipo;
+      document.getElementById('shareItemId').value = recursoId;
+      document.getElementById('shareItemTitulo').innerText = `${descreverTipoRecurso(recursoTipo)}: ${titulo || recursoId}`;
+      document.getElementById('shareItemNivel').value = 'visualizar';
+      sincronizarNivelParaFlags('shareItem');
+      carregarUsuariosAutocomplete();
+      carregarAcessosDoItem();
+      abrirModal('modalCompartilharItem');
+    }
+
+    function carregarAcessosDoItem() {
+      const tipo = document.getElementById('shareItemTipo')?.value || '';
+      const id = document.getElementById('shareItemId')?.value || '';
+      const el = document.getElementById('listaAcessosItem');
+      if (!el || !tipo || !id) return;
+      el.innerHTML = '<div class="text-xs text-gray-400 text-center py-3">Carregando...</div>';
+
+      google.script.run.withSuccessHandler(function(lista) {
+        if (!lista || lista.length === 0) {
+          el.innerHTML = '<div class="text-xs text-gray-400 italic p-3 bg-slate-50 rounded-xl border border-dashed border-gray-200 text-center">Este item ainda não foi compartilhado com ninguém diretamente.</div>';
+          return;
+        }
+        el.innerHTML = lista.map(s => `
+          <div class="flex flex-wrap justify-between items-center gap-2 p-3 bg-slate-50 rounded-xl border border-gray-200">
+            <div class="min-w-0 flex-1">
+              <div class="text-xs font-bold text-slate-800 truncate">${escapeHtml(s.targetNome)}</div>
+              <div class="text-[11px] text-slate-500 truncate">${escapeHtml(s.targetEmail)}</div>
+            </div>
+            <div class="flex items-center space-x-2">
+              <select onchange="alterarPermissaoItemModal(${s.id}, this.value)" class="text-xs border border-gray-300 rounded-lg px-2 py-1 bg-white">
+                <option value="visualizar" ${s.nivel === 'visualizar' ? 'selected' : ''}>Visualização</option>
+                <option value="editar" ${s.nivel === 'editar' ? 'selected' : ''}>Edição</option>
+                <option value="escrever" ${s.nivel === 'escrever' ? 'selected' : ''}>Escrita</option>
+                <option value="admin" ${s.nivel === 'admin' ? 'selected' : ''}>Controle Total</option>
+                ${s.nivel === 'personalizado' ? '<option value="personalizado" selected>Personalizado</option>' : ''}
+              </select>
+              <button type="button" onclick="revogarShareItemModal(${s.id})" class="text-xs text-red-500 hover:text-red-700 p-1.5" title="Revogar">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </div>
+          </div>
+        `).join('');
+      }).getCompartilhamentos({ escopo: 'item', recursoTipo: tipo, recursoId: id });
+    }
+
+    function processarCompartilharItem(e) {
+      e.preventDefault();
+      const tipo = document.getElementById('shareItemTipo').value;
+      const id = document.getElementById('shareItemId').value;
+      const emailDestinatario = document.getElementById('shareItemEmail').value.trim();
+      const nivel = document.getElementById('shareItemNivel').value;
+      const podeEditar = Boolean(document.getElementById('shareItemFlagEditar').checked);
+      const podeCriar = Boolean(document.getElementById('shareItemFlagCriar').checked);
+      const podeExcluir = Boolean(document.getElementById('shareItemFlagExcluir').checked);
+
+      const btn = document.getElementById('btnConfirmarShareItem');
+      btn.disabled = true;
+
+      google.script.run.withSuccessHandler(function(resp) {
+        btn.disabled = false;
+        alert(resp.message);
+        if (resp.success) {
+          document.getElementById('shareItemEmail').value = '';
+          carregarAcessosDoItem();
+          carregarCompartilhamentos();
+          carregarAnotacoes();
+          carregarTarefas();
+          carregarCursos();
+          carregarMidias();
+          carregarFlashcards();
+          carregarHabitos();
+        }
+      }).withFailureHandler(function(err) {
+        btn.disabled = false;
+        alert(err.message || err);
+      }).criarOuAtualizarCompartilhamento({
+        escopo: 'item',
+        recursoTipo: tipo,
+        recursoId: id,
+        emailDestinatario,
+        nivel,
+        podeEditar,
+        podeCriar,
+        podeExcluir
+      });
+    }
+
+    function alterarPermissaoItemModal(shareId, novoNivel) {
+      if (novoNivel === 'personalizado') return;
+      google.script.run.withSuccessHandler(function() {
+        carregarAcessosDoItem();
+        carregarCompartilhamentos();
+      }).atualizarPermissaoCompartilhamento(shareId, { nivel: novoNivel });
+    }
+
+    function revogarShareItemModal(shareId) {
+      if (!confirm('Remover o acesso deste usuário ao item?')) return;
+      google.script.run.withSuccessHandler(function() {
+        carregarAcessosDoItem();
+        carregarCompartilhamentos();
+        carregarAnotacoes();
+        carregarTarefas();
+        carregarCursos();
+        carregarMidias();
+        carregarFlashcards();
+        carregarHabitos();
+      }).revogarCompartilhamento(shareId);
+    }
+
+    function _configEspacoPorTipo(tipo) {
+      const mapa = {
+        'anotacao': { wrap: 'wrapOwnerAnotacao', select: 'ownerAnotacaoSelect', cat: 'materia' },
+        'tarefa': { wrap: 'wrapOwnerTarefa', select: 'ownerTarefaSelect', cat: 'categoriaTarefa' },
+        'curso': { wrap: 'wrapOwnerCurso', select: 'ownerCursoSelect', cat: 'categoriaCurso' },
+        'midia': { wrap: 'wrapOwnerMidia', select: 'ownerMidiaSelect', cat: 'categoriaMidia' },
+        'flashcard': { wrap: 'wrapOwnerFlashcard', select: 'ownerFlashcardSelect', cat: 'categoriaFlashcard' },
+        'habito': { wrap: 'wrapOwnerHabito', select: 'ownerHabitoSelect', cat: null }
+      };
+      return mapa[tipo] || null;
+    }
+
+    function popularSeletorEspacoEscrita(tipo, ehEdicao = false) {
+      const cfg = _configEspacoPorTipo(tipo);
+      if (!cfg) return;
+      const wrap = document.getElementById(cfg.wrap);
+      const sel = document.getElementById(cfg.select);
+      if (!wrap || !sel) return;
+
+      if (ehEdicao) {
+        wrap.classList.add('hidden');
+        sel.innerHTML = '';
+        sel.value = '';
+        if (cfg.cat) restaurarCategoriasPropriasNoSelect(cfg.cat);
+        return;
+      }
+
+      const espacos = (espacosEscritaGlobal || []).filter(s => s.recursoTipo === tipo || s.recursoTipo === 'todos');
+      if (espacos.length === 0) {
+        wrap.classList.add('hidden');
+        sel.innerHTML = '';
+        sel.value = '';
+        if (cfg.cat) restaurarCategoriasPropriasNoSelect(cfg.cat);
+        return;
+      }
+
+      const nomeProprio = usuarioAtual ? usuarioAtual.nome : 'Pessoal';
+      let opts = `<option value="">Meu Espaço (${escapeHtml(nomeProprio)})</option>`;
+      const vistos = new Set();
+      espacos.forEach(s => {
+        const key = `${s.ownerId}|${s.escopo}|${s.recursoId || ''}`;
+        if (vistos.has(key)) return;
+        vistos.add(key);
+        const label = s.escopo === 'categoria'
+          ? `${escapeHtml(s.ownerNome)} — Categoria: ${escapeHtml(s.recursoId)}`
+          : `${escapeHtml(s.ownerNome)} — ${escapeHtml(descreverTipoRecurso(s.recursoTipo))}`;
+        opts += `<option value="${escapeHtml(key)}">${label}</option>`;
+      });
+
+      sel.innerHTML = opts;
+      sel.value = '';
+      wrap.classList.remove('hidden');
+      if (cfg.cat) restaurarCategoriasPropriasNoSelect(cfg.cat);
+    }
+
+    function restaurarCategoriasPropriasNoSelect(catSelectId) {
+      const catEl = document.getElementById(catSelectId);
+      if (!catEl) return;
+      const valAntigo = catEl.value;
+      catEl.innerHTML = categoriasGlobal.map(c => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join('');
+      if (valAntigo && categoriasGlobal.includes(valAntigo)) {
+        catEl.value = valAntigo;
+      }
+      if (catSelectId === 'materia') {
+        atualizarSelectSubcategoriaModal();
+      }
+    }
+
+    function obterOwnerIdDoSeletor(selectId) {
+      const val = document.getElementById(selectId)?.value || '';
+      if (!val) return null;
+      const partes = val.split('|');
+      return partes[0] ? Number(partes[0]) : null;
+    }
+
+    function aoMudarOwnerDestino(tipo) {
+      const cfg = _configEspacoPorTipo(tipo);
+      if (!cfg) return;
+      const val = document.getElementById(cfg.select)?.value || '';
+      if (!val) {
+        if (cfg.cat) restaurarCategoriasPropriasNoSelect(cfg.cat);
+        return;
+      }
+      const [ownerIdStr, escopo, recursoId] = val.split('|');
+      const ownerId = Number(ownerIdStr);
+      const catEl = cfg.cat ? document.getElementById(cfg.cat) : null;
+      if (!catEl) return;
+
+      if (escopo === 'categoria' && recursoId) {
+        catEl.innerHTML = `<option value="${escapeHtml(recursoId)}">${escapeHtml(recursoId)}</option>`;
+        catEl.value = recursoId;
+        if (tipo === 'anotacao') atualizarSelectSubcategoriaModal('');
+        return;
+      }
+
+      const preencherDono = (dados) => {
+        const cats = (dados && dados.categorias && dados.categorias.length > 0) ? dados.categorias : categoriasGlobal;
+        catEl.innerHTML = cats.map(c => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join('');
+        if (tipo === 'anotacao') {
+          const subs = (dados && dados.subcategorias) ? dados.subcategorias : [];
+          const subEl = document.getElementById('subcategoriaAnotacao');
+          if (subEl) {
+            const catAtual = catEl.value;
+            const filtradas = subs.filter(s => s.categoria === catAtual).map(s => s.nome);
+            subEl.innerHTML = '<option value="">Nenhuma (Geral)</option>' + filtradas.map(s => `<option value="${escapeHtml(s)}">${escapeHtml(s)}</option>`).join('');
+          }
+        }
+      };
+
+      if (categoriasDonoCache[ownerId]) {
+        preencherDono(categoriasDonoCache[ownerId]);
+      } else {
+        google.script.run.withSuccessHandler(function(res) {
+          categoriasDonoCache[ownerId] = res;
+          preencherDono(res);
+        }).getCategoriasDono(ownerId);
+      }
     }
 
     // ================= CATEGORIAS & SUBCATEGORIAS =================
@@ -3027,6 +4402,16 @@
       const subBadge = (item.subcategoria || '').trim()
         ? `<span class="text-xs font-semibold text-teal-700 bg-teal-50 border border-teal-200 px-2 py-0.5 rounded-full truncate max-w-full inline-flex items-center space-x-1"><i class="fa-solid fa-folder-tree text-[10px]"></i><span class="truncate">${escapeHtml(item.subcategoria)}</span></span>`
         : '';
+      const sharedBadge = renderizarBadgeCompartilhado(item);
+      const btnShare = ehDonoItem(item)
+        ? `<button type="button" data-titulo="${escapeHtml(item.topico)}" onclick="abrirModalCompartilharItem('anotacao', '${item.id}', this.dataset.titulo)" class="text-xs text-emerald-600 hover:text-emerald-800 p-1" title="Compartilhar"><i class="fa-solid fa-share-nodes"></i></button>`
+        : '';
+      const btnEdit = podeEditarItem(item)
+        ? `<button type="button" onclick="abrirModalAnotacao('${item.id}')" class="text-xs text-indigo-600 hover:text-indigo-800 font-medium flex items-center space-x-1"><i class="fa-solid fa-pen"></i> <span>Editar</span></button>`
+        : '';
+      const btnDel = podeExcluirItem(item)
+        ? `<button type="button" onclick="deletarAnotacao('${item.id}')" class="text-xs text-red-500 hover:text-red-700 p-1"><i class="fa-solid fa-trash"></i></button>`
+        : '';
 
       return `
         <div class="nota-card-item bg-white p-4 md:p-5 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all flex flex-col justify-between" style="height: 330px;">
@@ -3035,6 +4420,7 @@
               <div class="flex flex-wrap items-center gap-1 min-w-0" style="max-width: 72%;">
                 <span class="text-xs font-semibold text-indigo-600 bg-indigo-50 px-2.5 py-0.5 rounded-full truncate max-w-full">${escapeHtml(item.materia)}</span>
                 ${subBadge}
+                ${sharedBadge}
               </div>
               <span class="text-xs text-gray-400 flex-shrink-0"><i class="fa-regular fa-clock mr-1"></i>${escapeHtml(item.data)}</span>
             </div>
@@ -3064,8 +4450,9 @@
                 <i class="fa-solid fa-expand text-indigo-500"></i> <span>Ler completo</span>
               </button>
               <div class="flex items-center space-x-3">
-                <button type="button" onclick="abrirModalAnotacao('${item.id}')" class="text-xs text-indigo-600 hover:text-indigo-800 font-medium flex items-center space-x-1"><i class="fa-solid fa-pen"></i> <span>Editar</span></button>
-                <button type="button" onclick="deletarAnotacao('${item.id}')" class="text-xs text-red-500 hover:text-red-700 p-1"><i class="fa-solid fa-trash"></i></button>
+                ${btnShare}
+                ${btnEdit}
+                ${btnDel}
               </div>
             </div>
           </div>
@@ -3254,10 +4641,14 @@
       if (item.anexoUrl) linksHtml += `<a href="${escapeHtml(item.anexoUrl)}" target="_blank" class="text-xs bg-purple-50 text-purple-700 border border-purple-200 px-3 py-1.5 rounded-lg hover:bg-purple-100 font-medium flex items-center space-x-1.5"><i class="fa-solid fa-paperclip"></i> <span>Anexo: ${escapeHtml(item.anexoNome)}</span></a>`;
       linksEl.innerHTML = linksHtml;
 
-      document.getElementById('btnEditarDaLeitura').onclick = function() {
-        fecharModal('modalLeituraAnotacao');
-        abrirModalAnotacao(item.id);
-      };
+      const btnEditarLeitura = document.getElementById('btnEditarDaLeitura');
+      if (btnEditarLeitura) {
+        btnEditarLeitura.classList.toggle('hidden', !podeEditarItem(item));
+        btnEditarLeitura.onclick = function() {
+          fecharModal('modalLeituraAnotacao');
+          abrirModalAnotacao(item.id);
+        };
+      }
       document.getElementById('btnExportarABNT').onclick = function() {
         exportarDocumentoABNT({
           titulo: item.topico,
@@ -3283,7 +4674,8 @@
       const cat = document.getElementById('filtroCategoriaAnotacao')?.value || '';
       const sub = document.getElementById('filtroSubcategoriaAnotacao')?.value || '';
 
-      const filtrado = listaAnotacoesGlobal.filter(item => {
+      const base = filtrarPorOrigem(listaAnotacoesGlobal, 'filtroOrigemAnotacao');
+      const filtrado = base.filter(item => {
         const textoLimpo = extrairTextoPuro(item.conteudo).toLowerCase();
         const subItem = (item.subcategoria || '').trim();
         const bateBusca = !busca ||
@@ -3307,7 +4699,15 @@
 
       const valorPreservar = subSelecionada !== null ? subSelecionada : subEl.value;
       const cat = catEl.value;
-      const subs = obterSubcategoriasDaCategoria(cat);
+      const ownerId = obterOwnerIdDoSeletor('ownerAnotacaoSelect');
+      let subs = [];
+      if (ownerId && categoriasDonoCache[ownerId]) {
+        subs = (categoriasDonoCache[ownerId].subcategorias || [])
+          .filter(s => !cat || s.categoria === cat)
+          .map(s => s.nome);
+      } else {
+        subs = obterSubcategoriasDaCategoria(cat);
+      }
 
       subEl.innerHTML = '<option value="">Nenhuma (Geral)</option>';
       subs.forEach(s => {
@@ -3470,6 +4870,14 @@
     }
 
     function abrirModalAnotacao(id = null, catPadrao = null, subPadrao = null) {
+      if (id) {
+        const itemCheck = listaAnotacoesGlobal.find(a => a.id === id);
+        if (itemCheck && !podeEditarItem(itemCheck)) {
+          alert('Esta anotação está em modo somente leitura.');
+          return;
+        }
+      }
+
       alternarAbaEditorMobile('conteudo');
       document.getElementById('formAnotacao').reset();
       document.getElementById('anotacaoId').value = '';
@@ -3478,12 +4886,17 @@
       document.getElementById('statusAnexoAnotacao').innerText = '';
       alternarFormSubcategoriaInline(false);
       if (quill) quill.setContents([]);
+      popularSeletorEspacoEscrita('anotacao', Boolean(id));
 
       if (id) {
         const item = listaAnotacoesGlobal.find(a => a.id === id);
         if (item) {
           document.getElementById('tituloModalAnotacao').innerText = 'Editar Documento';
           document.getElementById('anotacaoId').value = item.id;
+          const matEl = document.getElementById('materia');
+          if (matEl && item.materia && !Array.from(matEl.options).some(o => o.value === item.materia)) {
+            matEl.innerHTML += `<option value="${escapeHtml(item.materia)}">${escapeHtml(item.materia)}</option>`;
+          }
           document.getElementById('materia').value = item.materia;
           atualizarSelectSubcategoriaModal(item.subcategoria || '');
           document.getElementById('topico').value = item.topico;
@@ -3557,12 +4970,14 @@
           quill.root.innerHTML = tempDiv.innerHTML;
         }
 
-        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Gravando na planilha...';
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Gravando...';
 
         const arqData = await lerArquivoParaBase64(document.getElementById('arquivoAnotacao'));
+        const aid = document.getElementById('anotacaoId').value;
 
         const dados = {
-          id: document.getElementById('anotacaoId').value,
+          id: aid,
+          ownerUserId: aid ? undefined : obterOwnerIdDoSeletor('ownerAnotacaoSelect'),
           materia: document.getElementById('materia').value,
           subcategoria: document.getElementById('subcategoriaAnotacao').value,
           topico: document.getElementById('topico').value,
@@ -3579,14 +4994,16 @@
             btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Guardar Documento';
             btn.disabled = false;
             alert(resp.message);
-            fecharModal('modalAnotacao');
-            carregarSubcategorias();
-            carregarAnotacoes();
+            if (resp.success) {
+              fecharModal('modalAnotacao');
+              carregarSubcategorias();
+              carregarAnotacoes();
+            }
           })
           .withFailureHandler(function(err) {
             btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Guardar Documento';
             btn.disabled = false;
-            alert("Erro ao salvar: " + err);
+            alert("Erro ao salvar: " + (err.message || err));
           })
           .salvarAnotacao(dados);
 
@@ -3622,7 +5039,8 @@
       const status = document.getElementById('filtroStatusMidia')?.value || '';
       const cat = document.getElementById('filtroCategoriaMidia')?.value || '';
 
-      const filtradas = listaMidiasGlobal.filter(m => {
+      const base = filtrarPorOrigem(listaMidiasGlobal, 'filtroOrigemMidia');
+      const filtradas = base.filter(m => {
         const matchTermo = !termo || m.titulo.toLowerCase().includes(termo) || (m.autorDiretor && m.autorDiretor.toLowerCase().includes(termo));
         const matchTipo = !tipo || m.tipo === tipo;
         const matchStatus = !status || m.status === status;
@@ -3658,6 +5076,16 @@
       el.innerHTML = lista.map(m => {
         const estrelas = m.nota > 0 ? '★'.repeat(m.nota) + '☆'.repeat(5 - m.nota) : '<span class="text-gray-300">Sem nota</span>';
         const temCapa = m.capaUrl && m.capaUrl.trim().length > 5;
+        const sharedBadge = renderizarBadgeCompartilhado(m);
+        const btnShare = ehDonoItem(m)
+          ? `<button type="button" data-titulo="${escapeHtml(m.titulo)}" onclick="abrirModalCompartilharItem('midia', '${m.id}', this.dataset.titulo)" class="text-emerald-600 hover:text-emerald-800 p-1" title="Compartilhar"><i class="fa-solid fa-share-nodes"></i></button>`
+          : '';
+        const btnEdit = podeEditarItem(m)
+          ? `<button type="button" onclick="abrirModalMidia('${m.id}')" class="text-indigo-600 hover:text-indigo-800 font-medium p-1" title="Editar"><i class="fa-solid fa-pen-to-square"></i></button>`
+          : '';
+        const btnDel = podeExcluirItem(m)
+          ? `<button type="button" onclick="deletarMidia('${m.id}')" class="text-red-500 hover:text-red-700 p-1" title="Excluir"><i class="fa-solid fa-trash"></i></button>`
+          : '';
 
         return `
         <div class="bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all overflow-hidden flex flex-col justify-between group">
@@ -3665,31 +5093,35 @@
             <!-- TOPO: CAPA OU PLACEHOLDER -->
             <div class="relative bg-slate-900 h-44 overflow-hidden flex items-center justify-center">
               ${temCapa 
-                ? `<img src="${m.capaUrl}" alt="${m.titulo}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" onerror="this.parentElement.innerHTML='<i class=\'fa-solid fa-bookmark text-5xl text-slate-700\'></i>'">`
+                ? `<img src="${escapeHtml(m.capaUrl)}" alt="${escapeHtml(m.titulo)}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" onerror="this.parentElement.innerHTML='<i class=\\'fa-solid fa-bookmark text-5xl text-slate-700\\'></i>'">`
                 : `<i class="${iconesTipo[m.tipo] || 'fa-solid fa-bookmark'} text-5xl text-slate-600"></i>`}
               <span class="absolute top-2.5 left-2.5 text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-slate-950/80 backdrop-blur-sm text-white flex items-center space-x-1">
-                <i class="${iconesTipo[m.tipo] || 'fa-solid fa-bookmark'} text-xs"></i> <span>${m.tipo}</span>
+                <i class="${iconesTipo[m.tipo] || 'fa-solid fa-bookmark'} text-xs"></i> <span>${escapeHtml(m.tipo)}</span>
               </span>
               <span class="absolute top-2.5 right-2.5 text-[11px] font-bold px-2 py-0.5 rounded-full border ${coresStatus[m.status] || coresStatus['Quero Ler/Ver']}">
-                ${m.status}
+                ${escapeHtml(m.status)}
               </span>
             </div>
 
             <!-- CORPO -->
             <div class="p-4 space-y-2">
-              <div class="text-amber-500 text-xs font-bold tracking-wider">${estrelas}</div>
-              <h3 class="font-bold text-slate-800 text-base leading-snug line-clamp-2" title="${m.titulo}">${m.titulo}</h3>
-              <p class="text-xs text-slate-500 truncate"><i class="fa-solid fa-user-pen mr-1"></i>${m.autorDiretor || 'Autor não informado'} ${m.ano ? `(${m.ano})` : ''}</p>
-              ${m.resenha ? `<p class="text-xs text-slate-600 line-clamp-2 bg-slate-50 p-2 rounded-lg border border-gray-100">${m.resenha}</p>` : ''}
+              <div class="flex flex-wrap items-center justify-between gap-1">
+                <div class="text-amber-500 text-xs font-bold tracking-wider">${estrelas}</div>
+                ${sharedBadge}
+              </div>
+              <h3 class="font-bold text-slate-800 text-base leading-snug line-clamp-2" title="${escapeHtml(m.titulo)}">${escapeHtml(m.titulo)}</h3>
+              <p class="text-xs text-slate-500 truncate"><i class="fa-solid fa-user-pen mr-1"></i>${escapeHtml(m.autorDiretor || 'Autor não informado')} ${m.ano ? `(${escapeHtml(m.ano)})` : ''}</p>
+              ${m.resenha ? `<p class="text-xs text-slate-600 line-clamp-2 bg-slate-50 p-2 rounded-lg border border-gray-100">${escapeHtml(m.resenha)}</p>` : ''}
             </div>
           </div>
 
           <!-- RODAPÉ COM AÇÕES -->
           <div class="px-4 py-3 bg-gray-50 border-t border-gray-100 flex justify-between items-center text-xs">
-            <span class="text-slate-500 text-[11px] font-medium bg-slate-200/70 px-2 py-0.5 rounded truncate max-w-[120px]">${m.categoria || 'Geral'}</span>
+            <span class="text-slate-500 text-[11px] font-medium bg-slate-200/70 px-2 py-0.5 rounded truncate max-w-[120px]">${escapeHtml(m.categoria || 'Geral')}</span>
             <div class="flex items-center space-x-2">
-              <button type="button" onclick="abrirModalMidia('${m.id}')" class="text-indigo-600 hover:text-indigo-800 font-medium p-1" title="Editar"><i class="fa-solid fa-pen-to-square"></i></button>
-              <button type="button" onclick="deletarMidia('${m.id}')" class="text-red-500 hover:text-red-700 p-1" title="Excluir"><i class="fa-solid fa-trash"></i></button>
+              ${btnShare}
+              ${btnEdit}
+              ${btnDel}
             </div>
           </div>
         </div>
@@ -3698,9 +5130,17 @@
     }
 
     function abrirModalMidia(id = null) {
+      if (id) {
+        const itemCheck = listaMidiasGlobal.find(x => x.id === id);
+        if (itemCheck && !podeEditarItem(itemCheck)) {
+          alert('Esta obra está em modo somente leitura.');
+          return;
+        }
+      }
       document.getElementById('formMidia').reset();
       document.getElementById('midiaId').value = '';
       document.getElementById('termoAutoBusca').value = '';
+      popularSeletorEspacoEscrita('midia', Boolean(id));
 
       if (id) {
         const item = listaMidiasGlobal.find(x => x.id === id);
@@ -3711,6 +5151,10 @@
           document.getElementById('tituloMidia').value = item.titulo;
           document.getElementById('autorDiretorMidia').value = item.autorDiretor;
           document.getElementById('anoMidia').value = item.ano;
+          const catEl = document.getElementById('categoriaMidia');
+          if (catEl && item.categoria && !Array.from(catEl.options).some(o => o.value === item.categoria)) {
+            catEl.innerHTML += `<option value="${escapeHtml(item.categoria)}">${escapeHtml(item.categoria)}</option>`;
+          }
           document.getElementById('categoriaMidia').value = item.categoria;
           document.getElementById('statusMidia').value = item.status;
           document.getElementById('notaMidia').value = item.nota;
@@ -3772,8 +5216,10 @@
       btn.innerText = 'A guardar...';
       btn.disabled = true;
 
+      const mid = document.getElementById('midiaId').value;
       const dados = {
-        id: document.getElementById('midiaId').value,
+        id: mid,
+        ownerUserId: mid ? undefined : obterOwnerIdDoSeletor('ownerMidiaSelect'),
         tipo: document.getElementById('tipoMidia').value,
         titulo: document.getElementById('tituloMidia').value,
         autorDiretor: document.getElementById('autorDiretorMidia').value,
@@ -3791,8 +5237,14 @@
         btn.innerText = 'Guardar Obra';
         btn.disabled = false;
         alert(resp.message);
-        fecharModal('modalMidia');
-        carregarMidias();
+        if (resp.success) {
+          fecharModal('modalMidia');
+          carregarMidias();
+        }
+      }).withFailureHandler(function(err) {
+        btn.innerText = 'Guardar Obra';
+        btn.disabled = false;
+        alert(err.message || err);
       }).salvarMidia(dados);
     }
 
@@ -3856,10 +5308,14 @@
 
       document.getElementById('viewMidiaDatas').innerText = `Adicionado em: ${m.dataCriacao || 'Data desconhecida'} ${m.dataConclusao ? `• Concluído em: ${m.dataConclusao}` : ''}`;
 
-      document.getElementById('btnEditarDaLeituraMidia').onclick = () => {
-        fecharModal('modalLeituraMidia');
-        abrirModalMidia(m.id);
-      };
+      const btnEditMidia = document.getElementById('btnEditarDaLeituraMidia');
+      if (btnEditMidia) {
+        btnEditMidia.classList.toggle('hidden', !podeEditarItem(m));
+        btnEditMidia.onclick = () => {
+          fecharModal('modalLeituraMidia');
+          abrirModalMidia(m.id);
+        };
+      }
       document.getElementById('btnExportarMidiaABNT').onclick = () => {
         const refABNT = `${(m.autorDiretor || 'AUTOR').toUpperCase()}. <strong>${m.titulo}</strong>. ${m.ano || 's.d.'}.`;
         const corpoHtml = `
@@ -3895,6 +5351,11 @@
             const novoStatus = evt.to.getAttribute('data-status');
             if (tarefaId && novoStatus) {
               const t = listaTarefasGlobal.find(x => x.id === tarefaId);
+              if (t && !podeEditarItem(t)) {
+                alert('Esta tarefa está em modo somente leitura.');
+                renderizarKanbanTarefas();
+                return;
+              }
               if (t && t.status !== novoStatus) {
                 t.status = novoStatus;
                 atualizarContadoresKanban();
@@ -3956,8 +5417,9 @@
     function obterTarefasFiltradas(incluirStatus = true) {
       const busca = (document.getElementById('buscaTarefa')?.value || '').toLowerCase().trim();
       const catFiltro = document.getElementById('filtroCategoriaTarefa')?.value || '';
+      const base = filtrarPorOrigem(listaTarefasGlobal, 'filtroOrigemTarefa');
 
-      return listaTarefasGlobal.filter(t => {
+      return base.filter(t => {
         const bateCat = !catFiltro || t.categoria === catFiltro;
         const bateStatus = !incluirStatus || !statusFiltroTarefa || t.status === statusFiltroTarefa;
         const bateBusca = !busca ||
@@ -4026,17 +5488,24 @@
       };
 
       if (el) {
-        el.innerHTML = lista.map(t => `
+        el.innerHTML = lista.map(t => {
+          const podeEd = podeEditarItem(t);
+          const podeEx = podeExcluirItem(t);
+          const ehDono = ehDonoItem(t);
+          const sharedBadge = renderizarBadgeCompartilhado(t);
+          const iconCheck = t.status === 'Concluído' ? '<i class="fa-solid fa-circle-check text-emerald-500"></i>' : '<i class="fa-regular fa-circle text-gray-300 hover:text-emerald-500"></i>';
+          return `
           <tr class="border-b border-gray-100 hover:bg-gray-50 transition-colors">
             <td class="p-4">
-              <button type="button" onclick="alternarStatusTarefa('${t.id}', '${t.status}')" class="text-lg">
-                ${t.status === 'Concluído' ? '<i class="fa-solid fa-circle-check text-emerald-500"></i>' : '<i class="fa-regular fa-circle text-gray-300 hover:text-emerald-500"></i>'}
+              <button type="button" ${podeEd ? `onclick="alternarStatusTarefa('${t.id}', '${t.status}')"` : 'disabled title="Somente leitura"'} class="text-lg ${podeEd ? '' : 'opacity-60 cursor-not-allowed'}">
+                ${iconCheck}
               </button>
             </td>
             <td class="p-4">
               <div class="flex flex-wrap items-center gap-2">
                 <span class="font-medium ${t.status === 'Concluído' ? 'line-through text-gray-400' : 'text-slate-800'}">${escapeHtml(t.titulo)}</span>
                 ${obterBadgeEisenhowerHtml(t.eisenhower)}
+                ${sharedBadge}
               </div>
               ${t.descricao ? `<div class="text-xs text-gray-500 mt-1 whitespace-pre-line">${escapeHtml(t.descricao)}</div>` : ''}
             </td>
@@ -4047,19 +5516,27 @@
               ${t.anexoUrl ? `<a href="${escapeHtml(t.anexoUrl)}" target="_blank" class="text-emerald-600 hover:underline flex items-center space-x-1"><i class="fa-solid fa-paperclip"></i> <span>${escapeHtml(t.anexoNome)}</span></a>` : '<span class="text-gray-300">-</span>'}
             </td>
             <td class="p-4 text-right space-x-2">
-              <button type="button" onclick="abrirModalTarefa('${t.id}')" class="text-indigo-600 hover:text-indigo-800 p-1 text-xs font-medium"><i class="fa-solid fa-pen"></i></button>
-              <button type="button" onclick="deletarTarefa('${t.id}')" class="text-red-500 hover:text-red-700 p-1 text-xs"><i class="fa-solid fa-trash"></i></button>
+              ${ehDono ? `<button type="button" data-titulo="${escapeHtml(t.titulo)}" onclick="abrirModalCompartilharItem('tarefa', '${t.id}', this.dataset.titulo)" class="text-emerald-600 hover:text-emerald-800 p-1 text-xs" title="Compartilhar"><i class="fa-solid fa-share-nodes"></i></button>` : ''}
+              ${podeEd ? `<button type="button" onclick="abrirModalTarefa('${t.id}')" class="text-indigo-600 hover:text-indigo-800 p-1 text-xs font-medium"><i class="fa-solid fa-pen"></i></button>` : ''}
+              ${podeEx ? `<button type="button" onclick="deletarTarefa('${t.id}')" class="text-red-500 hover:text-red-700 p-1 text-xs"><i class="fa-solid fa-trash"></i></button>` : ''}
             </td>
           </tr>
-        `).join('');
+        `;
+        }).join('');
       }
 
       if (elMob) {
-        elMob.innerHTML = lista.map(t => `
+        elMob.innerHTML = lista.map(t => {
+          const podeEd = podeEditarItem(t);
+          const podeEx = podeExcluirItem(t);
+          const ehDono = ehDonoItem(t);
+          const sharedBadge = renderizarBadgeCompartilhado(t);
+          const iconCheck = t.status === 'Concluído' ? '<i class="fa-solid fa-circle-check text-emerald-500"></i>' : '<i class="fa-regular fa-circle text-gray-300 hover:text-emerald-500"></i>';
+          return `
           <div class="p-4 space-y-2.5">
             <div class="flex items-start gap-3">
-              <button type="button" onclick="alternarStatusTarefa('${t.id}', '${t.status}')" class="text-xl mt-0.5 flex-shrink-0 p-1">
-                ${t.status === 'Concluído' ? '<i class="fa-solid fa-circle-check text-emerald-500"></i>' : '<i class="fa-regular fa-circle text-gray-300 hover:text-emerald-500"></i>'}
+              <button type="button" ${podeEd ? `onclick="alternarStatusTarefa('${t.id}', '${t.status}')"` : 'disabled'} class="text-xl mt-0.5 flex-shrink-0 p-1 ${podeEd ? '' : 'opacity-60'}">
+                ${iconCheck}
               </button>
               <div class="flex-1 min-w-0 space-y-1">
                 <div class="font-semibold text-sm ${t.status === 'Concluído' ? 'line-through text-gray-400' : 'text-slate-800'} break-words">${escapeHtml(t.titulo)}</div>
@@ -4068,6 +5545,7 @@
                   <span class="text-[11px] bg-slate-100 text-slate-700 px-2 py-0.5 rounded font-medium">${escapeHtml(t.categoria)}</span>
                   <span class="text-[11px] px-2 py-0.5 rounded-full border font-semibold ${prioridadeCores[t.prioridade] || prioridadeCores['Média']}">${escapeHtml(t.prioridade)}</span>
                   ${obterBadgeEisenhowerHtml(t.eisenhower)}
+                  ${sharedBadge}
                   <span class="text-[11px] text-gray-500"><i class="fa-regular fa-calendar mr-1"></i>${escapeHtml(t.prazo || 'S/ prazo')}</span>
                 </div>
               </div>
@@ -4077,12 +5555,14 @@
                 ${t.anexoUrl ? `<a href="${escapeHtml(t.anexoUrl)}" target="_blank" class="text-emerald-600 hover:underline flex items-center space-x-1"><i class="fa-solid fa-paperclip"></i> <span class="truncate max-w-[170px]">${escapeHtml(t.anexoNome)}</span></a>` : ''}
               </div>
               <div class="flex items-center space-x-3">
-                <button type="button" onclick="abrirModalTarefa('${t.id}')" class="text-xs text-indigo-600 hover:text-indigo-800 font-semibold px-2 py-1"><i class="fa-solid fa-pen mr-1"></i>Editar</button>
-                <button type="button" onclick="deletarTarefa('${t.id}')" class="text-xs text-red-500 hover:text-red-700 px-2 py-1"><i class="fa-solid fa-trash"></i></button>
+                ${ehDono ? `<button type="button" data-titulo="${escapeHtml(t.titulo)}" onclick="abrirModalCompartilharItem('tarefa', '${t.id}', this.dataset.titulo)" class="text-xs text-emerald-600 hover:text-emerald-800 px-2 py-1" title="Compartilhar"><i class="fa-solid fa-share-nodes"></i></button>` : ''}
+                ${podeEd ? `<button type="button" onclick="abrirModalTarefa('${t.id}')" class="text-xs text-indigo-600 hover:text-indigo-800 font-semibold px-2 py-1"><i class="fa-solid fa-pen mr-1"></i>Editar</button>` : ''}
+                ${podeEx ? `<button type="button" onclick="deletarTarefa('${t.id}')" class="text-xs text-red-500 hover:text-red-700 px-2 py-1"><i class="fa-solid fa-trash"></i></button>` : ''}
               </div>
             </div>
           </div>
-        `).join('');
+        `;
+        }).join('');
       }
     }
 
@@ -4138,16 +5618,22 @@
               </button>
             </div>
             <div class="divide-y divide-gray-100">
-              ${tarefasCat.map(t => `
+              ${tarefasCat.map(t => {
+                const podeEd = podeEditarItem(t);
+                const podeEx = podeExcluirItem(t);
+                const ehDono = ehDonoItem(t);
+                const sharedBadge = renderizarBadgeCompartilhado(t);
+                return `
                 <div class="p-4 flex flex-wrap justify-between items-center gap-3 hover:bg-slate-50/70 transition-colors">
                   <div class="flex items-start space-x-3 flex-1 min-w-[220px]">
-                    <button type="button" onclick="alternarStatusTarefa('${t.id}', '${t.status}')" class="text-lg mt-0.5">
+                    <button type="button" ${podeEd ? `onclick="alternarStatusTarefa('${t.id}', '${t.status}')"` : 'disabled'} class="text-lg mt-0.5 ${podeEd ? '' : 'opacity-60'}">
                       ${t.status === 'Concluído' ? '<i class="fa-solid fa-circle-check text-emerald-500"></i>' : '<i class="fa-regular fa-circle text-gray-300 hover:text-emerald-500"></i>'}
                     </button>
                     <div class="space-y-1 min-w-0">
                       <div class="flex flex-wrap items-center gap-2">
                         <span class="font-semibold text-sm ${t.status === 'Concluído' ? 'line-through text-gray-400' : 'text-slate-800'}">${escapeHtml(t.titulo)}</span>
                         ${obterBadgeEisenhowerHtml(t.eisenhower)}
+                        ${sharedBadge}
                       </div>
                       ${t.descricao ? `<p class="text-xs text-gray-500 whitespace-pre-line">${escapeHtml(t.descricao)}</p>` : ''}
                     </div>
@@ -4156,11 +5642,13 @@
                     <span class="text-gray-500"><i class="fa-regular fa-calendar mr-1"></i>${escapeHtml(t.prazo || 'Sem prazo')}</span>
                     <span class="px-2.5 py-0.5 rounded-full border font-semibold ${prioridadeCores[t.prioridade] || prioridadeCores['Média']}">${escapeHtml(t.prioridade)}</span>
                     ${t.anexoUrl ? `<a href="${escapeHtml(t.anexoUrl)}" target="_blank" class="text-emerald-600 hover:underline flex items-center space-x-1"><i class="fa-solid fa-paperclip"></i> <span>${escapeHtml(t.anexoNome)}</span></a>` : ''}
-                    <button type="button" onclick="abrirModalTarefa('${t.id}')" class="text-indigo-600 hover:text-indigo-800 p-1"><i class="fa-solid fa-pen"></i></button>
-                    <button type="button" onclick="deletarTarefa('${t.id}')" class="text-red-500 hover:text-red-700 p-1"><i class="fa-solid fa-trash"></i></button>
+                    ${ehDono ? `<button type="button" data-titulo="${escapeHtml(t.titulo)}" onclick="abrirModalCompartilharItem('tarefa', '${t.id}', this.dataset.titulo)" class="text-emerald-600 hover:text-emerald-800 p-1" title="Compartilhar"><i class="fa-solid fa-share-nodes"></i></button>` : ''}
+                    ${podeEd ? `<button type="button" onclick="abrirModalTarefa('${t.id}')" class="text-indigo-600 hover:text-indigo-800 p-1"><i class="fa-solid fa-pen"></i></button>` : ''}
+                    ${podeEx ? `<button type="button" onclick="deletarTarefa('${t.id}')" class="text-red-500 hover:text-red-700 p-1"><i class="fa-solid fa-trash"></i></button>` : ''}
                   </div>
                 </div>
-              `).join('')}
+              `;
+              }).join('')}
             </div>
           </div>
         `;
@@ -4181,29 +5669,39 @@
         if (!colEl) return;
         const tarefasCol = filtradas.filter(t => (t.status || 'Pendente') === status);
 
-        colEl.innerHTML = tarefasCol.map(t => `
-          <div data-id="${t.id}" class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 cursor-move hover:shadow-md transition-all space-y-2">
+        colEl.innerHTML = tarefasCol.map(t => {
+          const podeEd = podeEditarItem(t);
+          const podeEx = podeExcluirItem(t);
+          const ehDono = ehDonoItem(t);
+          const sharedBadge = renderizarBadgeCompartilhado(t);
+          return `
+          <div data-id="${t.id}" class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 ${podeEd ? 'cursor-move' : ''} hover:shadow-md transition-all space-y-2">
             <div class="flex justify-between items-start gap-2">
               <span class="text-xs font-semibold bg-slate-100 text-slate-600 px-2 py-0.5 rounded truncate" style="max-width: 70%;">${escapeHtml(t.categoria)}</span>
               <span class="text-xs font-bold px-2 py-0.5 rounded-full ${prioridadeBadge[t.prioridade] || prioridadeBadge['Média']}">${escapeHtml(t.prioridade)}</span>
             </div>
             <h4 class="font-bold text-slate-800 text-sm">${escapeHtml(t.titulo)}</h4>
-            ${obterBadgeEisenhowerHtml(t.eisenhower)}
+            <div class="flex flex-wrap gap-1">
+              ${obterBadgeEisenhowerHtml(t.eisenhower)}
+              ${sharedBadge}
+            </div>
             ${t.descricao ? `<p class="text-xs text-gray-500 truncate">${escapeHtml(t.descricao)}</p>` : ''}
             <div class="flex flex-wrap justify-between items-center gap-2 pt-2 border-t border-gray-100 text-xs text-gray-400">
               <span><i class="fa-regular fa-calendar mr-1"></i>${escapeHtml(t.prazo || 'S/ prazo')}</span>
               <div class="flex items-center space-x-2">
-                <select onchange="alterarStatusTarefaDireto('${t.id}', this.value)" class="md:hidden text-xs border border-gray-300 rounded-lg px-2 py-1 bg-slate-50 text-slate-700" aria-label="Mover status">
+                ${podeEd ? `<select onchange="alterarStatusTarefaDireto('${t.id}', this.value)" class="md:hidden text-xs border border-gray-300 rounded-lg px-2 py-1 bg-slate-50 text-slate-700" aria-label="Mover status">
                   <option value="Pendente" ${t.status === 'Pendente' || !t.status ? 'selected' : ''}>Pendente</option>
                   <option value="Em Andamento" ${t.status === 'Em Andamento' ? 'selected' : ''}>Em Andamento</option>
                   <option value="Concluído" ${t.status === 'Concluído' ? 'selected' : ''}>Concluído</option>
-                </select>
-                <button type="button" onclick="abrirModalTarefa('${t.id}')" class="text-indigo-600 hover:text-indigo-800"><i class="fa-solid fa-pen"></i></button>
-                <button type="button" onclick="deletarTarefa('${t.id}')" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button>
+                </select>` : ''}
+                ${ehDono ? `<button type="button" data-titulo="${escapeHtml(t.titulo)}" onclick="abrirModalCompartilharItem('tarefa', '${t.id}', this.dataset.titulo)" class="text-emerald-600 hover:text-emerald-800" title="Compartilhar"><i class="fa-solid fa-share-nodes"></i></button>` : ''}
+                ${podeEd ? `<button type="button" onclick="abrirModalTarefa('${t.id}')" class="text-indigo-600 hover:text-indigo-800"><i class="fa-solid fa-pen"></i></button>` : ''}
+                ${podeEx ? `<button type="button" onclick="deletarTarefa('${t.id}')" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button>` : ''}
               </div>
             </div>
           </div>
-        `).join('');
+        `;
+        }).join('');
       });
 
       atualizarContadoresKanban();
@@ -4211,6 +5709,11 @@
 
     function alterarStatusTarefaDireto(id, novoStatus) {
       const t = listaTarefasGlobal.find(x => x.id === id);
+      if (t && !podeEditarItem(t)) {
+        alert('Esta tarefa está em modo somente leitura.');
+        renderizarTarefas();
+        return;
+      }
       if (t) {
         t.status = novoStatus;
         renderizarTarefas();
@@ -4227,12 +5730,20 @@
     }
 
     function abrirModalTarefa(id = null, defaults = null) {
+      if (id) {
+        const tCheck = listaTarefasGlobal.find(item => item.id === id);
+        if (tCheck && !podeEditarItem(tCheck)) {
+          alert('Esta tarefa está em modo somente leitura.');
+          return;
+        }
+      }
       document.getElementById('formTarefa').reset();
       document.getElementById('tarefaId').value = '';
       document.getElementById('tarefaAnexoUrl').value = '';
       document.getElementById('tarefaAnexoNome').value = '';
       document.getElementById('statusAnexoTarefa').innerText = '';
       document.getElementById('eisenhowerTarefa').value = '';
+      popularSeletorEspacoEscrita('tarefa', Boolean(id));
 
       if (id) {
         const t = listaTarefasGlobal.find(item => item.id === id);
@@ -4241,6 +5752,10 @@
           document.getElementById('tarefaId').value = t.id;
           document.getElementById('tituloTarefa').value = t.titulo;
           document.getElementById('descricaoTarefa').value = t.descricao || '';
+          const catEl = document.getElementById('categoriaTarefa');
+          if (catEl && t.categoria && !Array.from(catEl.options).some(o => o.value === t.categoria)) {
+            catEl.innerHTML += `<option value="${escapeHtml(t.categoria)}">${escapeHtml(t.categoria)}</option>`;
+          }
           document.getElementById('categoriaTarefa').value = t.categoria;
           document.getElementById('prazoTarefa').value = t.prazo;
           document.getElementById('prioridadeTarefa').value = t.prioridade;
@@ -4285,6 +5800,11 @@
     }
 
     function alternarStatusTarefa(id, statusAtual) {
+      const t = listaTarefasGlobal.find(x => x.id === id);
+      if (t && !podeEditarItem(t)) {
+        alert('Esta tarefa está em modo somente leitura.');
+        return;
+      }
       const novoStatus = statusAtual === 'Concluído' ? 'Pendente' : 'Concluído';
       google.script.run.withSuccessHandler(function() { carregarTarefas(); }).atualizarStatusTarefa(id, novoStatus);
     }
@@ -4295,9 +5815,11 @@
       btn.innerText = 'A guardar...'; btn.disabled = true;
 
       const arqData = await lerArquivoParaBase64(document.getElementById('arquivoTarefa'));
+      const tid = document.getElementById('tarefaId').value;
 
       const dados = {
-        id: document.getElementById('tarefaId').value,
+        id: tid,
+        ownerUserId: tid ? undefined : obterOwnerIdDoSeletor('ownerTarefaSelect'),
         titulo: document.getElementById('tituloTarefa').value,
         descricao: document.getElementById('descricaoTarefa').value,
         categoria: document.getElementById('categoriaTarefa').value,
@@ -4312,9 +5834,14 @@
 
       google.script.run.withSuccessHandler(function(resp) {
         alert(resp.message);
-        fecharModal('modalTarefa');
         btn.innerText = 'Guardar Tarefa'; btn.disabled = false;
-        carregarTarefas();
+        if (resp.success) {
+          fecharModal('modalTarefa');
+          carregarTarefas();
+        }
+      }).withFailureHandler(function(err) {
+        btn.innerText = 'Guardar Tarefa'; btn.disabled = false;
+        alert(err.message || err);
       }).salvarTarefa(dados);
     }
 
@@ -4350,6 +5877,11 @@
             const novoQuadrante = evt.to.getAttribute('data-quadrante') || '';
             if (!tarefaId) return;
             const t = listaTarefasGlobal.find(x => x.id === tarefaId);
+            if (t && !podeEditarItem(t)) {
+              alert('Esta tarefa está em modo somente leitura.');
+              renderizarEisenhower();
+              return;
+            }
             if (t) {
               const mudou = (t.eisenhower || '') !== novoQuadrante;
               t.eisenhower = novoQuadrante;
@@ -4371,6 +5903,11 @@
 
     function moverQuadranteEisenhower(id, quadrante) {
       const t = listaTarefasGlobal.find(x => x.id === id);
+      if (t && !podeEditarItem(t)) {
+        alert('Esta tarefa está em modo somente leitura.');
+        renderizarEisenhower();
+        return;
+      }
       if (t) {
         t.eisenhower = quadrante || '';
         renderizarEisenhower();
@@ -4420,11 +5957,15 @@
 
       function criarCardQuadrante(t) {
         const atrasada = t.prazo && t.status !== 'Concluído' && t.prazo < hojeIso;
+        const podeEd = podeEditarItem(t);
+        const podeEx = podeExcluirItem(t);
+        const ehDono = ehDonoItem(t);
+        const sharedBadge = renderizarBadgeCompartilhado(t);
         return `
-          <div data-id="${t.id}" class="eisenhower-card bg-white p-3.5 rounded-xl shadow-sm border border-gray-200 cursor-move hover:shadow-md transition-all space-y-2">
+          <div data-id="${t.id}" class="eisenhower-card bg-white p-3.5 rounded-xl shadow-sm border border-gray-200 ${podeEd ? 'cursor-move' : ''} hover:shadow-md transition-all space-y-2">
             <div class="flex justify-between items-start gap-2">
               <div class="flex items-start space-x-2 min-w-0 flex-1">
-                <button type="button" onclick="event.stopPropagation(); alternarStatusTarefa('${t.id}', '${t.status}')" class="text-base mt-0.5 flex-shrink-0" title="Marcar/desmarcar conclusão">
+                <button type="button" ${podeEd ? `onclick="event.stopPropagation(); alternarStatusTarefa('${t.id}', '${t.status}')"` : 'disabled'} class="text-base mt-0.5 flex-shrink-0 ${podeEd ? '' : 'opacity-60'}" title="Marcar/desmarcar conclusão">
                   ${t.status === 'Concluído' ? '<i class="fa-solid fa-circle-check text-emerald-500"></i>' : '<i class="fa-regular fa-circle text-gray-300 hover:text-emerald-500"></i>'}
                 </button>
                 <div class="min-w-0">
@@ -4434,6 +5975,7 @@
               </div>
               <span class="text-[11px] font-bold px-2 py-0.5 rounded-full flex-shrink-0 ${prioridadeBadge[t.prioridade] || prioridadeBadge['Média']}">${escapeHtml(t.prioridade)}</span>
             </div>
+            ${sharedBadge ? `<div class="flex flex-wrap gap-1">${sharedBadge}</div>` : ''}
             <div class="flex flex-wrap justify-between items-center gap-2 pt-2 border-t border-gray-100 text-[11px]">
               <div class="flex items-center space-x-2 min-w-0">
                 <span class="bg-slate-100 text-slate-600 px-2 py-0.5 rounded truncate max-w-[140px]">${escapeHtml(t.categoria)}</span>
@@ -4442,16 +5984,17 @@
                 </span>
               </div>
               <div class="flex items-center space-x-1.5">
-                <select onchange="moverQuadranteEisenhower('${t.id}', this.value)" class="md:hidden text-[11px] border border-gray-300 rounded-md px-1.5 py-0.5 bg-slate-50 text-slate-700" aria-label="Mover quadrante">
+                ${podeEd ? `<select onchange="moverQuadranteEisenhower('${t.id}', this.value)" class="md:hidden text-[11px] border border-gray-300 rounded-md px-1.5 py-0.5 bg-slate-50 text-slate-700" aria-label="Mover quadrante">
                   <option value="fazer" ${(t.eisenhower || '') === 'fazer' ? 'selected' : ''}>Q1 Fazer</option>
                   <option value="agendar" ${(t.eisenhower || '') === 'agendar' ? 'selected' : ''}>Q2 Agendar</option>
                   <option value="delegar" ${(t.eisenhower || '') === 'delegar' ? 'selected' : ''}>Q3 Delegar</option>
                   <option value="eliminar" ${(t.eisenhower || '') === 'eliminar' ? 'selected' : ''}>Q4 Postergar</option>
                   <option value="">Entrada</option>
-                </select>
-                <button type="button" onclick="abrirModalTarefa('${t.id}')" class="text-indigo-600 hover:text-indigo-800 p-1" title="Editar tarefa"><i class="fa-solid fa-pen"></i></button>
-                <button type="button" onclick="moverQuadranteEisenhower('${t.id}', '')" class="hidden md:inline-block text-slate-400 hover:text-slate-700 p-1" title="Mover para Caixa de Entrada"><i class="fa-solid fa-inbox"></i></button>
-                <button type="button" onclick="deletarTarefa('${t.id}')" class="text-red-500 hover:text-red-700 p-1" title="Excluir tarefa"><i class="fa-solid fa-trash"></i></button>
+                </select>` : ''}
+                ${ehDono ? `<button type="button" data-titulo="${escapeHtml(t.titulo)}" onclick="abrirModalCompartilharItem('tarefa', '${t.id}', this.dataset.titulo)" class="text-emerald-600 hover:text-emerald-800 p-1" title="Compartilhar"><i class="fa-solid fa-share-nodes"></i></button>` : ''}
+                ${podeEd ? `<button type="button" onclick="abrirModalTarefa('${t.id}')" class="text-indigo-600 hover:text-indigo-800 p-1" title="Editar tarefa"><i class="fa-solid fa-pen"></i></button>` : ''}
+                ${podeEd ? `<button type="button" onclick="moverQuadranteEisenhower('${t.id}', '')" class="hidden md:inline-block text-slate-400 hover:text-slate-700 p-1" title="Mover para Caixa de Entrada"><i class="fa-solid fa-inbox"></i></button>` : ''}
+                ${podeEx ? `<button type="button" onclick="deletarTarefa('${t.id}')" class="text-red-500 hover:text-red-700 p-1" title="Excluir tarefa"><i class="fa-solid fa-trash"></i></button>` : ''}
               </div>
             </div>
           </div>
@@ -4460,15 +6003,19 @@
 
       function criarCardCaixaEntrada(t) {
         const atrasada = t.prazo && t.status !== 'Concluído' && t.prazo < hojeIso;
+        const podeEd = podeEditarItem(t);
+        const podeEx = podeExcluirItem(t);
+        const ehDono = ehDonoItem(t);
+        const sharedBadge = renderizarBadgeCompartilhado(t);
         return `
-          <div data-id="${t.id}" class="eisenhower-card bg-slate-50/70 p-3.5 rounded-xl border border-gray-200 cursor-move hover:bg-white hover:shadow-md transition-all flex flex-col justify-between space-y-2.5">
+          <div data-id="${t.id}" class="eisenhower-card bg-slate-50/70 p-3.5 rounded-xl border border-gray-200 ${podeEd ? 'cursor-move' : ''} hover:bg-white hover:shadow-md transition-all flex flex-col justify-between space-y-2.5">
             <div class="space-y-1.5">
               <div class="flex justify-between items-start gap-2">
                 <span class="text-[11px] font-semibold bg-white border border-gray-200 text-slate-600 px-2 py-0.5 rounded truncate max-w-[65%]">${escapeHtml(t.categoria)}</span>
                 <span class="text-[11px] font-bold px-2 py-0.5 rounded-full ${prioridadeBadge[t.prioridade] || prioridadeBadge['Média']}">${escapeHtml(t.prioridade)}</span>
               </div>
               <div class="flex items-start space-x-2">
-                <button type="button" onclick="alternarStatusTarefa('${t.id}', '${t.status}')" class="text-base mt-0.5 flex-shrink-0">
+                <button type="button" ${podeEd ? `onclick="alternarStatusTarefa('${t.id}', '${t.status}')"` : 'disabled'} class="text-base mt-0.5 flex-shrink-0 ${podeEd ? '' : 'opacity-60'}">
                   ${t.status === 'Concluído' ? '<i class="fa-solid fa-circle-check text-emerald-500"></i>' : '<i class="fa-regular fa-circle text-gray-300 hover:text-emerald-500"></i>'}
                 </button>
                 <div class="min-w-0">
@@ -4476,17 +6023,21 @@
                   <span class="text-[11px] ${atrasada ? 'text-red-600 font-semibold' : 'text-gray-400'}"><i class="fa-regular fa-calendar mr-1"></i>${escapeHtml(t.prazo || 'S/ prazo')}</span>
                 </div>
               </div>
+              ${sharedBadge ? `<div class="flex flex-wrap gap-1">${sharedBadge}</div>` : ''}
             </div>
             <div class="flex justify-between items-center pt-2 border-t border-gray-200/80 gap-1">
               <div class="flex items-center space-x-1">
+                ${podeEd ? `
                 <button type="button" onclick="moverQuadranteEisenhower('${t.id}', 'fazer')" class="px-2 py-0.5 rounded text-[11px] font-bold bg-red-100 hover:bg-red-600 text-red-700 hover:text-white transition-colors" title="Mover para Q1: Fazer Agora">Q1</button>
                 <button type="button" onclick="moverQuadranteEisenhower('${t.id}', 'agendar')" class="px-2 py-0.5 rounded text-[11px] font-bold bg-indigo-100 hover:bg-indigo-600 text-indigo-700 hover:text-white transition-colors" title="Mover para Q2: Agendar">Q2</button>
                 <button type="button" onclick="moverQuadranteEisenhower('${t.id}', 'delegar')" class="px-2 py-0.5 rounded text-[11px] font-bold bg-amber-100 hover:bg-amber-500 text-amber-800 hover:text-white transition-colors" title="Mover para Q3: Delegar">Q3</button>
                 <button type="button" onclick="moverQuadranteEisenhower('${t.id}', 'eliminar')" class="px-2 py-0.5 rounded text-[11px] font-bold bg-gray-200 hover:bg-slate-700 text-slate-700 hover:text-white transition-colors" title="Mover para Q4: Eliminar/Postergar">Q4</button>
+                ` : '<span class="text-[11px] text-slate-400 italic">Somente leitura</span>'}
               </div>
               <div class="flex items-center space-x-1">
-                <button type="button" onclick="abrirModalTarefa('${t.id}')" class="text-indigo-600 hover:text-indigo-800 p-1 text-xs"><i class="fa-solid fa-pen"></i></button>
-                <button type="button" onclick="deletarTarefa('${t.id}')" class="text-red-500 hover:text-red-700 p-1 text-xs"><i class="fa-solid fa-trash"></i></button>
+                ${ehDono ? `<button type="button" data-titulo="${escapeHtml(t.titulo)}" onclick="abrirModalCompartilharItem('tarefa', '${t.id}', this.dataset.titulo)" class="text-emerald-600 hover:text-emerald-800 p-1 text-xs" title="Compartilhar"><i class="fa-solid fa-share-nodes"></i></button>` : ''}
+                ${podeEd ? `<button type="button" onclick="abrirModalTarefa('${t.id}')" class="text-indigo-600 hover:text-indigo-800 p-1 text-xs"><i class="fa-solid fa-pen"></i></button>` : ''}
+                ${podeEx ? `<button type="button" onclick="deletarTarefa('${t.id}')" class="text-red-500 hover:text-red-700 p-1 text-xs"><i class="fa-solid fa-trash"></i></button>` : ''}
               </div>
             </div>
           </div>
@@ -4519,15 +6070,20 @@
 
     // ================= CALENDÁRIO DE PRAZOS =================
     function carregarCalendario() {
+      const btnSyncCal = document.getElementById('btnSyncGoogleCal');
+      if (btnSyncCal) {
+        btnSyncCal.classList.toggle('hidden', !(usuarioAtual && usuarioAtual.isAdmin));
+      }
       google.script.run.withSuccessHandler(function(tarefas) {
         listaTarefasGlobal = tarefas || [];
-        // Busca eventos sincronizados do Google Calendar
-        fetch('/api/getEventosGoogleCalendar')
-          .then(res => res.json())
-          .then(gEventos => {
-            renderizarCalendario(gEventos || []);
-          })
-          .catch(() => renderizarCalendario([]));
+        if (usuarioAtual && usuarioAtual.isAdmin) {
+          google.script.run
+            .withSuccessHandler(gEventos => renderizarCalendario(gEventos || []))
+            .withFailureHandler(() => renderizarCalendario([]))
+            .getEventosGoogleCalendar();
+        } else {
+          renderizarCalendario([]);
+        }
       }).getTarefas();
     }
 
@@ -4604,7 +6160,8 @@
 
     function filtrarFlashcards() {
       const cat = document.getElementById('filtroCategoriaFlashcard').value;
-      const filtrados = cat ? listaFlashcardsGlobal.filter(f => f.categoria === cat) : listaFlashcardsGlobal;
+      const base = filtrarPorOrigem(listaFlashcardsGlobal, 'filtroOrigemFlashcard');
+      const filtrados = cat ? base.filter(f => f.categoria === cat) : base;
       renderizarFlashcards(filtrados);
     }
 
@@ -4622,26 +6179,68 @@
         'Dominado': 'bg-green-100 text-emerald-700 border-green-200'
       };
 
-      el.innerHTML = lista.map(f => `
+      el.innerHTML = lista.map(f => {
+        const ehDono = ehDonoItem(f);
+        const podeEd = podeEditarItem(f);
+        const podeEx = podeExcluirItem(f);
+        const sharedBadge = renderizarBadgeCompartilhado(f);
+        return `
         <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
           <div>
-            <div class="flex justify-between items-center gap-2 mb-3">
-              <span class="text-xs font-semibold bg-slate-100 text-slate-700 px-2.5 py-1 rounded-md truncate" style="max-width: 65%;">${f.categoria}</span>
-              <span class="text-xs font-bold px-2.5 py-0.5 rounded-full border ${coresNivel[f.nivel] || coresNivel['Novo']}">${f.nivel}</span>
+            <div class="flex justify-between items-center gap-2 mb-2">
+              <span class="text-xs font-semibold bg-slate-100 text-slate-700 px-2.5 py-1 rounded-md truncate" style="max-width: 65%;">${escapeHtml(f.categoria)}</span>
+              <span class="text-xs font-bold px-2.5 py-0.5 rounded-full border ${coresNivel[f.nivel] || coresNivel['Novo']}">${escapeHtml(f.nivel)}</span>
             </div>
+            ${sharedBadge ? `<div class="mb-2">${sharedBadge}</div>` : ''}
             <p class="text-xs uppercase font-bold text-indigo-500 mb-1">Pergunta:</p>
-            <h4 class="font-bold text-slate-800 text-sm mb-3">${f.frente}</h4>
+            <h4 class="font-bold text-slate-800 text-sm mb-3">${escapeHtml(f.frente)}</h4>
             <div class="p-3 bg-slate-50 rounded-lg border border-gray-100">
               <p class="text-xs uppercase font-bold text-slate-400 mb-1">Resposta:</p>
-              <p class="text-xs text-slate-600">${f.verso}</p>
+              <p class="text-xs text-slate-600">${escapeHtml(f.verso)}</p>
             </div>
           </div>
           <div class="flex justify-between items-center pt-3 mt-3 border-t border-gray-100 text-xs text-gray-400">
-            <span>Última revisão: ${f.ultimaRevisao}</span>
-            <button type="button" onclick="deletarFlashcard('${f.id}')" class="text-red-500 hover:text-red-700 p-1"><i class="fa-solid fa-trash"></i></button>
+            <span>Última revisão: ${escapeHtml(f.ultimaRevisao)}</span>
+            <div class="flex items-center space-x-2">
+              ${ehDono ? `<button type="button" data-titulo="${escapeHtml(f.frente)}" onclick="abrirModalCompartilharItem('flashcard', '${f.id}', this.dataset.titulo)" class="text-emerald-600 hover:text-emerald-800 p-1" title="Compartilhar"><i class="fa-solid fa-share-nodes"></i></button>` : ''}
+              ${podeEd ? `<button type="button" onclick="abrirModalFlashcard('${f.id}')" class="text-indigo-600 hover:text-indigo-800 p-1" title="Editar"><i class="fa-solid fa-pen"></i></button>` : ''}
+              ${podeEx ? `<button type="button" onclick="deletarFlashcard('${f.id}')" class="text-red-500 hover:text-red-700 p-1" title="Excluir"><i class="fa-solid fa-trash"></i></button>` : ''}
+            </div>
           </div>
         </div>
-      `).join('');
+      `;
+      }).join('');
+    }
+
+    function abrirModalFlashcard(id = null) {
+      if (id) {
+        const fCheck = listaFlashcardsGlobal.find(x => x.id === id);
+        if (fCheck && !podeEditarItem(fCheck)) {
+          alert('Este flashcard está em modo somente leitura.');
+          return;
+        }
+      }
+      document.getElementById('formFlashcard').reset();
+      document.getElementById('flashcardId').value = '';
+      popularSeletorEspacoEscrita('flashcard', Boolean(id));
+
+      if (id) {
+        const f = listaFlashcardsGlobal.find(x => x.id === id);
+        if (f) {
+          document.getElementById('tituloModalFlashcard').innerHTML = '<i class="fa-solid fa-layer-group text-yellow-400 mr-2"></i>Editar Flashcard';
+          document.getElementById('flashcardId').value = f.id;
+          const catEl = document.getElementById('categoriaFlashcard');
+          if (catEl && f.categoria && !Array.from(catEl.options).some(o => o.value === f.categoria)) {
+            catEl.innerHTML += `<option value="${escapeHtml(f.categoria)}">${escapeHtml(f.categoria)}</option>`;
+          }
+          document.getElementById('categoriaFlashcard').value = f.categoria;
+          document.getElementById('frenteFlashcard').value = f.frente;
+          document.getElementById('versoFlashcard').value = f.verso;
+        }
+      } else {
+        document.getElementById('tituloModalFlashcard').innerHTML = '<i class="fa-solid fa-layer-group text-yellow-400 mr-2"></i>Novo Flashcard';
+      }
+      abrirModal('modalFlashcard');
     }
 
     function processarFlashcard(e) {
@@ -4649,7 +6248,10 @@
       const btn = document.getElementById('btnSalvarFlashcard');
       btn.innerText = 'A guardar...'; btn.disabled = true;
 
+      const fid = document.getElementById('flashcardId').value;
       const dados = {
+        id: fid,
+        ownerUserId: fid ? undefined : obterOwnerIdDoSeletor('ownerFlashcardSelect'),
         categoria: document.getElementById('categoriaFlashcard').value,
         frente: document.getElementById('frenteFlashcard').value,
         verso: document.getElementById('versoFlashcard').value
@@ -4657,21 +6259,30 @@
 
       google.script.run.withSuccessHandler(function(resp) {
         alert(resp.message);
-        fecharModal('modalFlashcard');
         btn.innerText = 'Guardar Cartão'; btn.disabled = false;
-        carregarFlashcards();
+        if (resp.success) {
+          fecharModal('modalFlashcard');
+          carregarFlashcards();
+        }
+      }).withFailureHandler(function(err) {
+        btn.innerText = 'Guardar Cartão'; btn.disabled = false;
+        alert(err.message || err);
       }).salvarFlashcard(dados);
     }
 
     function deletarFlashcard(id) {
       if (confirm('Excluir este flashcard?')) {
-        google.script.run.withSuccessHandler(() => carregarFlashcards()).excluirFlashcard(id);
+        google.script.run.withSuccessHandler(function(resp) {
+          if (resp && !resp.success && resp.message) alert(resp.message);
+          carregarFlashcards();
+        }).excluirFlashcard(id);
       }
     }
 
     function iniciarModoEstudoFlashcards() {
       const cat = document.getElementById('filtroCategoriaFlashcard').value;
-      filaEstudoFlashcards = cat ? listaFlashcardsGlobal.filter(f => f.categoria === cat) : [...listaFlashcardsGlobal];
+      const base = filtrarPorOrigem(listaFlashcardsGlobal, 'filtroOrigemFlashcard');
+      filaEstudoFlashcards = cat ? base.filter(f => f.categoria === cat) : [...base];
 
       if (filaEstudoFlashcards.length === 0) {
         alert("Não há flashcards disponíveis para praticar.");
@@ -4708,7 +6319,9 @@
 
     function avaliarFlashcardAtual(nivel) {
       const card = filaEstudoFlashcards[indiceFlashcardAtual];
-      google.script.run.atualizarNivelFlashcard(card.id, nivel);
+      if (podeEditarItem(card)) {
+        google.script.run.atualizarNivelFlashcard(card.id, nivel);
+      }
 
       if (indiceFlashcardAtual + 1 < filaEstudoFlashcards.length) {
         indiceFlashcardAtual++;
@@ -4734,7 +6347,8 @@
 
     function renderizarCursos() {
       const el = document.getElementById('listaCursos');
-      if (!listaCursosGlobal || listaCursosGlobal.length === 0) {
+      const filtrados = filtrarPorOrigem(listaCursosGlobal, 'filtroOrigemCurso');
+      if (!filtrados || filtrados.length === 0) {
         el.innerHTML = `<div class="col-span-full text-center py-12 bg-white rounded-xl border border-gray-200"><i class="fa-solid fa-graduation-cap text-4xl text-gray-300 mb-3"></i><p class="text-gray-500 font-medium">Nenhum curso registado.</p></div>`;
         return;
       }
@@ -4745,23 +6359,70 @@
         'Planejado': 'bg-gray-100 text-gray-600 border-gray-200'
       };
 
-      el.innerHTML = listaCursosGlobal.map(c => `
+      el.innerHTML = filtrados.map(c => {
+        const ehDono = ehDonoItem(c);
+        const podeEd = podeEditarItem(c);
+        const podeEx = podeExcluirItem(c);
+        const sharedBadge = renderizarBadgeCompartilhado(c);
+        return `
         <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
           <div>
             <div class="flex justify-between items-start gap-2 mb-2">
-              <span class="text-xs font-semibold px-2.5 py-1 rounded-full border ${statusBadges[c.status] || statusBadges['Em Andamento']}">${c.status}</span>
-              <span class="text-xs text-gray-400"><i class="fa-solid fa-clock mr-1"></i>${c.cargaHoraria}h</span>
+              <span class="text-xs font-semibold px-2.5 py-1 rounded-full border ${statusBadges[c.status] || statusBadges['Em Andamento']}">${escapeHtml(c.status)}</span>
+              <span class="text-xs text-gray-400"><i class="fa-solid fa-clock mr-1"></i>${escapeHtml(c.cargaHoraria)}h</span>
             </div>
-            <h3 class="font-bold text-slate-800 text-lg mb-1">${c.nome}</h3>
-            <p class="text-xs text-gray-500 mb-2"><i class="fa-solid fa-building mr-1"></i>${c.instituicao}</p>
-            <span class="text-xs bg-slate-100 text-slate-600 px-2.5 py-1 rounded-md font-medium">${c.categoria}</span>
+            <h3 class="font-bold text-slate-800 text-lg mb-1">${escapeHtml(c.nome)}</h3>
+            <p class="text-xs text-gray-500 mb-2"><i class="fa-solid fa-building mr-1"></i>${escapeHtml(c.instituicao)}</p>
+            <div class="flex flex-wrap items-center gap-1.5">
+              <span class="text-xs bg-slate-100 text-slate-600 px-2.5 py-1 rounded-md font-medium">${escapeHtml(c.categoria)}</span>
+              ${sharedBadge}
+            </div>
           </div>
           <div class="flex justify-between items-center pt-4 mt-4 border-t border-gray-100">
-            ${c.link ? `<a href="${c.link}" target="_blank" class="text-xs text-purple-600 hover:underline flex items-center space-x-1"><i class="fa-solid fa-up-right-from-square"></i> <span>Aceder ao Link</span></a>` : '<span></span>'}
-            <button type="button" onclick="deletarCurso('${c.id}')" class="text-xs text-red-500 hover:text-red-700 p-1"><i class="fa-solid fa-trash"></i> Excluir</button>
+            ${c.link ? `<a href="${escapeHtml(c.link)}" target="_blank" class="text-xs text-purple-600 hover:underline flex items-center space-x-1"><i class="fa-solid fa-up-right-from-square"></i> <span>Aceder ao Link</span></a>` : '<span></span>'}
+            <div class="flex items-center space-x-2">
+              ${ehDono ? `<button type="button" data-titulo="${escapeHtml(c.nome)}" onclick="abrirModalCompartilharItem('curso', '${c.id}', this.dataset.titulo)" class="text-xs text-emerald-600 hover:text-emerald-800 p-1" title="Compartilhar"><i class="fa-solid fa-share-nodes"></i></button>` : ''}
+              ${podeEd ? `<button type="button" onclick="abrirModalCurso('${c.id}')" class="text-xs text-indigo-600 hover:text-indigo-800 p-1" title="Editar"><i class="fa-solid fa-pen"></i></button>` : ''}
+              ${podeEx ? `<button type="button" onclick="deletarCurso('${c.id}')" class="text-xs text-red-500 hover:text-red-700 p-1"><i class="fa-solid fa-trash"></i> Excluir</button>` : ''}
+            </div>
           </div>
         </div>
-      `).join('');
+      `;
+      }).join('');
+    }
+
+    function abrirModalCurso(id = null) {
+      if (id) {
+        const cCheck = listaCursosGlobal.find(x => x.id === id);
+        if (cCheck && !podeEditarItem(cCheck)) {
+          alert('Este curso está em modo somente leitura.');
+          return;
+        }
+      }
+      document.getElementById('formCurso').reset();
+      document.getElementById('cursoId').value = '';
+      popularSeletorEspacoEscrita('curso', Boolean(id));
+
+      if (id) {
+        const c = listaCursosGlobal.find(x => x.id === id);
+        if (c) {
+          document.getElementById('tituloModalCurso').innerText = 'Editar Curso / Certificação';
+          document.getElementById('cursoId').value = c.id;
+          document.getElementById('nomeCurso').value = c.nome;
+          document.getElementById('instituicaoCurso').value = c.instituicao;
+          const catEl = document.getElementById('categoriaCurso');
+          if (catEl && c.categoria && !Array.from(catEl.options).some(o => o.value === c.categoria)) {
+            catEl.innerHTML += `<option value="${escapeHtml(c.categoria)}">${escapeHtml(c.categoria)}</option>`;
+          }
+          document.getElementById('categoriaCurso').value = c.categoria;
+          document.getElementById('cargaHorariaCurso').value = c.cargaHoraria;
+          document.getElementById('statusCurso').value = c.status;
+          document.getElementById('linkCurso').value = c.link || '';
+        }
+      } else {
+        document.getElementById('tituloModalCurso').innerText = 'Registar Curso / Certificação';
+      }
+      abrirModal('modalCurso');
     }
 
     function processarCurso(e) {
@@ -4769,7 +6430,10 @@
       const btn = document.getElementById('btnSalvarCurso');
       btn.innerText = 'A guardar...'; btn.disabled = true;
 
+      const cid = document.getElementById('cursoId').value;
       const dados = {
+        id: cid,
+        ownerUserId: cid ? undefined : obterOwnerIdDoSeletor('ownerCursoSelect'),
         nome: document.getElementById('nomeCurso').value,
         instituicao: document.getElementById('instituicaoCurso').value,
         categoria: document.getElementById('categoriaCurso').value,
@@ -4780,9 +6444,14 @@
 
       google.script.run.withSuccessHandler(function(resp) {
         alert(resp.message);
-        fecharModal('modalCurso');
         btn.innerText = 'Guardar Curso'; btn.disabled = false;
-        carregarCursos();
+        if (resp.success) {
+          fecharModal('modalCurso');
+          carregarCursos();
+        }
+      }).withFailureHandler(function(err) {
+        btn.innerText = 'Guardar Curso'; btn.disabled = false;
+        alert(err.message || err);
       }).salvarCurso(dados);
     }
 
@@ -5206,12 +6875,15 @@
     }
 
     // ================= 3. RASTREADOR DE HÁBITOS & GAMIFICAÇÃO =================
+    let listaHabitosGlobal = [];
+
     function carregarHabitos() {
       google.script.run.withSuccessHandler(renderizarPainelHabitos).getHabitosDados();
     }
 
     function renderizarPainelHabitos(dados) {
       if (!dados) return;
+      listaHabitosGlobal = dados.habitos || [];
 
       document.getElementById('habitoStreakGlobal').innerText = `${dados.streakGlobal || 0} dias`;
       document.getElementById('habitoConcluidosHoje').innerText = `${dados.concluidosHoje || 0} / ${dados.totalHabitos || 0} hábitos`;
@@ -5239,13 +6911,23 @@
       if (lista.length === 0) {
         tbody.innerHTML = `<tr><td colspan="10" class="text-center py-8 text-gray-400">Nenhum hábito cadastrado.</td></tr>`;
       } else {
-        tbody.innerHTML = lista.map(h => `
+        tbody.innerHTML = lista.map(h => {
+          const ehDono = ehDonoItem(h);
+          const podeEd = podeEditarItem(h);
+          const podeEx = podeExcluirItem(h);
+          const sharedBadge = renderizarBadgeCompartilhado(h);
+          return `
           <tr class="hover:bg-slate-50 transition-colors">
-            <td class="py-3 px-4 font-semibold text-slate-800 flex items-center space-x-2.5">
-              <span class="w-8 h-8 rounded-lg flex items-center justify-center text-white text-xs shadow-sm" style="background-color: ${h.cor};">
-                <i class="${h.icone}"></i>
-              </span>
-              <span>${h.nome}</span>
+            <td class="py-3 px-4 font-semibold text-slate-800">
+              <div class="flex items-center space-x-2.5">
+                <span class="w-8 h-8 rounded-lg flex items-center justify-center text-white text-xs shadow-sm flex-shrink-0" style="background-color: ${h.cor};">
+                  <i class="${h.icone}"></i>
+                </span>
+                <div class="min-w-0">
+                  <span class="block truncate">${escapeHtml(h.nome)}</span>
+                  ${sharedBadge ? `<div class="mt-0.5">${sharedBadge}</div>` : ''}
+                </div>
+              </div>
             </td>
             <td class="py-3 px-2 text-center">
               <span class="text-xs font-bold px-2 py-0.5 rounded-full ${h.streak > 0 ? 'bg-amber-100 text-amber-800' : 'bg-gray-100 text-gray-400'}">
@@ -5255,18 +6937,19 @@
             ${dias.map(d => {
               const feito = h.historico7d && h.historico7d[d.data];
               return `<td class="py-3 px-2 text-center">
-                <button type="button" onclick="alternarCheckHabito('${h.id}', '${d.data}')" class="w-7 h-7 rounded-full border-2 inline-flex items-center justify-center transition-all ${feito ? 'bg-emerald-500 border-emerald-500 text-white shadow-sm scale-105' : 'border-gray-300 text-transparent hover:border-emerald-400'}">
+                <button type="button" ${podeEd ? `onclick="alternarCheckHabito('${h.id}', '${d.data}')"` : 'disabled title="Somente leitura"'} class="w-7 h-7 rounded-full border-2 inline-flex items-center justify-center transition-all ${feito ? 'bg-emerald-500 border-emerald-500 text-white shadow-sm scale-105' : 'border-gray-300 text-transparent hover:border-emerald-400'} ${podeEd ? '' : 'opacity-60 cursor-not-allowed'}">
                   <i class="fa-solid fa-check text-xs"></i>
                 </button>
               </td>`;
             }).join('')}
-            <td class="py-3 px-3 text-right">
-              <button type="button" onclick="removerHabito('${h.id}')" class="text-gray-400 hover:text-red-500 p-1" title="Excluir hábito">
-                <i class="fa-solid fa-trash text-xs"></i>
-              </button>
+            <td class="py-3 px-3 text-right whitespace-nowrap space-x-1">
+              ${ehDono ? `<button type="button" data-titulo="${escapeHtml(h.nome)}" onclick="abrirModalCompartilharItem('habito', '${h.id}', this.dataset.titulo)" class="text-emerald-600 hover:text-emerald-800 p-1" title="Compartilhar hábito"><i class="fa-solid fa-share-nodes text-xs"></i></button>` : ''}
+              ${podeEd ? `<button type="button" onclick="abrirModalHabito('${h.id}')" class="text-indigo-600 hover:text-indigo-800 p-1" title="Editar hábito"><i class="fa-solid fa-pen text-xs"></i></button>` : ''}
+              ${podeEx ? `<button type="button" onclick="removerHabito('${h.id}')" class="text-gray-400 hover:text-red-500 p-1" title="Excluir hábito"><i class="fa-solid fa-trash text-xs"></i></button>` : ''}
             </td>
           </tr>
-        `).join('');
+        `;
+        }).join('');
       }
 
       // Renderiza Heatmap
@@ -5282,18 +6965,59 @@
     }
 
     function alternarCheckHabito(habitoId, dataStr) {
+      const h = listaHabitosGlobal.find(x => x.id === habitoId);
+      if (h && !podeEditarItem(h)) {
+        alert('Este hábito está em modo somente leitura.');
+        return;
+      }
       google.script.run.withSuccessHandler(() => carregarHabitos()).alternarRegistroHabito(habitoId, dataStr);
+    }
+
+    function abrirModalHabito(id = null) {
+      if (id) {
+        const hCheck = listaHabitosGlobal.find(x => x.id === id);
+        if (hCheck && !podeEditarItem(hCheck)) {
+          alert('Este hábito está em modo somente leitura.');
+          return;
+        }
+      }
+      document.getElementById('formNovoHabito').reset();
+      document.getElementById('habitoId').value = '';
+      popularSeletorEspacoEscrita('habito', Boolean(id));
+
+      if (id) {
+        const h = listaHabitosGlobal.find(x => x.id === id);
+        if (h) {
+          document.getElementById('tituloModalHabito').innerHTML = '<i class="fa-solid fa-fire text-amber-400"></i> <span>Editar Hábito</span>';
+          document.getElementById('btnSalvarHabito').innerText = 'Salvar Alterações';
+          document.getElementById('habitoId').value = h.id;
+          document.getElementById('nomeHabitoInput').value = h.nome;
+          document.getElementById('iconeHabitoInput').value = h.icone || 'fa-solid fa-fire';
+          document.getElementById('corHabitoInput').value = h.cor || '#10b981';
+        }
+      } else {
+        document.getElementById('tituloModalHabito').innerHTML = '<i class="fa-solid fa-fire text-amber-400"></i> <span>Criar Hábito Diário</span>';
+        document.getElementById('btnSalvarHabito').innerText = 'Adicionar Hábito';
+      }
+      abrirModal('modalNovoHabito');
     }
 
     function processarNovoHabito(e) {
       e.preventDefault();
+      const hid = document.getElementById('habitoId').value;
       const dados = {
+        id: hid || undefined,
+        ownerUserId: hid ? undefined : obterOwnerIdDoSeletor('ownerHabitoSelect'),
         nome: document.getElementById('nomeHabitoInput').value,
         icone: document.getElementById('iconeHabitoInput').value,
         cor: document.getElementById('corHabitoInput').value,
         metaSemanal: 7
       };
-      google.script.run.withSuccessHandler(() => {
+      google.script.run.withSuccessHandler((resp) => {
+        if (resp && !resp.success) {
+          alert(resp.message || 'Erro ao salvar hábito.');
+          return;
+        }
         fecharModal('modalNovoHabito');
         carregarHabitos();
       }).salvarHabito(dados);

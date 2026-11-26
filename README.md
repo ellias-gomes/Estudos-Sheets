@@ -22,6 +22,8 @@ Transformação do sistema do Google Apps Script / Google Sheets para uma aplica
 - **🎯 Matriz de Eisenhower**: Página dedicada para priorização de tarefas por Urgência × Importância nos 4 quadrantes (Fazer Agora, Agendar, Delegar e Eliminar/Postergar) + Caixa de Entrada com arrastar e soltar (SortableJS) e classificação em 1 clique.
 - **🏷️ Tarefas por Categoria**: Filtro por categoria, busca textual, barra rápida de categorias e modo de visualização "Por Categoria" integrado às visualizações Lista e Kanban.
 - **🌙 Modo Noturno (Dark Mode)**: Alternância instantânea no cabeçalho com persistência em `localStorage` sem flash ao recarregar e adaptação visual completa de todos os módulos, modais, editor Quill, FullCalendar, Chart.js, Kanban, Matriz de Eisenhower e Heatmap.
+- **🔐 Sistema de Login Multi-Usuário & Isolamento Individual**: Cadastro e autenticação por e-mail/senha com sessões `HttpOnly`, isolamento total de anotações, tarefas, hábitos, cursos, mídias, flashcards, pomodoro e backups por usuário, além de migração automática com backup de segurança para contas legadas.
+- **🤝 Compartilhamento Híbrido & Permissões Granulares**: Compartilhe itens individuais, categorias inteiras ou módulos completos entre usuários cadastrados com 4 perfis (`Visualização`, `Edição`, `Escrita/Colaboração` e `Controle Total`) ou permissões granulares personalizadas, além de revogação e saída a qualquer momento.
 
 ---
 
@@ -80,6 +82,7 @@ O navegador abrirá automaticamente em:
 ```text
 .
 ├── app.py              # Servidor Web FastAPI e endpoints da API
+├── auth.py             # Autenticação, hash de senhas e gestão de sessões (cookies HttpOnly)
 ├── db.py               # Gerenciador do Banco de Dados SQLite (study_hub.db)
 ├── importer.py         # Módulo de importação de planilhas (.xlsx e .json) e exportação
 ├── start.py            # Inicializador automático com abertura de navegador

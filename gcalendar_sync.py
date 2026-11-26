@@ -42,8 +42,8 @@ def get_or_create_study_calendar(service):
         # Fallback para a agenda principal se falhar
         return 'primary'
 
-def sincronizar_tarefas_google_calendar():
-    """Envia tarefas pendentes com prazo para o Google Calendar."""
+def sincronizar_tarefas_google_calendar(user_id: int):
+    """Envia tarefas pendentes com prazo do usuário para o Google Calendar."""
     service, err = get_calendar_service()
     if err:
         return {"success": False, "message": err}
@@ -51,7 +51,10 @@ def sincronizar_tarefas_google_calendar():
     try:
         conn = get_connection()
         cursor = conn.cursor()
-        cursor.execute("SELECT * FROM tarefas WHERE prazo IS NOT NULL AND prazo != '' AND status != 'Concluído'")
+        cursor.execute(
+            "SELECT * FROM tarefas WHERE user_id = ? AND prazo IS NOT NULL AND prazo != '' AND status != 'Concluído'",
+            (user_id,),
+        )
         tarefas = cursor.fetchall()
         conn.close()
 
